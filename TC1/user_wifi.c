@@ -76,7 +76,7 @@ void WifiScanCallback(ScanResult_adv* scan_ret, void* arg)
     int i = 0;
     wifi_ret = malloc(sizeof(char)*count * (32 + 2) + 50);
     char* ssids = malloc(sizeof(char)*count * 32);
-    char* secs = malloc(sizeof(char)*count * 2);
+    char* secs = malloc(sizeof(char)*count * 2 + 1);
     char* tmp1 = ssids;
     char* tmp2 = secs;
     for (; i < count; i++)
@@ -85,7 +85,7 @@ void WifiScanCallback(ScanResult_adv* scan_ret, void* arg)
         if (strstr(ssid, "'") || strstr(ssid, "\"")) continue;
         sprintf(tmp1, "'%s',", ssid);
         tmp1 += (strlen(ssid) + 3);
-        sprintf(tmp2, "%d,", scan_ret->ApList[i].security);
+        sprintf(tmp2, "%d,", scan_ret->ApList[i].security%10);
         tmp2 += 2;
     }
     *(--tmp1) = 0;

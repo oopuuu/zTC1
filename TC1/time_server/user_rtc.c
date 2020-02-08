@@ -20,62 +20,48 @@ OSStatus user_sntp_get_time()
     char ** pptr = NULL;
     struct in_addr ipp;
 
-//  mico_rtc_time_t rtc_time;
-
-    hostent_content = gethostbyname("pool.ntp.org");
-    pptr = hostent_content->h_addr_list;
     ipp.s_addr = 0xd248912c;
     err = sntp_get_time(&ipp, &current_time);
+
     if (err != kNoErr)
     {
-        os_log("sntp_get_time err = %d.", err);
-        ipp.s_addr = *(uint32_t *) (*pptr);
-        err = sntp_get_time(&ipp, &current_time);
-    }
-    if (err != kNoErr)
-    {
-        os_log("sntp_get_time0 err = %d.", err);
-        hostent_content = gethostbyname("cn.ntp.org.cn");
-        pptr = hostent_content->h_addr_list;
-        ipp.s_addr = *(uint32_t *) (*pptr);
-        err = sntp_get_time(&ipp, &current_time);
-    }
-    if (err != kNoErr)
-    {
-        os_log("sntp_get_time1 err = %d.", err);
-        hostent_content = gethostbyname("cn.pool.ntp.org");
-        pptr = hostent_content->h_addr_list;
-        ipp.s_addr = *(uint32_t *) (*pptr);
-        err = sntp_get_time(&ipp, &current_time);
-    }
-    if (err != kNoErr)
-    {
-        os_log("sntp_get_time2 err = %d.", err);
-        hostent_content = gethostbyname("s1a.time.edu.cn");
-        pptr = hostent_content->h_addr_list;
-        ipp.s_addr = *(uint32_t *) (*pptr);
-        err = sntp_get_time(&ipp, &current_time);
-    }
-    if (err != kNoErr)
-    {
-        os_log("sntp_get_time3 err = %d.", err);
-        hostent_content = gethostbyname("ntp.sjtu.edu.cn");
-        pptr = hostent_content->h_addr_list;
-        ipp.s_addr = *(uint32_t *) (*pptr);
-        err = sntp_get_time(&ipp, &current_time);
+        int ntp_count = 5;
+        char* ntp_hosts[5] = {
+            "pool.ntp.org",
+            "cn.ntp.org.cn",
+            "cn.pool.ntp.org",
+            "s1a.time.edu.cn",
+            "ntp.sjtu.edu.cn",
+        };
+
+        int i = 0;
+        for (; i < ntp_count; i++)
+        {
+            hostent_content = gethostbyname(ntp_hosts[i]);
+            if (hostent_content == NULL)
+            {
+                os_log("gethostbyname(%s)", ntp_hosts[i]);
+                continue;
+            }
+            pptr = hostent_content->h_addr_list;
+            ipp.s_addr = *(uint32_t *)(*pptr);
+            err = sntp_get_time(&ipp, &current_time);
+            if (err == kNoErr)
+            {
+                break;
+            }
+        }
     }
 
-    if (err == kNoErr)
+    if (err != kNoErr)
     {
-        mico_utc_time_ms_t utc_time_ms = (uint64_t) current_time.seconds * (uint64_t) 1000
-                                         + (current_time.microseconds / 1000);
-        mico_time_set_utc_time_ms(&utc_time_ms);
-    }
-    else
-    {
-        os_log("sntp_get_time4 err = %d.", err);
+        os_log("sntp_get_time4 err[%d]", err);
         return err;
     }
+
+    mico_utc_time_ms_t utc_time_ms = (uint64_t)current_time.seconds * (uint64_t)1000
+        + (current_time.microseconds / 1000);
+    mico_time_set_utc_time_ms(&utc_time_ms);
     return kNoErr;
 }
 

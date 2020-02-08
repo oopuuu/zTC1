@@ -318,8 +318,9 @@ void mqtt_client_thread(mico_thread_arg_t arg)
 
         rc = NewNetwork(&n, MQTT_SERVER, MQTT_SERVER_PORT, ssl_settings);
         if (rc == MQTT_SUCCESS) break;
-        mqtt_log("ERROR: MQTT network connection err=%d, reconnect after 3s...", rc);
 
+        //暂时去掉这个日志
+        //mqtt_log("ERROR: MQTT network connection err=%d, reconnect after 3s...", rc);
     }
     mqtt_log("MQTT network connection success!");
 
