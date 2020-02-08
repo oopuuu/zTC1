@@ -43,7 +43,7 @@
 </head>
 <body>
 <fieldset class="socket">
-    <legend>Power Controll</legend>
+    <legend>Power Control</legend>
     <table id="socket_tb">
         <tr>
             <td>
@@ -170,6 +170,10 @@
     <legend>System Status</legend>
     <table>
         <tr>
+            <td class="right">Version:</td>
+            <td class="info" id="version"></td>
+        </tr>
+        <tr>
             <td class="right">IP:</td>
             <td class="info" id="ip"></td>
         </tr>
@@ -215,7 +219,7 @@
             <th>On</th>
         </tr>
         <tr>
-            <td colspan="4">Plese Sync</td>
+            <td colspan="4">Please Sync</td>
         </tr>
     </table>
     <button onclick="GetTimedTask()">Sync</button>
@@ -292,6 +296,7 @@ var mode_rd2 = document.getElementById("mode2");
 var mqtt_addr_ipt = document.getElementById("mqtt_addr");
 var mqtt_port_ipt = document.getElementById("mqtt_port");
 
+var info_version = document.getElementById("version");
 var info_ip = document.getElementById("ip");
 var info_mask = document.getElementById("mask");
 var info_gateway = document.getElementById("gateway");
@@ -320,6 +325,7 @@ HttpGet("/status", function (re) {
         mqtt_addr_ipt.value = status.mqtt_addr;
         mqtt_port_ipt.value = status.mqtt_port;
 
+        info_version.innerHTML = status.version;
         info_ip.innerHTML = status.ip;
         info_mask.innerHTML = status.mask;
         info_gateway.innerHTML = status.gateway;
