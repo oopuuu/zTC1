@@ -519,7 +519,7 @@ OSStatus user_mqtt_send_socket_state(char socket_id)
     if (send_buf != NULL && topic_buf != NULL)
     {
         sprintf(topic_buf, "homeassistant/switch/%s/socket_%d/state", strMac, (int)socket_id);
-        sprintf(send_buf, "{\"mac\":\"%s\",\"socket_%d\":{\"on\":%d}}", strMac, socket_id, (int)user_config->socket[(int)socket_id].on);
+        sprintf(send_buf, "{\"mac\":\"%s\",\"socket_%d\":{\"on\":%d}}", strMac, socket_id, (int)user_config->socket_configs[(int)socket_id].on);
         oss_status = user_mqtt_send_topic(topic_buf, send_buf, 1);
     }
     if (send_buf) free(send_buf);
@@ -568,7 +568,7 @@ void user_mqtt_hass_auto_name(char socket_id)
                  "\"pl_on\":\"{\\\"mac\\\":\\\"%s\\\",\\\"socket_%d\\\":{\\\"on\\\":1}}\","
                  "\"pl_off\":\"{\\\"mac\\\":\\\"%s\\\",\\\"socket_%d\\\":{\\\"on\\\":0}}\""
                  "}",
-                 user_config->socket[(int)socket_id].name, strMac, socket_id, strMac, socket_id, strMac, socket_id);
+                 user_config->socket_configs[(int)socket_id].name, strMac, socket_id, strMac, socket_id, strMac, socket_id);
         user_mqtt_send_topic(topic_buf, send_buf, 0);
     }
     if (send_buf)

@@ -57,7 +57,7 @@ typedef struct
     char mqtt_password[SETTING_MQTT_STRING_LENGTH_MAX];  //mqtt service user
 //  char mqtt_device_id[SETTING_MQTT_STRING_LENGTH_MAX]; //mqtt service user device name
     char version;
-    user_socket_config_t socket[SOCKET_NUM];
+    user_socket_config_t socket_configs[SOCKET_NUM];
     char user[maxNameLen];
     WiFiEvent last_wifi_status;
 } user_config_t;

@@ -24,7 +24,7 @@ bool RelayOut(void)
     int i;
     for (i = 0; i < SOCKET_NUM; i++)
     {
-        if (user_config->socket[i].on != 0)
+        if (user_config->socket_configs[i].on != 0)
         {
             return true;
         }
@@ -35,12 +35,12 @@ bool RelayOut(void)
 const unsigned char* GetSocketStatus()
 {
     sprintf(socket_status, "%d,%d,%d,%d,%d,%d",
-        user_config->socket[0].on,
-        user_config->socket[1].on,
-        user_config->socket[2].on,
-        user_config->socket[3].on,
-        user_config->socket[4].on,
-        user_config->socket[5].on);
+        user_config->socket_configs[0].on,
+        user_config->socket_configs[1].on,
+        user_config->socket_configs[2].on,
+        user_config->socket_configs[3].on,
+        user_config->socket_configs[4].on,
+        user_config->socket_configs[5].on);
     return (const unsigned char*)socket_status;
 }
 
@@ -74,7 +74,7 @@ void UserRelaySet(unsigned char i, unsigned char on)
         MicoGpioOutputLow(relay[i]);
     }
 
-    user_config->socket[i].on = on;
+    user_config->socket_configs[i].on = on;
 
     if (RelayOut())
     {

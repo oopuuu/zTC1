@@ -251,10 +251,10 @@ bool json_socket_analysis(int udp_flag, unsigned char x, cJSON * pJsonRoot, cJSO
                 if (cJSON_IsString(p_socket_setting_name))
                 {
                     return_flag = true;
-                    sprintf(user_config->socket[x].name, p_socket_setting_name->valuestring);
+                    sprintf(user_config->socket_configs[x].name, p_socket_setting_name->valuestring);
                     user_mqtt_hass_auto_name(x);
                 }
-                cJSON_AddStringToObject(json_socket_setting_send, "name", user_config->socket[x].name);
+                cJSON_AddStringToObject(json_socket_setting_send, "name", user_config->socket_configs[x].name);
             }
 
             //解析socket中setting中task----------------------------------------
@@ -267,7 +267,7 @@ bool json_socket_analysis(int udp_flag, unsigned char x, cJSON * pJsonRoot, cJSO
             cJSON_AddItemToObject(json_socket_send, "setting", json_socket_setting_send);
         }
     }
-    cJSON_AddNumberToObject(json_socket_send, "on", user_config->socket[x].on);
+    cJSON_AddNumberToObject(json_socket_send, "on", user_config->socket_configs[x].on);
 
     cJSON_AddItemToObject(pJsonSend, socket_str, json_socket_send);
     return return_flag;
@@ -308,19 +308,19 @@ bool json_socket_task_analysis(unsigned char x, unsigned char y, cJSON * pJsonRo
              && cJSON_IsNumber(p_socket_task_on))
         {
             return_flag = true;
-            user_config->socket[x].time_tasks[y].hour = p_socket_task_hour->valueint;
-            user_config->socket[x].time_tasks[y].minute = p_socket_task_minute->valueint;
-            user_config->socket[x].time_tasks[y].repeat = p_socket_task_repeat->valueint;
-            user_config->socket[x].time_tasks[y].action = p_socket_task_action->valueint;
-            user_config->socket[x].time_tasks[y].on = p_socket_task_on->valueint;
+            user_config->socket_configs[x].time_tasks[y].hour = p_socket_task_hour->valueint;
+            user_config->socket_configs[x].time_tasks[y].minute = p_socket_task_minute->valueint;
+            user_config->socket_configs[x].time_tasks[y].repeat = p_socket_task_repeat->valueint;
+            user_config->socket_configs[x].time_tasks[y].action = p_socket_task_action->valueint;
+            user_config->socket_configs[x].time_tasks[y].on = p_socket_task_on->valueint;
         }
 
     }
-    cJSON_AddNumberToObject(json_socket_task_send, "hour", user_config->socket[x].time_tasks[y].hour);
-    cJSON_AddNumberToObject(json_socket_task_send, "minute", user_config->socket[x].time_tasks[y].minute);
-    cJSON_AddNumberToObject(json_socket_task_send, "repeat", user_config->socket[x].time_tasks[y].repeat);
-    cJSON_AddNumberToObject(json_socket_task_send, "action", user_config->socket[x].time_tasks[y].action);
-    cJSON_AddNumberToObject(json_socket_task_send, "on", user_config->socket[x].time_tasks[y].on);
+    cJSON_AddNumberToObject(json_socket_task_send, "hour", user_config->socket_configs[x].time_tasks[y].hour);
+    cJSON_AddNumberToObject(json_socket_task_send, "minute", user_config->socket_configs[x].time_tasks[y].minute);
+    cJSON_AddNumberToObject(json_socket_task_send, "repeat", user_config->socket_configs[x].time_tasks[y].repeat);
+    cJSON_AddNumberToObject(json_socket_task_send, "action", user_config->socket_configs[x].time_tasks[y].action);
+    cJSON_AddNumberToObject(json_socket_task_send, "on", user_config->socket_configs[x].time_tasks[y].on);
 
     cJSON_AddItemToObject(pJsonSend, socket_task_str, json_socket_task_send);
     return return_flag;
