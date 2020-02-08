@@ -3,7 +3,6 @@
 #include "main.h"
 #include "mico_socket.h"
 #include "user_gpio.h"
-#include "time_server/user_sntp.h"
 #include "mqtt_server/user_function.h"
 #include "http_server/web_log.h"
 

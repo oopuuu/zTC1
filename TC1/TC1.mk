@@ -30,7 +30,6 @@ $(NAME)_SOURCES := main.c\
 				   user_wifi.c\
 				   user_gpio.c\
 				   user_udp.c\
-				   time_server/user_sntp.c\
 				   time_server/user_rtc.c\
 				   mqtt_server/user_mqtt_client.c\
 				   ota_server/user_ota.c\
