@@ -11,7 +11,7 @@
 
 #define ZTC1_NAME "zTC1-%s"
 
-#define USER_CONFIG_VERSION 2
+#define USER_CONFIG_VERSION 3
 #define SETTING_MQTT_STRING_LENGTH_MAX 32 //必须4字节对齐。
 
 #define SOCKET_NAME_LENGTH   32
@@ -41,12 +41,11 @@ typedef struct
 //用户保存参数结构体
 typedef struct
 {
+    char version;
     char mqtt_ip[SETTING_MQTT_STRING_LENGTH_MAX];        //mqtt service ip
     int mqtt_port;                                       //mqtt service port
     char mqtt_user[SETTING_MQTT_STRING_LENGTH_MAX];      //mqtt service user
     char mqtt_password[SETTING_MQTT_STRING_LENGTH_MAX];  //mqtt service user
-//  char mqtt_device_id[SETTING_MQTT_STRING_LENGTH_MAX]; //mqtt service user device name
-    char version;
     user_socket_config_t socket_configs[SOCKET_NUM];
     char user[maxNameLen];
     WiFiEvent last_wifi_status;
