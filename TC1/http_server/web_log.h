@@ -24,6 +24,7 @@ char* GetLogRecord();
 #define web_log(format, ...)                           \
     LOG_TMP = (char*)malloc(sizeof(char)*LOG_LEN);     \
     now = time(NULL); \
+    now += 28800; \
     strftime(time_buf, TIM_LEN, "[%Y-%m-%d %H:%M:%S]", localtime(&now)); \
     snprintf(LOG_TMP, LOG_LEN, "%s"format, time_buf, ##__VA_ARGS__); \
     SetLogRecord(&log_record, LOG_TMP);                \
