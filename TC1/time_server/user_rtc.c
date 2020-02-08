@@ -82,12 +82,9 @@ OSStatus user_rtc_init(void)
 
 void rtc_thread(mico_thread_arg_t arg)
 {
-    int i, j;
-    char task_flag[SOCKET_NUM] = { -1, -1, -1, -1, -1, -1 };   //记录每个插座哪个任务需要返回数据
     OSStatus err = kUnknownErr;
     LinkStatusTypeDef LinkStatus;
     mico_rtc_time_t rtc_time;
-
 
     mico_utc_time_t utc_time;
     mico_utc_time_t utc_time_last = 0;
@@ -104,7 +101,6 @@ void rtc_thread(mico_thread_arg_t arg)
                 break;
             }
         }
-
         mico_rtos_thread_sleep(3);
     }
 
@@ -131,88 +127,6 @@ void rtc_thread(mico_thread_arg_t arg)
 
         // MicoRtcSetTime(&rtc_time);      //MicoRtc不自动走时!
 
-        //if (rtc_time.sec == 0)
-        //os_log("time1:20%02d/%02d/%02d %d %02d:%02d:%02d",rtc_time.year,rtc_time.month,rtc_time.date,rtc_time.weekday,rtc_time.hr,rtc_time.min,rtc_time.sec);
-
-        char update_user_config_flag = 0;
-        for (i = 0; i < SOCKET_NUM; i++)
-        {
-            for (j = 0; j < 5; j++)
-            {
-                if (user_config->socket_configs[i].time_tasks[j].on != 0)
-                {
-
-                    char repeat = user_config->socket_configs[i].time_tasks[j].repeat;
-                    if ( //符合条件则改变继电器状态: 秒为0 时分符合设定值, 重复符合设定值
-                    rtc_time.sec == 0 && rtc_time.min == user_config->socket_configs[i].time_tasks[j].minute
-                    && rtc_time.hr == user_config->socket_configs[i].time_tasks[j].hour
-                    && ((repeat == 0x00) || repeat & (1 << (rtc_time.weekday - 1)))
-                  )
-                    {
-                        if (user_config->socket_configs[i].on != user_config->socket_configs[i].time_tasks[j].action)
-                        {
-                            UserRelaySet(i, user_config->socket_configs[i].time_tasks[j].action);
-                            update_user_config_flag = 1;
-                            user_mqtt_send_socket_state(i);
-                        }
-                        if (repeat == 0x00)
-                        {
-                            task_flag[i] = j;
-                            user_config->socket_configs[i].time_tasks[j].on = 0;
-                            update_user_config_flag = 1;
-                        }
-                    }
-                }
-            }
-        }
-
-        //更新储存数据 更新定时任务数据
-        if (update_user_config_flag == 1)
-        {
-            os_log("update_user_config_flag");
-            mico_system_context_update(sys_config);
-            update_user_config_flag = 0;
-
-            cJSON *json_send = cJSON_CreateObject();
-            cJSON_AddStringToObject(json_send, "mac", strMac);
-
-            for (i = 0; i < SOCKET_NUM; i++)
-            {
-                char strTemp1[] = "socket_X";
-                strTemp1[5] = i + '0';
-                cJSON *json_send_socket = cJSON_CreateObject();
-                cJSON_AddNumberToObject(json_send_socket, "on", user_config->socket_configs[i].on);
-
-                if (task_flag[i] >= 0)
-                {
-                    cJSON *json_send_socket_setting = cJSON_CreateObject();
-
-                    j = task_flag[i];
-                    char strTemp2[] = "task_X";
-                    strTemp2[5] = j + '0';
-                    cJSON *json_send_socket_task = cJSON_CreateObject();
-                    cJSON_AddNumberToObject(json_send_socket_task, "hour", user_config->socket_configs[i].time_tasks[j].hour);
-                    cJSON_AddNumberToObject(json_send_socket_task, "minute", user_config->socket_configs[i].time_tasks[j].minute);
-                    cJSON_AddNumberToObject(json_send_socket_task, "repeat", user_config->socket_configs[i].time_tasks[j].repeat);
-                    cJSON_AddNumberToObject(json_send_socket_task, "action", user_config->socket_configs[i].time_tasks[j].action);
-                    cJSON_AddNumberToObject(json_send_socket_task, "on", user_config->socket_configs[i].time_tasks[j].on);
-                    cJSON_AddItemToObject(json_send_socket_setting, strTemp2, json_send_socket_task);
-
-                    cJSON_AddItemToObject(json_send_socket, "setting", json_send_socket_setting);
-
-                    task_flag[i] = -1;
-                }
-                cJSON_AddItemToObject(json_send, strTemp1, json_send_socket);
-            }
-
-            char *json_str = cJSON_Print(json_send);
-            user_send(false, json_str);    //发送数据
-
-            free(json_str);
-            cJSON_Delete(json_send);
-//          os_log("cJSON_Delete");
-        }
-
         //SNTP服务 开机及每小时校准一次
         if (rtc_init != 1 || (rtc_time.sec == 0 && rtc_time.min == 0))
         {
@@ -226,8 +140,6 @@ void rtc_thread(mico_thread_arg_t arg)
                     rtc_init = 2;
             }
         }
-
-
 
         mico_rtos_thread_msleep(900);
     }

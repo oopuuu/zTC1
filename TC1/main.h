@@ -34,18 +34,8 @@
 
 typedef struct
 {
-    char hour;   //小时
-    char minute; //分钟
-    char repeat; //bit7:一次 bit6-0:周日-周一
-    char action; //动作
-    char on;     //开关
-} user_socket_task_config_t;
-
-typedef struct
-{
     char name[SOCKET_NAME_LENGTH];
     char on;    //记录当前开关
-    user_socket_task_config_t time_tasks[5];
 } user_socket_config_t;
 
 //用户保存参数结构体

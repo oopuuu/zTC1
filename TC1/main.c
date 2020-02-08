@@ -40,7 +40,7 @@ void appRestoreDefault_callback(void * const user_config_data, uint32_t size)
     userConfigDefault->mqtt_password[0] = 0;
     userConfigDefault->version = USER_CONFIG_VERSION;
 
-    int i, j;
+    int i;
     for (i = 0; i < SOCKET_NUM; i++)
     {
         userConfigDefault->socket_configs[i].on = 1;
@@ -54,15 +54,6 @@ void appRestoreDefault_callback(void * const user_config_data, uint32_t size)
         userConfigDefault->socket_configs[i].name[6] = i + '1';
         userConfigDefault->socket_configs[i].name[7] = 0;
         //sprintf(userConfigDefault->socket[i].name, "插座%d", i);//编码异常
-
-        for (j = 0; j < 5; j++)
-        {
-            userConfigDefault->socket_configs[i].time_tasks[j].hour = 0;
-            userConfigDefault->socket_configs[i].time_tasks[j].minute = 0;
-            userConfigDefault->socket_configs[i].time_tasks[j].repeat = 0x00;
-            userConfigDefault->socket_configs[i].time_tasks[j].on = 0;
-            userConfigDefault->socket_configs[i].time_tasks[j].action = 1;
-        }
     }
     //mico_system_context_update(sys_config);
 }
@@ -106,9 +97,7 @@ int application_start(void)
     }
     MicoSysLed(0);
 
-    if (user_config->version != USER_CONFIG_VERSION
-        || user_config->socket_configs[0].time_tasks[0].hour < 0
-        || user_config->socket_configs[0].time_tasks[0].hour > 23)
+    if (user_config->version != USER_CONFIG_VERSION)
     {
         os_log("WARNGIN: user params restored!");
         err = mico_system_context_restore(sys_config);
