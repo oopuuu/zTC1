@@ -112,7 +112,7 @@ static void PowerIrqHandler(void* arg)
     }
     else
     {
-        os_log("PowerIrqHandler error past_ns[%ld] t_x[%ld] rest_x_ns[%ld]", past_ns, t_x, rest_x_ns);
+        os_log("PowerIrqHandler error past_ns[%llu] t_x[%llu] rest_x_ns[%llu]", past_ns, t_x, rest_x_ns);
         //一般不会出现这种情况, 所以不管了...哈哈哈~
         SetPowerRecord(&power_record, 123456);
         SetPowerRecord(&power_record, past_ns);
