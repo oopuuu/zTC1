@@ -32,6 +32,14 @@ typedef struct {
     char mask[16];
 } IpStatus;
 
+typedef struct {
+    char ssid[32];
+    char bssid[6];
+    char channel;
+    wlan_sec_type_t security;
+    int16_t rssi;
+} ApInfo;
+
 extern IpStatus ip_status;
 
 extern void WifiInit(void);

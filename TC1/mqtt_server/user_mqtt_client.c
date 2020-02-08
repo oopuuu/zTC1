@@ -311,7 +311,7 @@ void mqtt_client_thread(mico_thread_arg_t arg)
         micoWlanGetLinkStatus(&LinkStatus);
         if (LinkStatus.is_connected != 1)
         {
-            mqtt_log("ERROR:WIFI not connection , waiting 3s for connecting and then connecting MQTT ");
+            mqtt_log("ERROR:WIFI not connect, waiting 3s for connecting and then connecting MQTT ");
             mico_rtos_thread_sleep(3);
             continue;
         }
