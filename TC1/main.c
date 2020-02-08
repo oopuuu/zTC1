@@ -10,7 +10,7 @@
 #include "http_server/app_httpd.h"
 #include "timed_task/timed_task.h"
 
-#define os_log(format, ...) custom_log("TC1", format, ##__VA_ARGS__); web_log(format, ##__VA_ARGS__)
+#define os_log(format, ...) do { custom_log("TC1", format, ##__VA_ARGS__); web_log(format, ##__VA_ARGS__) } while(0)
 
 char rtc_init = 0; //sntp校时成功标志位
 uint32_t total_time = 0;

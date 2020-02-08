@@ -1,5 +1,5 @@
 #include "http_server/web_log.h"
-#define os_log(format, ...) custom_log("SNTP", format, ##__VA_ARGS__); web_log(format, ##__VA_ARGS__)
+#define os_log(format, ...) do { custom_log("SNTP", format, ##__VA_ARGS__); web_log(format, ##__VA_ARGS__) } while(0)
 
 #include "main.h"
 //#include "user_gpio.h"

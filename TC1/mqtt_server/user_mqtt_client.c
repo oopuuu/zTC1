@@ -20,8 +20,8 @@
  */
 #include "http_server/web_log.h"
 
-#define app_log(M, ...) custom_log("APP", M, ##__VA_ARGS__); web_log(M, ##__VA_ARGS__)
-#define mqtt_log(M, ...) custom_log("MQTT", M, ##__VA_ARGS__); web_log(M, ##__VA_ARGS__)
+#define app_log(M, ...) do { custom_log("APP", M, ##__VA_ARGS__); web_log(M, ##__VA_ARGS__) } while(0)
+#define mqtt_log(M, ...) do { custom_log("MQTT", M, ##__VA_ARGS__); web_log(M, ##__VA_ARGS__) } while(0)
 
 #include "main.h"
 #include "mico.h"
@@ -210,7 +210,7 @@ OSStatus user_mqtt_init(void)
     require_noerr_string(err, exit, "ERROR: Unable to start the mqtt client worker thread.");
 
     exit:
-    if (kNoErr != err) app_log("ERROR, app thread exit err: %d", err);
+    if (kNoErr != err) app_log("ERROR2, app thread exit err: %d kNoErr[%d]", err, kNoErr);
     return err;
 }
 

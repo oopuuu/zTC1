@@ -1,5 +1,5 @@
 #include "http_server/web_log.h"
-#define os_log(format, ...)  custom_log("UDP", format, ##__VA_ARGS__); web_log(format, ##__VA_ARGS__)
+#define os_log(format, ...) do { custom_log("UDP", format, ##__VA_ARGS__); web_log(format, ##__VA_ARGS__) } while(0)
 
 #include "main.h"
 #include "mqtt_server/user_function.h"
@@ -29,7 +29,7 @@ OSStatus user_udp_init(void)
                                    0x1000, 0);
     require_noerr_string(err, exit, "ERROR: Unable to start the rtc thread.");
 
-    if (kNoErr != err) os_log("ERROR, app thread exit err: %d", err);
+    if (kNoErr != err) os_log("ERROR3, app thread exit err: %d kNoErr[%d]", err, kNoErr);
 
     exit:
     return err;
