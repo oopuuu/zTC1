@@ -16,7 +16,6 @@
 
 #define SOCKET_NAME_LENGTH   32
 #define SOCKET_NUM           6  //插座数量
-#define SOCKET_TIME_TASK_NUM 5  //每个插座最多5组定时任务
 
 #define Led    MICO_GPIO_5
 #define Button MICO_GPIO_23
@@ -46,7 +45,7 @@ typedef struct
 {
     char name[SOCKET_NAME_LENGTH];
     char on;    //记录当前开关
-    user_socket_task_config_t task[SOCKET_TIME_TASK_NUM];
+    user_socket_task_config_t time_tasks[5];
 } user_socket_config_t;
 
 //用户保存参数结构体

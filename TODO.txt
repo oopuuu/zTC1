@@ -1,8 +1,5 @@
 
-1. AP名拼Mac地址
-2. 添加定时任务
-3. 登录
-4. ota进度
-5. 时区问题
-6. station改回ap
-7. mqtt
+1. 登录
+2. ota进度
+3. station改回ap
+4. mqtt
