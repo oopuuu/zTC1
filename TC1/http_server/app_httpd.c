@@ -108,7 +108,7 @@ static int HttpGetTc1Status(httpd_request_t *req)
     char* tc1_status = malloc(412);
     sprintf(tc1_status, TC1_STATUS_JSON, sockets, ip_status.mode,
         sys_config->micoSystemConfig.ssid, sys_config->micoSystemConfig.user_key,
-        ap_name, ELAND_AP_KEY, "MQTT.ADDR", 1883, VERSION, ip_status.ip, ip_status.mask, ip_status.gateway, 0L);
+        ap_name, ap_key, "MQTT.ADDR", 1883, VERSION, ip_status.ip, ip_status.mask, ip_status.gateway, 0L);
 
     OSStatus err = kNoErr;
     send_http(tc1_status, strlen(tc1_status), exit, &err);
@@ -178,15 +178,22 @@ static int HttpSetWifiConfig(httpd_request_t *req)
 
     int buf_size = 97;
     char *buf = malloc(buf_size);
+    int mode = -1;
     char *wifi_ssid = malloc(32);
-    char *wifi_key = malloc(64);
+    char *wifi_key = malloc(32);
 
     err = httpd_get_data(req, buf, buf_size);
     require_noerr(err, exit);
 
-    sscanf(buf, "%s %s", wifi_ssid, wifi_key);
-
-    WifiConnect(wifi_ssid, wifi_key);
+    sscanf(buf, "%d %s %s", &mode, wifi_ssid, wifi_key);
+    if (mode == 1)
+    {
+        WifiConnect(wifi_ssid, wifi_key);
+    }
+    else
+    {
+        ApConfig(wifi_ssid, wifi_key);
+    }
 
     send_http("OK", 2, exit, &err);
 

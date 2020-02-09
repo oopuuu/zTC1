@@ -415,18 +415,21 @@ function ChangeMode(m) {
 }
 
 function ChangeInput(type) {
-    if(mode != 1) {
+    if (mode == 0) {
         ap_name = ssid_ipt.value;
         ap_pswd = pswd_ipt.value;
-    } else {
+    } else if (mode == 1) {
         station_name = ssid_ipt.value;
         station_pswd = pswd_ipt.value;
+    } else {
+        alert("mode error: " + mode);
     }
 }
 
 //Quotation Marks
 function ContainQM(str) {
-    if (str.indexOf("'") >= 0
+    if (str == ""
+     || str.indexOf("'") >= 0
      || str.indexOf('"') >= 0
      || str.indexOf(' ') >= 0
      || str.length > 32) {
@@ -434,24 +437,35 @@ function ContainQM(str) {
     }
     return false;
 }
-var qm_mess = "Sorry, can't use ' or \" or space.\n\nAlso, length <= 32."
+var qm_mess = "Sorry, can't use ' or \" or space or empty.\n\nAlso, length <= 32."
+var le_mess = "Sorry, length < 8."
 
 function SubmitNetwork() {
-    if(mode != 1) {
+    if (mode == 0) {
         if (ContainQM(ap_name) || ContainQM(ap_pswd)) {
             alert(qm_mess);
             return;
         }
-    } else {
+        if (ap_pswd.length < 8) {
+            alert(le_mess);
+        }
+        var params = mode + " " + ap_name+" "+ap_pswd;
+    } else if (mode == 1) {
         if (ContainQM(station_name) || ContainQM(station_pswd)) {
             alert(qm_mess);
             return;
         }
-        var params = station_name+" "+station_pswd;
-        HttpPost("/wifi/config", function (re) {
-            alert(re);
-        }, params);
+        if (station_pswd.length < 8) {
+            alert(le_mess);
+        }
+        var params = mode + " " + station_name+" "+station_pswd;
+    } else {
+        alert("mode error: " + mode);
+        return;
     }
+    HttpPost("/wifi/config", function (re) {
+        alert(re);
+    }, params);
 }
 
 function Rescan() {

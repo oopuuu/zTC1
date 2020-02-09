@@ -3,3 +3,6 @@
 2. ota进度
 3. station改回ap
 4. mqtt
+5. 删除定时任务
+6. 保存ap及密码到Flash
+

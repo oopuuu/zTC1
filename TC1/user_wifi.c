@@ -11,8 +11,9 @@
 char wifi_status = WIFI_STATE_NOCONNECT;
 
 mico_timer_t wifi_led_timer;
-IpStatus ip_status = { 0, ELAND_AP_LOCAL_IP, ELAND_AP_LOCAL_IP, ELAND_AP_NET_MASK };
-char ap_name[16];
+IpStatus ip_status = { 0, ZZ_AP_LOCAL_IP, ZZ_AP_LOCAL_IP, ZZ_AP_NET_MASK };
+char ap_name[32] = { 0 };
+char ap_key[32] = { 0 };
 
 //wifi已连接获取到IP地址回调
 static void WifiGetIpCallback(IPStatusTypedef *pnet, void * arg)
@@ -136,6 +137,7 @@ static void WifiLedTimerCallback(void* arg)
 
 void WifiConnect(char* wifi_ssid, char* wifi_key)
 {
+    os_log("WifiConnect wifi_ssid[%s] wifi_key[%s]", wifi_ssid, wifi_key);
     //wifi配置初始化
     network_InitTypeDef_st wNetConfig;
 
@@ -171,21 +173,34 @@ void WifiInit(void)
     if (!mico_rtos_is_timer_running(&wifi_led_timer)) mico_rtos_start_timer(&wifi_led_timer);
 }
 
+void ApConfig(char* name, char* key)
+{
+    strncpy(ap_name, name, 32);
+    strncpy(ap_key, key, 32);
+    os_log("ApConfig ap_name[%s] ap_key[%s]", ap_name, ap_key);
+    ApInit();
+    //TODO 保存ap及密码到Flash
+}
+
 void ApInit()
 {
-    sprintf(ap_name, ELAND_AP_SSID, str_mac+6);
-    os_log("ApInit ap_name[%s]", ap_name);
+    if (ap_name[0] == 0)
+    {
+        sprintf(ap_name, ZZ_AP_SSID, str_mac + 6);
+        sprintf(ap_key, "%s", ZZ_AP_KEY);
+        os_log("ApInit ap_name[%s] ap_key[%s]", ap_name, ap_key);
+    }
 
     network_InitTypeDef_st wNetConfig;
     memset(&wNetConfig, 0x0, sizeof(network_InitTypeDef_st));
     strcpy((char *)wNetConfig.wifi_ssid, ap_name);
-    strcpy((char *)wNetConfig.wifi_key, ELAND_AP_KEY);
+    strcpy((char *)wNetConfig.wifi_key, ap_key);
     wNetConfig.wifi_mode = Soft_AP;
     wNetConfig.dhcpMode = DHCP_Server;
     wNetConfig.wifi_retry_interval = 100;
-    strcpy((char *)wNetConfig.local_ip_addr, ELAND_AP_LOCAL_IP);
-    strcpy((char *)wNetConfig.net_mask, ELAND_AP_NET_MASK);
-    strcpy((char *)wNetConfig.dnsServer_ip_addr, ELAND_AP_DNS_SERVER);
+    strcpy((char *)wNetConfig.local_ip_addr, ZZ_AP_LOCAL_IP);
+    strcpy((char *)wNetConfig.net_mask, ZZ_AP_NET_MASK);
+    strcpy((char *)wNetConfig.dnsServer_ip_addr, ZZ_AP_DNS_SERVER);
     micoWlanStart(&wNetConfig);
 
     os_log("ApInit ssid[%s] key[%s]", wNetConfig.wifi_ssid, wNetConfig.wifi_key);
