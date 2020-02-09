@@ -240,6 +240,7 @@
     <br>
     <button class="submit_bt" onclick="OtaStart()">Update</button>
     <span class="status_sp success">OK</span>
+    <span class="info" id="ota_status"></span>
 </fieldset>
 
 <p class="power_by">power by <a id="end" href="https://github.com/zogodo/zTC1" target="_blank">github/zTC1</a></p>
@@ -304,6 +305,8 @@ var uptime = document.getElementById("uptime");
 
 var sys_log = document.getElementById("sys_log");
 var log_div = document.getElementsByClassName("log_div")[0];
+
+var ota_status = document.getElementById("ota_status");
 
 var mode = -1;
 var ap_name = "";
@@ -568,6 +571,14 @@ function OtaStart() {
     SetIng(4);
     HttpPost("/ota", function (re) {
         SetOK(4);
+        OtaStatus();
+    }, ato_url);
+}
+
+function OtaStatus() {
+    HttpGet("/ota", function (re) {
+        ota_status.innerHTML = " ota progress: " + re + "%";
+        window.setTimeout(OtaStatus, 1000);
     }, ato_url);
 }
 

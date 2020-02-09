@@ -297,6 +297,16 @@ exit:
     return err;
 }
 
+static int Otastatus(httpd_request_t *req)
+{
+    OSStatus err = kNoErr;
+    char buf[16] = { 0 };
+    sprintf(buf, "%.2f", ota_progress);
+    send_http(buf, strlen(buf), exit, &err);
+exit:
+    return err;
+}
+
 static int OtaStart(httpd_request_t *req)
 {
     OSStatus err = kNoErr;
@@ -321,7 +331,7 @@ struct httpd_wsgi_call g_app_handlers[] = {
     { "/wifi/scan", HTTPD_HDR_DEFORT, 0, HttpGetWifiScan, HttpSetWifiScan, NULL, NULL },
     { "/log", HTTPD_HDR_DEFORT, 0, HttpGetLog, NULL, NULL, NULL },
     { "/task", HTTPD_HDR_DEFORT, 0, HttpGetTasks, HttpAddTask, NULL, HttpDelTask },
-    { "/ota", HTTPD_HDR_DEFORT, 0, NULL, OtaStart, NULL, NULL },
+    { "/ota", HTTPD_HDR_DEFORT, 0, Otastatus, OtaStart, NULL, NULL },
 };
 
 static int g_app_handlers_no = sizeof(g_app_handlers)/sizeof(struct httpd_wsgi_call);

@@ -8,17 +8,21 @@
 #include "mqtt_server/user_mqtt_client.h"
 #include "mqtt_server/user_function.h"
 
+float ota_progress = 0;
+
 static void ota_server_status_handler(OTA_STATE_E state, float progress)
 {
     char str[64] = { 0 };
     switch (state)
     {
         case OTA_LOADING:
+            ota_progress = progress;
             os_log("ota server is loading, progress %.2f%%", progress);
             if (((int) progress)%10 == 1)
                 sprintf(str, "{\"mac\":\"%s\",\"ota_progress\":%d}", strMac,((int) progress));
             break;
         case OTA_SUCCE:
+            ota_progress = 100;
             os_log("ota server daemons success");
             sprintf(str, "{\"mac\":\"%s\",\"ota_progress\":100}", strMac);
             break;
@@ -37,6 +41,7 @@ static void ota_server_status_handler(OTA_STATE_E state, float progress)
 
 void user_ota_start(char *url, char *md5)
 {
+    ota_progress = 0;
     os_log("ready to ota:%s",url);
     ota_server_start(url, md5, ota_server_status_handler);
 }
