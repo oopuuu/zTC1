@@ -243,7 +243,7 @@ static int HttpSetMqttConfig(httpd_request_t *req)
     require_noerr(err, exit);
 
     sscanf(buf, "%s %d", MQTT_SERVER, &MQTT_SERVER_PORT);
-    user_mqtt_init();
+    //user_mqtt_init();
 
     send_http("OK", 2, exit, &err);
 

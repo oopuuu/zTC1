@@ -475,8 +475,8 @@ function SubmitNetwork() {
 
 function SubmitMqtt() {
     SetIng(2);
-    var params = mqtt_addr_ipt.value + mqtt_port_ipt;
-    HttpPost("/wifi/config", function (re) {
+    var params = mqtt_addr_ipt.value + " " + mqtt_port_ipt.value;
+    HttpPost("/mqtt/config", function (re) {
         alert(re);
         SetOK(2);
     }, params);
