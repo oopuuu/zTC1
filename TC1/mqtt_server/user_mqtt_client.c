@@ -38,7 +38,7 @@
 #define MAX_MQTT_SEND_QUEUE_SIZE    (10)
 
 char MQTT_SERVER[64] = "192.168.33.219";
-int  MQTT_SERVER_PORT = 1883;
+int MQTT_SERVER_PORT = 1883;
 
 #ifdef MQTT_CLIENT_SSL_ENABLE
 char* mqtt_server_ssl_cert_str =

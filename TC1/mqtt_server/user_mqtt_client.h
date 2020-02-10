@@ -10,6 +10,8 @@
 #define MQTT_CMD_TIMEOUT        5000  // 5s
 #define MQTT_YIELD_TMIE         5000  // 5s
 
+extern char MQTT_SERVER[64];
+extern int MQTT_SERVER_PORT;
 
 extern OSStatus user_mqtt_init(void);
 extern OSStatus user_mqtt_send(char *arg);

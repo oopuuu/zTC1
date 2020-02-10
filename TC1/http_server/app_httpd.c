@@ -46,6 +46,7 @@
 #include "web_log.h"
 #include "timed_task/timed_task.h"
 #include "ota_server/user_ota.h"
+#include "mqtt_server/user_mqtt_client.h"
 
 static bool is_http_init;
 static bool is_handlers_registered;
@@ -108,7 +109,7 @@ static int HttpGetTc1Status(httpd_request_t *req)
     char* tc1_status = malloc(412);
     sprintf(tc1_status, TC1_STATUS_JSON, sockets, ip_status.mode,
         sys_config->micoSystemConfig.ssid, sys_config->micoSystemConfig.user_key,
-        ap_name, ap_key, MQTT_SERVER, MQTT_PORT, VERSION, ip_status.ip, ip_status.mask, ip_status.gateway, 0L);
+        ap_name, ap_key, MQTT_SERVER, MQTT_SERVER_PORT, VERSION, ip_status.ip, ip_status.mask, ip_status.gateway, 0L);
 
     OSStatus err = kNoErr;
     send_http(tc1_status, strlen(tc1_status), exit, &err);
@@ -237,12 +238,11 @@ static int HttpSetMqttConfig(httpd_request_t *req)
 
     int buf_size = 97;
     char *buf = malloc(buf_size);
-    int mode = -1;
 
     err = httpd_get_data(req, buf, buf_size);
     require_noerr(err, exit);
 
-    sscanf(buf, "%s %d", MQTT_SERVER, &MQTT_PORT);
+    sscanf(buf, "%s %d", MQTT_SERVER, &MQTT_SERVER_PORT);
     user_mqtt_init();
 
     send_http("OK", 2, exit, &err);
