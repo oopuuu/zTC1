@@ -37,10 +37,10 @@
 #define MAX_MQTT_DATA_SIZE          (1024)
 #define MAX_MQTT_SEND_QUEUE_SIZE    (10)
 
-#ifdef MQTT_CLIENT_SSL_ENABLE
+char MQTT_SERVER[64] = "192.168.33.219";
+int  MQTT_SERVER_PORT = 1883;
 
-#define MQTT_SERVER             "192.168.33.201"
-#define MQTT_SERVER_PORT        1883
+#ifdef MQTT_CLIENT_SSL_ENABLE
 char* mqtt_server_ssl_cert_str =
 "-----BEGIN CERTIFICATE-----\r\n\
 MIIC8DCCAlmgAwIBAgIJAOD63PlXjJi8MA0GCSqGSIb3DQEBBQUAMIGQMQswCQYD\r\n\
@@ -60,14 +60,6 @@ A4GBAAqw1rK4NlRUCUBLhEFUQasjP7xfFqlVbE2cRy0Rs4o3KS0JwzQVBwG85xge\r\n\
 REyPOFdGdhBY2P1FNRy0MDr6xr+D2ZOwxs63dG1nnAnWZg7qwoLgpZ4fESPD3PkA\r\n\
 1ZgKJc2zbSQ9fCPxt2W3mdVav66c6fsb7els2W2Iz7gERJSX\r\n\
 -----END CERTIFICATE-----";
-
-#else  // ! MQTT_CLIENT_SSL_ENABLE
-
-//#define MQTT_SERVER             user_config->mqtt_ip
-//#define MQTT_SERVER_PORT        user_config->mqtt_port
-#define MQTT_SERVER             "192.168.33.201"
-#define MQTT_SERVER_PORT        1883
-
 #endif // MQTT_CLIENT_SSL_ENABLE
 
 typedef struct
@@ -319,8 +311,7 @@ void mqtt_client_thread(mico_thread_arg_t arg)
         rc = NewNetwork(&n, MQTT_SERVER, MQTT_SERVER_PORT, ssl_settings);
         if (rc == MQTT_SUCCESS) break;
 
-        //暂时去掉这个日志
-        //mqtt_log("ERROR: MQTT network connection err=%d, reconnect after 3s...", rc);
+        mqtt_log("ERROR: MQTT network connection err=%d, reconnect after 3s...", rc);
     }
     mqtt_log("MQTT network connection success!");
 

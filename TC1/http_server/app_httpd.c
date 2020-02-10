@@ -108,7 +108,7 @@ static int HttpGetTc1Status(httpd_request_t *req)
     char* tc1_status = malloc(412);
     sprintf(tc1_status, TC1_STATUS_JSON, sockets, ip_status.mode,
         sys_config->micoSystemConfig.ssid, sys_config->micoSystemConfig.user_key,
-        ap_name, ap_key, "MQTT.ADDR", 1883, VERSION, ip_status.ip, ip_status.mask, ip_status.gateway, 0L);
+        ap_name, ap_key, MQTT_SERVER, MQTT_PORT, VERSION, ip_status.ip, ip_status.mask, ip_status.gateway, 0L);
 
     OSStatus err = kNoErr;
     send_http(tc1_status, strlen(tc1_status), exit, &err);
@@ -231,6 +231,27 @@ exit:
     return err;
 }
 
+static int HttpSetMqttConfig(httpd_request_t *req)
+{
+    OSStatus err = kNoErr;
+
+    int buf_size = 97;
+    char *buf = malloc(buf_size);
+    int mode = -1;
+
+    err = httpd_get_data(req, buf, buf_size);
+    require_noerr(err, exit);
+
+    sscanf(buf, "%s %d", MQTT_SERVER, &MQTT_PORT);
+    user_mqtt_init();
+
+    send_http("OK", 2, exit, &err);
+
+exit:
+    if (buf) free(buf);
+    return err;
+}
+
 static int HttpGetLog(httpd_request_t *req)
 {
     OSStatus err = kNoErr;
@@ -329,6 +350,7 @@ struct httpd_wsgi_call g_app_handlers[] = {
     { "/power", HTTPD_HDR_DEFORT, 0, NULL, HttpGetPowerInfo, NULL, NULL },
     { "/wifi/config", HTTPD_HDR_DEFORT, 0, HttpGetWifiConfig, HttpSetWifiConfig, NULL, NULL },
     { "/wifi/scan", HTTPD_HDR_DEFORT, 0, HttpGetWifiScan, HttpSetWifiScan, NULL, NULL },
+    { "/mqtt/config", HTTPD_HDR_DEFORT, 0, NULL, HttpSetMqttConfig, NULL, NULL },
     { "/log", HTTPD_HDR_DEFORT, 0, HttpGetLog, NULL, NULL, NULL },
     { "/task", HTTPD_HDR_DEFORT, 0, HttpGetTasks, HttpAddTask, NULL, HttpDelTask },
     { "/ota", HTTPD_HDR_DEFORT, 0, Otastatus, OtaStart, NULL, NULL },
