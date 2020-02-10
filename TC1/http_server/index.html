@@ -210,7 +210,7 @@
     </select>
     <button class="submit_bt" onclick="AddTimedTask()">Add</button>
     <span class="status_sp success">OK</span>
-    <button class="submit_bt" onclick="DelTimedTask()">TestDelete</button>
+    <!-- <button class="submit_bt" onclick="DelTimedTask()">TestDelete</button> -->
     <table id="timed_task_tb">
         <tr>
             <th>Index</th>
@@ -466,8 +466,19 @@ function SubmitNetwork() {
         alert("mode error: " + mode);
         return;
     }
+    SetIng(1);
     HttpPost("/wifi/config", function (re) {
         alert(re);
+        SetOK(1);
+    }, params);
+}
+
+function SubmitMqtt() {
+    SetIng(2);
+    var params = mqtt_addr_ipt.value + mqtt_port_ipt;
+    HttpPost("/wifi/config", function (re) {
+        alert(re);
+        SetOK(2);
     }, params);
 }
 

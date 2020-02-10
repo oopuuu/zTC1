@@ -31,14 +31,8 @@
 #include "user_mqtt_client.h"
 #include "c_json/c_json.h"
 
-//#define MQTT_CLIENT_SSL_ENABLE  // ssl
-
-#define MAX_MQTT_TOPIC_SIZE         (256)
-#define MAX_MQTT_DATA_SIZE          (1024)
-#define MAX_MQTT_SEND_QUEUE_SIZE    (10)
-
-char MQTT_SERVER[64] = "192.168.33.219";
-int MQTT_SERVER_PORT = 1883;
+//char MQTT_SERVER[64] = "192.168.33.219";
+//int MQTT_SERVER_PORT = 1883;
 
 #ifdef MQTT_CLIENT_SSL_ENABLE
 char* mqtt_server_ssl_cert_str =
@@ -77,10 +71,6 @@ static void messageArrived(MessageData* md);
 static OSStatus mqtt_msg_publish(Client *c, const char* topic, char qos, char retained, const unsigned char* msg, uint32_t msg_len);
 
 OSStatus user_recv_handler(void *arg);
-
-OSStatus user_mqtt_send_socket_state(char socket_id);
-void user_mqtt_hass_auto(char socket_id);
-void user_mqtt_hass_auto_power(void);
 
 bool isconnect = false;
 mico_queue_t mqtt_msg_send_queue = NULL;
@@ -379,7 +369,7 @@ void mqtt_client_thread(mico_thread_arg_t arg)
 
                 require_noerr_string(err, MQTT_reconnect, "ERROR: MQTT publish data err");
 
-                mqtt_log("MQTT publish data success! send_topic=[%s], msg=[%ld].\r\n", p_send_msg->topic, p_send_msg->datalen);
+                mqtt_log("MQTT publish data success! send_topic=[%s], msg=[%ld].", p_send_msg->topic, p_send_msg->datalen);
                 no_mqtt_msg_exchange = false;
                 free(p_send_msg);
                 p_send_msg = NULL;

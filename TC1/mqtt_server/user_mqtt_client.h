@@ -10,8 +10,13 @@
 #define MQTT_CMD_TIMEOUT        5000  // 5s
 #define MQTT_YIELD_TMIE         5000  // 5s
 
-extern char MQTT_SERVER[64];
-extern int MQTT_SERVER_PORT;
+//#define MQTT_CLIENT_SSL_ENABLE  // ssl
+#define MAX_MQTT_TOPIC_SIZE         (256)
+#define MAX_MQTT_DATA_SIZE          (1024)
+#define MAX_MQTT_SEND_QUEUE_SIZE    (10)
+
+#define MQTT_SERVER      user_config->mqtt_ip
+#define MQTT_SERVER_PORT user_config->mqtt_port
 
 extern OSStatus user_mqtt_init(void);
 extern OSStatus user_mqtt_send(char *arg);
