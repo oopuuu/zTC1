@@ -1,8 +1,9 @@
 
 1. 登录
 2. ota进度
-3. station改回ap
+3. station改回ap并关闭station
 4. mqtt
 5. 删除定时任务
 6. 保存ap及密码到Flash
-
+7. user_config 如何保存
+8. 重复定时任务
