@@ -6,8 +6,8 @@
 #include "mico.h"
 #include "micokit_ext.h"
 
-OSStatus user_udp_init(void);
-OSStatus user_udp_send(char *arg);
+OSStatus UserUdpInit(void);
+OSStatus UserUdpSend(char *arg);
 
 
 

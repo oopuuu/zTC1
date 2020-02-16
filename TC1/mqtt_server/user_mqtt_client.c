@@ -66,11 +66,11 @@ typedef struct
     uint32_t datalen;
 } mqtt_recv_msg_t, *p_mqtt_recv_msg_t, mqtt_send_msg_t, *p_mqtt_send_msg_t;
 
-static void mqtt_client_thread(mico_thread_arg_t arg);
-static void messageArrived(MessageData* md);
-static OSStatus mqtt_msg_publish(Client *c, const char* topic, char qos, char retained, const unsigned char* msg, uint32_t msg_len);
+static void MqttClientThread(mico_thread_arg_t arg);
+static void MessageArrived(MessageData* md);
+static OSStatus MqttMsgPublish(Client *c, const char* topic, char qos, char retained, const unsigned char* msg, uint32_t msg_len);
 
-OSStatus user_recv_handler(void *arg);
+OSStatus UserRecvHandler(void *arg);
 
 bool isconnect = false;
 mico_queue_t mqtt_msg_send_queue = NULL;
@@ -86,7 +86,7 @@ char topic_set[MAX_MQTT_TOPIC_SIZE];
 
 mico_timer_t timer_handle;
 static char timer_status = 0;
-void user_mqtt_timer_func(void *arg)
+void UserMqttTimerFunc(void *arg)
 {
     char* buf1 = malloc(1024); //idx为1位时长度为24
 
@@ -103,51 +103,51 @@ void user_mqtt_timer_func(void *arg)
         switch (timer_status)
         {
             case 1:
-                user_mqtt_hass_auto_power();
+                UserMqttHassAutoPower();
                 break;
             case 2:
-                user_mqtt_hass_auto(0);
+                UserMqttHassAuto(0);
                 break;
             case 3:
-                user_mqtt_hass_auto(1);
+                UserMqttHassAuto(1);
                 break;
             case 4:
-                user_mqtt_hass_auto(2);
+                UserMqttHassAuto(2);
                 break;
             case 5:
-                user_mqtt_hass_auto(3);
+                UserMqttHassAuto(3);
                 break;
             case 6:
-                user_mqtt_hass_auto(4);
+                UserMqttHassAuto(4);
                 break;
             case 7:
-                user_mqtt_hass_auto(5);
+                UserMqttHassAuto(5);
                 break;
             case 8:
-                user_mqtt_hass_auto_name(0);
+                UserMqttHassAutoName(0);
                 break;
             case 9:
-                user_mqtt_hass_auto_name(1);
+                UserMqttHassAutoName(1);
                 break;
             case 10:
-                user_mqtt_hass_auto_name(2);
+                UserMqttHassAutoName(2);
                 break;
             case 11:
-                user_mqtt_hass_auto_name(3);
+                UserMqttHassAutoName(3);
                 break;
             case 12:
-                user_mqtt_hass_auto_name(4);
+                UserMqttHassAutoName(4);
                 break;
             case 13:
-                user_mqtt_hass_auto_name(5);
+                UserMqttHassAutoName(5);
                 break;
             case 14:
-                user_mqtt_hass_auto_power_name();
+                UserMqttHassAutoPowerName();
                 break;
             case 15:
                 if (buf1 == NULL) break;
                 sprintf(buf1, "{\"mac\":\"%s\",\"version\":null,\"socket_0\":{\"on\":null,\"setting\":{\"name\":null}},\"socket_1\":{\"on\":null,\"setting\":{\"name\":null}},\"socket_2\":{\"on\":null,\"setting\":{\"name\":null}},\"socket_3\":{\"on\":null,\"setting\":{\"name\":null}},\"socket_4\":{\"on\":null,\"setting\":{\"name\":null}},\"socket_5\":{\"on\":null,\"setting\":{\"name\":null}}}", strMac);
-                user_function_cmd_received(0, buf1);
+                UserFunctionCmdReceived(0, buf1);
                 free(buf1);
                 break;
             default:
@@ -159,7 +159,7 @@ void user_mqtt_timer_func(void *arg)
 }
 
 /* Application entrance */
-OSStatus user_mqtt_init(void)
+OSStatus UserMqttInit(void)
 {
     OSStatus err = kNoErr;
 
@@ -183,7 +183,7 @@ OSStatus user_mqtt_init(void)
 
     /* start mqtt client */
     err = mico_rtos_create_thread(NULL, MICO_APPLICATION_PRIORITY, "mqtt_client",
-                                   (mico_thread_function_t) mqtt_client_thread,
+                                   (mico_thread_function_t) MqttClientThread,
                                    mqtt_thread_stack_size, 0);
     require_noerr_string(err, exit, "ERROR: Unable to start the mqtt client thread.");
 
@@ -196,7 +196,7 @@ OSStatus user_mqtt_init(void)
     return err;
 }
 
-static OSStatus mqtt_client_release(Client *c, Network *n)
+static OSStatus UserMqttClientRelease(Client *c, Network *n)
 {
     OSStatus err = kNoErr;
 
@@ -213,7 +213,7 @@ static OSStatus mqtt_client_release(Client *c, Network *n)
 }
 
 // publish msg to mqtt server
-static OSStatus mqtt_msg_publish(Client *c, const char* topic, char qos, char retained,
+static OSStatus MqttMsgPublish(Client *c, const char* topic, char qos, char retained,
                                   const unsigned char* msg,
                                   uint32_t msg_len)
 {
@@ -246,7 +246,7 @@ static OSStatus mqtt_msg_publish(Client *c, const char* topic, char qos, char re
     return err;
 }
 
-void mqtt_client_thread(mico_thread_arg_t arg)
+void MqttClientThread(mico_thread_arg_t arg)
 {
     OSStatus err = kUnknownErr;
 
@@ -327,13 +327,13 @@ void mqtt_client_thread(mico_thread_arg_t arg)
     mqtt_log("MQTT client connect success!");
 
     /* 4. mqtt client subscribe */
-    rc = MQTTSubscribe(&c, topic_set, QOS0, messageArrived);
+    rc = MQTTSubscribe(&c, topic_set, QOS0, MessageArrived);
     require_noerr_string(rc, MQTT_reconnect, "ERROR: MQTT client subscribe err.");
     mqtt_log("MQTT client subscribe success! recv_topic=[%s].", topic_set);
     /*4.1 连接成功后先更新发送一次数据*/
     isconnect = true;
 
-    mico_init_timer(&timer_handle, 150, user_mqtt_timer_func, &arg);
+    mico_init_timer(&timer_handle, 150, UserMqttTimerFunc, &arg);
     mico_start_timer(&timer_handle);
     /* 5. client loop for recv msg && keepalive */
     while (1)
@@ -363,7 +363,7 @@ void mqtt_client_thread(mico_thread_arg_t arg)
                 require_string(p_send_msg, exit, "Wrong data point");
 
                 // send message to server
-                err = mqtt_msg_publish(&c, p_send_msg->topic, p_send_msg->qos, p_send_msg->retained,
+                err = MqttMsgPublish(&c, p_send_msg->topic, p_send_msg->qos, p_send_msg->retained,
                                         (const unsigned char*)p_send_msg->data,
                                         p_send_msg->datalen);
 
@@ -390,7 +390,7 @@ void mqtt_client_thread(mico_thread_arg_t arg)
 
     timer_status=100;
 
-    mqtt_client_release(&c, &n);
+    UserMqttClientRelease(&c, &n);
     isconnect = false;
     UserLedSet(-1);
     mico_rtos_thread_msleep(100);
@@ -401,12 +401,12 @@ void mqtt_client_thread(mico_thread_arg_t arg)
     exit:
     isconnect = false;
     mqtt_log("EXIT: MQTT client exit with err = %d.", err);
-    mqtt_client_release(&c, &n);
+    UserMqttClientRelease(&c, &n);
     mico_rtos_delete_thread(NULL);
 }
 
 // callback, msg received from mqtt server
-static void messageArrived(MessageData* md)
+static void MessageArrived(MessageData* md)
 {
     OSStatus err = kUnknownErr;
     p_mqtt_recv_msg_t p_recv_msg = NULL;
@@ -421,7 +421,7 @@ static void messageArrived(MessageData* md)
     strncpy(p_recv_msg->topic, md->topicName->lenstring.data, md->topicName->lenstring.len);
     memcpy(p_recv_msg->data, message->payload, message->payloadlen);
 
-    err = mico_rtos_send_asynchronous_event(&mqtt_client_worker_thread, user_recv_handler, p_recv_msg);
+    err = mico_rtos_send_asynchronous_event(&mqtt_client_worker_thread, UserRecvHandler, p_recv_msg);
     require_noerr(err, exit);
 
     exit:
@@ -434,21 +434,21 @@ static void messageArrived(MessageData* md)
 }
 
 /* Application process MQTT received data */
-OSStatus user_recv_handler(void *arg)
+OSStatus UserRecvHandler(void *arg)
 {
     OSStatus err = kUnknownErr;
     p_mqtt_recv_msg_t p_recv_msg = arg;
     require(p_recv_msg, exit);
 
     app_log("user get data success! from_topic=[%s], msg=[%ld].\r\n", p_recv_msg->topic, p_recv_msg->datalen);
-    user_function_cmd_received(0, p_recv_msg->data);
+    UserFunctionCmdReceived(0, p_recv_msg->data);
     free(p_recv_msg);
 
     exit:
     return err;
 }
 
-OSStatus user_mqtt_send_topic(char *topic, char *arg, char retained)
+OSStatus UserMqttSendTopic(char *topic, char *arg, char retained)
 {
     OSStatus err = kUnknownErr;
     p_mqtt_send_msg_t p_send_msg = NULL;
@@ -484,13 +484,13 @@ OSStatus user_mqtt_send_topic(char *topic, char *arg, char retained)
 }
 
 /* Application collect data and seng them to MQTT send queue */
-OSStatus user_mqtt_send(char *arg)
+OSStatus UserMqttSend(char *arg)
 {
-    return user_mqtt_send_topic(topic_state, arg, 0);
+    return UserMqttSendTopic(topic_state, arg, 0);
 }
 
 //更新ha开关状态
-OSStatus user_mqtt_send_socket_state(char socket_id)
+OSStatus UserMqttSendSocketState(char socket_id)
 {
     char *send_buf = NULL;
     char *topic_buf = NULL;
@@ -501,7 +501,7 @@ OSStatus user_mqtt_send_socket_state(char socket_id)
     {
         sprintf(topic_buf, "homeassistant/switch/%s/socket_%d/state", strMac, (int)socket_id);
         sprintf(send_buf, "{\"mac\":\"%s\",\"socket_%d\":{\"on\":%d}}", strMac, socket_id, (int)user_config->socket_configs[(int)socket_id].on);
-        oss_status = user_mqtt_send_topic(topic_buf, send_buf, 1);
+        oss_status = UserMqttSendTopic(topic_buf, send_buf, 1);
     }
     if (send_buf) free(send_buf);
     if (topic_buf) free(topic_buf);
@@ -510,7 +510,7 @@ OSStatus user_mqtt_send_socket_state(char socket_id)
 }
 
 //hass mqtt自动发现数据开关发送
-void user_mqtt_hass_auto(char socket_id)
+void UserMqttHassAuto(char socket_id)
 {
     char *send_buf = NULL;
     char *topic_buf = NULL;
@@ -527,13 +527,13 @@ void user_mqtt_hass_auto(char socket_id)
                  "\"pl_off\":\"{\\\"mac\\\":\\\"%s\\\",\\\"socket_%d\\\":{\\\"on\\\":0}}\""
                  "}",
                  socket_id, strMac + 8, strMac, socket_id, strMac, socket_id, strMac, socket_id);
-        user_mqtt_send_topic(topic_buf, send_buf, 1);
+        UserMqttSendTopic(topic_buf, send_buf, 1);
     }
     if (send_buf) free(send_buf);
     if (topic_buf) free(topic_buf);
 
 }
-void user_mqtt_hass_auto_name(char socket_id)
+void UserMqttHassAutoName(char socket_id)
 {
     char *send_buf = NULL;
     char *topic_buf = NULL;
@@ -550,7 +550,7 @@ void user_mqtt_hass_auto_name(char socket_id)
                  "\"pl_off\":\"{\\\"mac\\\":\\\"%s\\\",\\\"socket_%d\\\":{\\\"on\\\":0}}\""
                  "}",
                  user_config->socket_configs[(int)socket_id].name, strMac, socket_id, strMac, socket_id, strMac, socket_id);
-        user_mqtt_send_topic(topic_buf, send_buf, 0);
+        UserMqttSendTopic(topic_buf, send_buf, 0);
     }
     if (send_buf)
         free(send_buf);
@@ -558,7 +558,7 @@ void user_mqtt_hass_auto_name(char socket_id)
         free(topic_buf);
 }
 //hass mqtt自动发现数据功率发送
-void user_mqtt_hass_auto_power(void)
+void UserMqttHassAutoPower(void)
 {
     char *send_buf = NULL;
     char *topic_buf = NULL;
@@ -576,12 +576,12 @@ void user_mqtt_hass_auto_power(void)
                  "}",
                  strMac + 8, strMac);
 
-        user_mqtt_send_topic(topic_buf, send_buf, 1);
+        UserMqttSendTopic(topic_buf, send_buf, 1);
     }
     if (send_buf) free(send_buf);
     if (topic_buf) free(topic_buf);
 }
-void user_mqtt_hass_auto_power_name(void)
+void UserMqttHassAutoPowerName(void)
 {
     char *send_buf = NULL;
     char *topic_buf = NULL;
@@ -604,7 +604,7 @@ void user_mqtt_hass_auto_power_name(void)
         send_buf[16] = 0xe7;
         send_buf[17] = 0x8e;
         send_buf[18] = 0x87;
-        user_mqtt_send_topic(topic_buf, send_buf, 0);
+        UserMqttSendTopic(topic_buf, send_buf, 0);
     }
     if (send_buf)
         free(send_buf);
@@ -612,7 +612,7 @@ void user_mqtt_hass_auto_power_name(void)
         free(topic_buf);
 }
 
-void user_mqtt_hass_power(void)
+void UserMqttHassPower(void)
 {
     char *send_buf = NULL;
     char *topic_buf = NULL;
@@ -622,13 +622,13 @@ void user_mqtt_hass_power(void)
     {
         sprintf(topic_buf, "homeassistant/sensor/%s/power/state", strMac);
         sprintf(send_buf, "{\"power\":\"%d.%d\"}", (int)(power/10), (int)(power%10));
-        user_mqtt_send_topic(topic_buf, send_buf, 0);
+        UserMqttSendTopic(topic_buf, send_buf, 0);
     }
     if (send_buf) free(send_buf);
     if (topic_buf) free(topic_buf);
 }
 
-bool user_mqtt_isconnect()
+bool UserMqttIsConnect()
 {
     return isconnect;
 }

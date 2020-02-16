@@ -18,13 +18,13 @@
 #define MQTT_SERVER      user_config->mqtt_ip
 #define MQTT_SERVER_PORT user_config->mqtt_port
 
-extern OSStatus user_mqtt_init(void);
-extern OSStatus user_mqtt_send(char *arg);
-extern bool user_mqtt_isconnect(void);
-extern OSStatus user_mqtt_send_socket_state(char socket_id);
-extern void user_mqtt_hass_auto(char socket_id);
-extern void user_mqtt_hass_auto_name(char socket_id);
-extern void user_mqtt_hass_power(void);
-extern void user_mqtt_hass_auto_power(void);
-extern void user_mqtt_hass_auto_power_name(void);
+extern OSStatus UserMqttInit(void);
+extern OSStatus UserMqttSend(char *arg);
+extern bool UserMqttIsConnect(void);
+extern OSStatus UserMqttSendSocketState(char socket_id);
+extern void UserMqttHassAuto(char socket_id);
+extern void UserMqttHassAutoName(char socket_id);
+extern void UserMqttHassPower(void);
+extern void UserMqttHassAutoPower(void);
+extern void UserMqttHassAutoPowerName(void);
 #endif

@@ -6,9 +6,9 @@
 #include "mico.h"
 #include "micokit_ext.h"
 
-void user_send(int udp_flag, char *s);
-void user_function_cmd_received(int udp_flag, char* pusrdata);
-unsigned char strtohex(char a, char b);
+void UserSend(int udp_flag, char *s);
+void UserFunctionCmdReceived(int udp_flag, char* pusrdata);
+unsigned char StrToHex(char a, char b);
 
 
 #endif

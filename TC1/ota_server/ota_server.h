@@ -109,34 +109,34 @@ typedef struct _ota_server_context_t{
   * @return   kNoErr        : on success.
   * @return   kGeneralErr   : if an error occurred
   */
-OSStatus ota_server_start(char *url, char *md5, ota_server_cb_fn call_back);
+OSStatus OtaServerStart(char *url, char *md5, ota_server_cb_fn call_back);
 
 
 /** @brief    Get OTA server state
  *
  *  @return   OTA_CONTROL_E  : state
  */
-OTA_CONTROL_E ota_server_state_get(void);
+OTA_CONTROL_E OtaServerStateGet(void);
 
 
 /** @brief    Pause OTA server daemons
  *
  *  @return   No
  */
-void ota_server_pause(void);
+void OtaServerPause(void);
 
 
 /** @brief    Continue OTA server daemons
  *
  *  @return   No
  */
-void ota_server_continue(void);
+void OtaServerContinue(void);
 
 
 /** @brief    Stop OTA server daemons
  *
  *  @return   No
  */
-void ota_server_stop(void);
+void OtaServerStop(void);
 
 #endif

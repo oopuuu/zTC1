@@ -10,7 +10,7 @@
 
 float ota_progress = 0;
 
-static void ota_server_status_handler(OTA_STATE_E state, float progress)
+static void OtaServerStatusHandler(OTA_STATE_E state, float progress)
 {
     char str[64] = { 0 };
     switch (state)
@@ -35,14 +35,14 @@ static void ota_server_status_handler(OTA_STATE_E state, float progress)
     }
     if (str[0] > 0)
     {
-        user_send(true, str);
+        UserSend(true, str);
     }
 }
 
-void user_ota_start(char *url, char *md5)
+void UserOtaStart(char *url, char *md5)
 {
     ota_progress = 0;
     os_log("ready to ota:%s",url);
-    ota_server_start(url, md5, ota_server_status_handler);
+    OtaServerStart(url, md5, OtaServerStatusHandler);
 }
 

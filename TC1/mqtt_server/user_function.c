@@ -11,23 +11,22 @@
 #include "user_udp.h"
 
 uint32_t last_time = 0;
+bool JsonSocketAnalysis(int udp_flag, unsigned char x, cJSON * pJsonRoot, cJSON * pJsonSend);
 
-void user_function_set_last_time()
+void UserFunctionSetLastTime()
 {
     last_time = UpTicks();
 }
 
-bool json_socket_analysis(int udp_flag, unsigned char x, cJSON * pJsonRoot, cJSON * pJsonSend);
-
-void user_send(int udp_flag, char *s)
+void UserSend(int udp_flag, char *s)
 {
-    if (udp_flag || !user_mqtt_isconnect())
-        user_udp_send(s); //发送数据
+    if (udp_flag || !UserMqttIsConnect())
+        UserUdpSend(s); //发送数据
     else
-        user_mqtt_send(s);
+        UserMqttSend(s);
 }
 
-void user_function_cmd_received(int udp_flag, char* pusrdata)
+void UserFunctionCmdReceived(int udp_flag, char* pusrdata)
 {
 
     unsigned char i;
@@ -56,7 +55,7 @@ void user_function_cmd_received(int udp_flag, char* pusrdata)
         cJSON_AddStringToObject(pRoot, "ip", para.ip);
 
         char *s = cJSON_Print(pRoot);
-        user_send(udp_flag, s); //发送数据
+        UserSend(udp_flag, s); //发送数据
         free((void *) s);
         cJSON_Delete(pRoot);
     }
@@ -115,7 +114,7 @@ void user_function_cmd_received(int udp_flag, char* pusrdata)
             if (p_ota)
             {
                 if (cJSON_IsString(p_ota))
-                    user_ota_start(p_ota->valuestring, NULL);
+                    UserOtaStart(p_ota->valuestring, NULL);
             }
 
             cJSON *json_setting_send = cJSON_CreateObject();
@@ -180,7 +179,7 @@ void user_function_cmd_received(int udp_flag, char* pusrdata)
         //解析socket-----------------------------------------------------------------
         for (i = 0; i < SOCKET_NUM; i++)
         {
-            if (json_socket_analysis(udp_flag, i, pJsonRoot, json_send))
+            if (JsonSocketAnalysis(udp_flag, i, pJsonRoot, json_send))
                 update_user_config_flag = true;
         }
 
@@ -189,7 +188,7 @@ void user_function_cmd_received(int udp_flag, char* pusrdata)
         if (return_flag == true)
         {
             char *json_str = cJSON_Print(json_send);
-            user_send(udp_flag, json_str); //发送数据
+            UserSend(udp_flag, json_str); //发送数据
             free((void *) json_str);
         }
         cJSON_Delete(json_send);
@@ -210,7 +209,7 @@ void user_function_cmd_received(int udp_flag, char* pusrdata)
  *udp_flag:发送udp/mqtt标志位,此处修改插座开关状态时,需要实时更新给domoticz
  *x:插座编号
  */
-bool json_socket_analysis(int udp_flag, unsigned char x, cJSON * pJsonRoot, cJSON * pJsonSend)
+bool JsonSocketAnalysis(int udp_flag, unsigned char x, cJSON * pJsonRoot, cJSON * pJsonSend)
 {
     if (!pJsonRoot) return false;
     if (!pJsonSend) return false;
@@ -234,7 +233,7 @@ bool json_socket_analysis(int udp_flag, unsigned char x, cJSON * pJsonRoot, cJSO
                 UserRelaySet(x, p_socket_on->valueint);
                 return_flag = true;
             }
-            user_mqtt_send_socket_state(x);
+            UserMqttSendSocketState(x);
         }
 
         //解析socket中setting项目----------------------------------------------
@@ -250,7 +249,7 @@ bool json_socket_analysis(int udp_flag, unsigned char x, cJSON * pJsonRoot, cJSO
                 {
                     return_flag = true;
                     sprintf(user_config->socket_configs[x].name, p_socket_setting_name->valuestring);
-                    user_mqtt_hass_auto_name(x);
+                    UserMqttHassAutoName(x);
                 }
                 cJSON_AddStringToObject(json_socket_setting_send, "name", user_config->socket_configs[x].name);
             }
@@ -264,7 +263,7 @@ bool json_socket_analysis(int udp_flag, unsigned char x, cJSON * pJsonRoot, cJSO
     return return_flag;
 }
 
-unsigned char strtohex(char a, char b)
+unsigned char StrToHex(char a, char b)
 {
     if (a >= 0x30 && a <= 0x39)
     {

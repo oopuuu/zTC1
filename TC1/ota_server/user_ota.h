@@ -3,6 +3,6 @@
 
 extern float ota_progress;
 
-void user_ota_start(char *url, char *md5);
+void UserOtaStart(char *url, char *md5);
 
 #endif

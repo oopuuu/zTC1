@@ -243,7 +243,7 @@ static int HttpSetMqttConfig(httpd_request_t *req)
     require_noerr(err, exit);
 
     sscanf(buf, "%s %d", MQTT_SERVER, &MQTT_SERVER_PORT);
-    //user_mqtt_init();
+    //UserMqttInit();
 
     send_http("OK", 2, exit, &err);
 
@@ -336,7 +336,7 @@ static int OtaStart(httpd_request_t *req)
     require_noerr(err, exit);
 
     app_httpd_log("OtaStart ota_url[%s]", buf);
-    user_ota_start(buf, NULL);
+    UserOtaStart(buf, NULL);
 
     send_http("OK", 2, exit, &err);
 exit:

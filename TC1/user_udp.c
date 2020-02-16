@@ -9,7 +9,7 @@
 
 #define MAX_UDP_DATA_SIZE          (1024)
 #define MAX_UDP_SEND_QUEUE_SIZE    (5)
-mico_queue_t udp_msg_send_queue = NULL;
+mico_queue_t UdpMsgSend_queue = NULL;
 
 typedef struct
 {
@@ -17,15 +17,15 @@ typedef struct
     char data[MAX_UDP_DATA_SIZE];
 } udp_send_msg_t, *p_udp_send_msg_t;
 
-static OSStatus udp_msg_send(int socket, const unsigned char* msg, uint32_t msg_len);
-void udp_thread(void *arg);
+static OSStatus UdpMsgSend(int socket, const unsigned char* msg, uint32_t msg_len);
+void UdpThread(void *arg);
 
-OSStatus user_udp_init(void)
+OSStatus UserUdpInit(void)
 {
     OSStatus err = kNoErr;
     /* start udp client */
     err = mico_rtos_create_thread(NULL, MICO_APPLICATION_PRIORITY, "udp",
-                                   (mico_thread_function_t) udp_thread,
+                                   (mico_thread_function_t) UdpThread,
                                    0x1000, 0);
     require_noerr_string(err, exit, "ERROR: Unable to start the rtc thread.");
 
@@ -37,7 +37,7 @@ OSStatus user_udp_init(void)
 }
 
 /*create udp socket*/
-void udp_thread(void *arg)
+void UdpThread(void *arg)
 {
     UNUSED_PARAMETER(arg);
 
@@ -53,11 +53,11 @@ void udp_thread(void *arg)
     char *buf = NULL;
 
     /* create udp msg send queue */
-    err = mico_rtos_init_queue(&udp_msg_send_queue, "uqp_msg_send_queue", sizeof(p_udp_send_msg_t),
+    err = mico_rtos_init_queue(&UdpMsgSend_queue, "uqp_msg_send_queue", sizeof(p_udp_send_msg_t),
     MAX_UDP_SEND_QUEUE_SIZE);
     require_noerr_action(err, exit, os_log("ERROR: create udp msg send queue err=%d.", err));
     /* create msg send queue event fd */
-    msg_send_event_fd = mico_create_event_fd(udp_msg_send_queue);
+    msg_send_event_fd = mico_create_event_fd(UdpMsgSend_queue);
     require_action(msg_send_event_fd >= 0, exit, os_log("ERROR: create msg send queue event fd failed!!!"));
 
     buf = malloc(1024);
@@ -91,21 +91,21 @@ void udp_thread(void *arg)
             strcpy(ip_address, inet_ntoa(addr.sin_addr));
             if(len<1024) buf[len]=0;
             os_log("udp recv from %s:%d, len:%d ", ip_address,addr.sin_port, len);
-            user_function_cmd_received(1,buf);
+            UserFunctionCmdReceived(1,buf);
             // sendto(udp_fd, buf, len, 0, (struct sockaddr *) &addr, sizeof(struct sockaddr_in));
         }
 
         /* recv msg from user worker thread to be sent to server */
         if (FD_ISSET(msg_send_event_fd, &readfds))
         {
-            while (mico_rtos_is_queue_empty(&udp_msg_send_queue) == false)
+            while (mico_rtos_is_queue_empty(&UdpMsgSend_queue) == false)
             {
                 // get msg from send queue
-                mico_rtos_pop_from_queue(&udp_msg_send_queue, &p_send_msg, 0);
+                mico_rtos_pop_from_queue(&UdpMsgSend_queue, &p_send_msg, 0);
                 require_string(p_send_msg, exit, "Wrong data point");
 
                 // send message to server
-                err = udp_msg_send(udp_fd, (const unsigned char*)p_send_msg->data, p_send_msg->datalen);
+                err = UdpMsgSend(udp_fd, (const unsigned char*)p_send_msg->data, p_send_msg->datalen);
                 // require_noerr_string(err, MQTT_reconnect, "ERROR: udp publish data err");
 
                 //os_log("udp send data success! msg=[%ld].\r\n", p_send_msg->datalen);
@@ -123,7 +123,7 @@ void udp_thread(void *arg)
 }
 
 // send msg to udp
-static OSStatus udp_msg_send(int socket, const unsigned char* msg, uint32_t msg_len)
+static OSStatus UdpMsgSend(int socket, const unsigned char* msg, uint32_t msg_len)
 {
     OSStatus err = kUnknownErr;
 
@@ -144,7 +144,7 @@ exit:
 }
 
 /* Application collect data and seng them to udp send queue */
-OSStatus user_udp_send(char *arg)
+OSStatus UserUdpSend(char *arg)
 {
     OSStatus err = kUnknownErr;
     p_udp_send_msg_t p_send_msg = NULL;
@@ -152,9 +152,9 @@ OSStatus user_udp_send(char *arg)
     // app_log("======App prepare to send ![%d]======", MicoGetMemoryInfo()->free_memory);
 
     /* Send queue is full, pop the oldest */
-    if (mico_rtos_is_queue_full(&udp_msg_send_queue) == true)
+    if (mico_rtos_is_queue_full(&UdpMsgSend_queue) == true)
     {
-        mico_rtos_pop_from_queue(&udp_msg_send_queue, &p_send_msg, 0);
+        mico_rtos_pop_from_queue(&UdpMsgSend_queue, &p_send_msg, 0);
         free(p_send_msg);
         p_send_msg = NULL;
     }
@@ -166,7 +166,7 @@ OSStatus user_udp_send(char *arg)
     p_send_msg->datalen = strlen(arg);
     memcpy(p_send_msg->data, arg, p_send_msg->datalen);
 
-    err = mico_rtos_push_to_queue(&udp_msg_send_queue, &p_send_msg, 0);
+    err = mico_rtos_push_to_queue(&UdpMsgSend_queue, &p_send_msg, 0);
     require_noerr(err, exit);
 
     //app_log("Push user msg into send queue success!");

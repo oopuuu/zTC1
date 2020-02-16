@@ -102,7 +102,7 @@ static void KeyLongPress(void)
 {
 //  os_log("KeyLongPress");
 //  UserLedSet(1);
-//  user_mqtt_send("mqtt test");
+//  UserMqttSend("mqtt test");
 }
 
 static void KeyLong10sPress(void)
@@ -127,7 +127,7 @@ static void KeyShortPress(void)
 
     for (i = 0; i < SOCKET_NUM; i++)
     {
-        user_mqtt_send_socket_state(i);
+        UserMqttSendSocketState(i);
     }
 }
 mico_timer_t user_key_timer;

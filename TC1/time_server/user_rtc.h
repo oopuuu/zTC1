@@ -7,7 +7,7 @@
 #include "micokit_ext.h"
 
 
-extern OSStatus user_rtc_init(void);
+extern OSStatus UserRtcInit(void);
 
 
 #endif

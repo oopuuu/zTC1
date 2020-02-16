@@ -8,9 +8,9 @@
 #include "mqtt_server/user_mqtt_client.h"
 #include "mqtt_server/user_function.h"
 
-void rtc_thread(mico_thread_arg_t arg);
+void RtcThread(mico_thread_arg_t arg);
 
-OSStatus user_sntp_get_time()
+OSStatus UserSntpGetTime()
 {
     OSStatus err = kNoErr;
     ntp_timestamp_t current_time;
@@ -64,13 +64,13 @@ OSStatus user_sntp_get_time()
     return kNoErr;
 }
 
-OSStatus user_rtc_init(void)
+OSStatus UserRtcInit(void)
 {
     OSStatus err = kNoErr;
 
     /* start rtc client */
     err = mico_rtos_create_thread(NULL, MICO_APPLICATION_PRIORITY, "rtc",
-                                   (mico_thread_function_t) rtc_thread,
+                                   (mico_thread_function_t) RtcThread,
                                    0x1000, 0);
     require_noerr_string(err, exit, "ERROR: Unable to start the rtc thread.");
 
@@ -80,7 +80,7 @@ OSStatus user_rtc_init(void)
     return err;
 }
 
-void rtc_thread(mico_thread_arg_t arg)
+void RtcThread(mico_thread_arg_t arg)
 {
     OSStatus err = kUnknownErr;
     LinkStatusTypeDef LinkStatus;
@@ -93,7 +93,7 @@ void rtc_thread(mico_thread_arg_t arg)
         micoWlanGetLinkStatus(&LinkStatus);
         if (LinkStatus.is_connected == 1)
         {
-            err = user_sntp_get_time();
+            err = UserSntpGetTime();
             if (err == kNoErr)
             {
                 os_log("sntp success!");
@@ -133,7 +133,7 @@ void rtc_thread(mico_thread_arg_t arg)
             micoWlanGetLinkStatus(&LinkStatus);
             if (LinkStatus.is_connected == 1)
             {
-                err = user_sntp_get_time();
+                err = UserSntpGetTime();
                 if (err == kNoErr)
                     rtc_init = 1;
                 else

@@ -131,11 +131,11 @@ int application_start(void)
                 sys_config->micoSystemConfig.user_key);
         }
     }
-    user_udp_init();
+    UserUdpInit();
     KeyInit();
-    err = user_mqtt_init();
+    err = UserMqttInit();
     require_noerr(err, exit);
-    err = user_rtc_init();
+    err = UserRtcInit();
     require_noerr(err, exit);
     PowerInit();
 
@@ -153,8 +153,8 @@ int application_start(void)
         //SetPowerRecord(&power_record, power2);
         sprintf(power_buf, "{\"mac\":\"%s\",\"power\":\"%u.%u\",\"total_time\":%u}",
             strMac, (unsigned int)(power2 / 10), (unsigned int)(power2 % 10), (unsigned int)total_time);
-        user_send(0, power_buf);
-        user_mqtt_hass_power();
+        UserSend(0, power_buf);
+        UserMqttHassPower();
 
         time_t now = time(NULL);
         if (task_top && now >= task_top->prs_time)
