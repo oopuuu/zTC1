@@ -14,7 +14,6 @@
 
 char rtc_init = 0; //sntp校时成功标志位
 uint32_t total_time = 0;
-char strMac[16] = { 0 };
 char str_mac[16] = { 0 };
 uint32_t power = 0;
 
@@ -106,7 +105,6 @@ int application_start(void)
 
     if (sys_config->micoSystemConfig.name[0] == 1)
     {
-        strcpy(strMac, str_mac);
         sprintf(sys_config->micoSystemConfig.name, ZTC1_NAME, str_mac+8);
     }
 
@@ -152,7 +150,7 @@ int application_start(void)
         last_p_count = p_count;
         //SetPowerRecord(&power_record, power2);
         sprintf(power_buf, "{\"mac\":\"%s\",\"power\":\"%u.%u\",\"total_time\":%u}",
-            strMac, (unsigned int)(power2 / 10), (unsigned int)(power2 % 10), (unsigned int)total_time);
+            str_mac, (unsigned int)(power2 / 10), (unsigned int)(power2 % 10), (unsigned int)total_time);
         UserSend(0, power_buf);
         UserMqttHassPower();
 

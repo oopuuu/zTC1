@@ -146,7 +146,7 @@ void UserMqttTimerFunc(void *arg)
                 break;
             case 15:
                 if (buf1 == NULL) break;
-                sprintf(buf1, "{\"mac\":\"%s\",\"version\":null,\"socket_0\":{\"on\":null,\"setting\":{\"name\":null}},\"socket_1\":{\"on\":null,\"setting\":{\"name\":null}},\"socket_2\":{\"on\":null,\"setting\":{\"name\":null}},\"socket_3\":{\"on\":null,\"setting\":{\"name\":null}},\"socket_4\":{\"on\":null,\"setting\":{\"name\":null}},\"socket_5\":{\"on\":null,\"setting\":{\"name\":null}}}", strMac);
+                sprintf(buf1, "{\"mac\":\"%s\",\"version\":null,\"socket_0\":{\"on\":null,\"setting\":{\"name\":null}},\"socket_1\":{\"on\":null,\"setting\":{\"name\":null}},\"socket_2\":{\"on\":null,\"setting\":{\"name\":null}},\"socket_3\":{\"on\":null,\"setting\":{\"name\":null}},\"socket_4\":{\"on\":null,\"setting\":{\"name\":null}},\"socket_5\":{\"on\":null,\"setting\":{\"name\":null}}}", str_mac);
                 UserFunctionCmdReceived(0, buf1);
                 free(buf1);
                 break;
@@ -164,7 +164,7 @@ OSStatus UserMqttInit(void)
     OSStatus err = kNoErr;
 
     sprintf(topic_set, MQTT_CLIENT_SUB_TOPIC1);
-    sprintf(topic_state, MQTT_CLIENT_PUB_TOPIC, strMac);
+    sprintf(topic_state, MQTT_CLIENT_PUB_TOPIC, str_mac);
 
 #ifdef MQTT_CLIENT_SSL_ENABLE
     int mqtt_thread_stack_size = 0x3000;
@@ -315,7 +315,7 @@ void MqttClientThread(mico_thread_arg_t arg)
     /* 3. create mqtt client connection */
     connectData.willFlag = 0;
     connectData.MQTTVersion = 4;  // 3: 3.1, 4: v3.1.1
-    connectData.clientID.cstring = strMac;
+    connectData.clientID.cstring = str_mac;
     connectData.username.cstring = user_config->mqtt_user;
     connectData.password.cstring = user_config->mqtt_password;
     connectData.keepAliveInterval = MQTT_CLIENT_KEEPALIVE;
@@ -499,8 +499,8 @@ OSStatus UserMqttSendSocketState(char socket_id)
     OSStatus oss_status = kUnknownErr;
     if (send_buf != NULL && topic_buf != NULL)
     {
-        sprintf(topic_buf, "homeassistant/switch/%s/socket_%d/state", strMac, (int)socket_id);
-        sprintf(send_buf, "{\"mac\":\"%s\",\"socket_%d\":{\"on\":%d}}", strMac, socket_id, (int)user_config->socket_configs[(int)socket_id].on);
+        sprintf(topic_buf, "homeassistant/switch/%s/socket_%d/state", str_mac, (int)socket_id);
+        sprintf(send_buf, "{\"mac\":\"%s\",\"socket_%d\":{\"on\":%d}}", str_mac, socket_id, (int)user_config->socket_configs[(int)socket_id].on);
         oss_status = UserMqttSendTopic(topic_buf, send_buf, 1);
     }
     if (send_buf) free(send_buf);
@@ -518,7 +518,7 @@ void UserMqttHassAuto(char socket_id)
     topic_buf = malloc(128); //
     if (send_buf != NULL && topic_buf != NULL)
     {
-        sprintf(topic_buf, "homeassistant/switch/%s/socket_%d/config", strMac, socket_id);
+        sprintf(topic_buf, "homeassistant/switch/%s/socket_%d/config", str_mac, socket_id);
         sprintf(send_buf, "{"
                  "\"name\":\"zTC1_socket%d_%s\","
                  "\"stat_t\":\"homeassistant/switch/%s/socket_%d/state\","
@@ -526,7 +526,7 @@ void UserMqttHassAuto(char socket_id)
                  "\"pl_on\":\"{\\\"mac\\\":\\\"%s\\\",\\\"socket_%d\\\":{\\\"on\\\":1}}\","
                  "\"pl_off\":\"{\\\"mac\\\":\\\"%s\\\",\\\"socket_%d\\\":{\\\"on\\\":0}}\""
                  "}",
-                 socket_id, strMac + 8, strMac, socket_id, strMac, socket_id, strMac, socket_id);
+                 socket_id, str_mac + 8, str_mac, socket_id, str_mac, socket_id, str_mac, socket_id);
         UserMqttSendTopic(topic_buf, send_buf, 1);
     }
     if (send_buf) free(send_buf);
@@ -541,7 +541,7 @@ void UserMqttHassAutoName(char socket_id)
     topic_buf = (char *) malloc(64);
     if (send_buf != NULL && topic_buf != NULL)
     {
-        sprintf(topic_buf, "homeassistant/switch/%s/socket_%d/config", strMac, socket_id);
+        sprintf(topic_buf, "homeassistant/switch/%s/socket_%d/config", str_mac, socket_id);
         sprintf(send_buf, "{"
                  "\"name\":\"%s\","
                  "\"stat_t\":\"homeassistant/switch/%s/socket_%d/state\","
@@ -549,7 +549,7 @@ void UserMqttHassAutoName(char socket_id)
                  "\"pl_on\":\"{\\\"mac\\\":\\\"%s\\\",\\\"socket_%d\\\":{\\\"on\\\":1}}\","
                  "\"pl_off\":\"{\\\"mac\\\":\\\"%s\\\",\\\"socket_%d\\\":{\\\"on\\\":0}}\""
                  "}",
-                 user_config->socket_configs[(int)socket_id].name, strMac, socket_id, strMac, socket_id, strMac, socket_id);
+                 user_config->socket_configs[(int)socket_id].name, str_mac, socket_id, str_mac, socket_id, str_mac, socket_id);
         UserMqttSendTopic(topic_buf, send_buf, 0);
     }
     if (send_buf)
@@ -566,7 +566,7 @@ void UserMqttHassAutoPower(void)
     topic_buf = malloc(128); //
     if (send_buf != NULL && topic_buf != NULL)
     {
-        sprintf(topic_buf, "homeassistant/sensor/%s/power/config", strMac);
+        sprintf(topic_buf, "homeassistant/sensor/%s/power/config", str_mac);
         sprintf(send_buf, "{"
                  "\"name\":\"zTC1_power_%s\","
                  "\"state_topic\":\"homeassistant/sensor/%s/power/state\","
@@ -574,7 +574,7 @@ void UserMqttHassAutoPower(void)
                  "\"icon\":\"mdi:gauge\","
                  "\"value_template\":\"{{ value_json.power }}\""
                  "}",
-                 strMac + 8, strMac);
+                 str_mac + 8, str_mac);
 
         UserMqttSendTopic(topic_buf, send_buf, 1);
     }
@@ -589,7 +589,7 @@ void UserMqttHassAutoPowerName(void)
     topic_buf = (char *) malloc(64); //
     if (send_buf != NULL && topic_buf != NULL)
     {
-        sprintf(topic_buf, "homeassistant/sensor/%s/power/config", strMac);
+        sprintf(topic_buf, "homeassistant/sensor/%s/power/config", str_mac);
         sprintf(send_buf, "{"
                  "\"name\":\"zTC1xxxxxx\","
                  "\"state_topic\":\"homeassistant/sensor/%s/power/state\","
@@ -597,7 +597,7 @@ void UserMqttHassAutoPowerName(void)
                  "\"icon\":\"mdi:gauge\","
                  "\"value_template\":\"{{ value_json.power }}\""
                  "}",
-                 strMac);
+                 str_mac);
         send_buf[13] = 0xe5;
         send_buf[14] = 0x8a;
         send_buf[15] = 0x9f;
@@ -620,7 +620,7 @@ void UserMqttHassPower(void)
     topic_buf = malloc(128); //
     if (send_buf != NULL && topic_buf != NULL)
     {
-        sprintf(topic_buf, "homeassistant/sensor/%s/power/state", strMac);
+        sprintf(topic_buf, "homeassistant/sensor/%s/power/state", str_mac);
         sprintf(send_buf, "{\"power\":\"%d.%d\"}", (int)(power/10), (int)(power%10));
         UserMqttSendTopic(topic_buf, send_buf, 0);
     }

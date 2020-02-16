@@ -46,7 +46,7 @@ void UserFunctionCmdReceived(int udp_flag, char* pusrdata)
     {
         cJSON *pRoot = cJSON_CreateObject();
         cJSON_AddStringToObject(pRoot, "name", sys_config->micoSystemConfig.name);
-        cJSON_AddStringToObject(pRoot, "mac", strMac);
+        cJSON_AddStringToObject(pRoot, "mac", str_mac);
         cJSON_AddNumberToObject(pRoot, "type", TYPE);
         cJSON_AddStringToObject(pRoot, "type_name", TYPE_NAME);
 
@@ -66,11 +66,11 @@ void UserFunctionCmdReceived(int udp_flag, char* pusrdata)
 
     //开始正式处理所有命令
     if ((p_name && cJSON_IsString(p_name) && strcmp(p_name->valuestring, sys_config->micoSystemConfig.name) == 0)    //name
-         || (p_mac && cJSON_IsString(p_mac) && strcmp(p_mac->valuestring, strMac) == 0)   //mac
+         || (p_mac && cJSON_IsString(p_mac) && strcmp(p_mac->valuestring, str_mac) == 0)   //mac
        )
     {
         cJSON *json_send = cJSON_CreateObject();
-        cJSON_AddStringToObject(json_send, "mac", strMac);
+        cJSON_AddStringToObject(json_send, "mac", str_mac);
 
         //解析重启命令
         if(p_cmd && cJSON_IsString(p_cmd) && strcmp(p_cmd->valuestring, "restart") == 0)

@@ -53,7 +53,6 @@ typedef struct
 
 extern char rtc_init;
 extern uint32_t total_time;
-extern char strMac[16];
 extern char str_mac[16];
 extern uint32_t power;
 extern system_config_t* sys_config;
