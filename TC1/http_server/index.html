@@ -510,6 +510,7 @@ function GetSysLog() {
         log_div.scrollTo(0, log_div.scrollHeight);
     });
 }
+GetSysLog();
 
 function GetTimedTask() {
     HttpGet("/task", function (re) {

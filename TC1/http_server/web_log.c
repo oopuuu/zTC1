@@ -29,13 +29,13 @@ char* GetLogRecord()
     int i = log_record.idx - LOG_NUM + 1;
     i = i < 0 ? 0 : i;
     char* tmp = log_record_str;
+    sprintf(tmp, "%d\n", log_record.idx);
     for (; i <= log_record.idx; i++)
     {
+        tmp += strlen(tmp);
         if (!log_record.logs[i%LOG_NUM]) continue;
         sprintf(tmp, "%s\n", log_record.logs[i%LOG_NUM]);
-        tmp += strlen(tmp);
     }
-    sprintf(tmp, "%d", log_record.idx);
     return log_record_str;
 }
 
