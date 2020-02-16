@@ -15,7 +15,7 @@
 char rtc_init = 0; //sntp校时成功标志位
 uint32_t total_time = 0;
 char str_mac[16] = { 0 };
-uint32_t power = 0;
+uint32_t real_time_power = 0;
 
 system_config_t* sys_config;
 user_config_t* user_config;
@@ -146,11 +146,11 @@ int application_start(void)
     while (1)
     {
         //发送功率数据
-        uint32_t power2 = 171 * (p_count - last_p_count) / 10;
+        real_time_power = 171 * (p_count - last_p_count) / 10;
         last_p_count = p_count;
-        //SetPowerRecord(&power_record, power2);
+        //SetPowerRecord(&power_record, real_time_power);
         sprintf(power_buf, "{\"mac\":\"%s\",\"power\":\"%u.%u\",\"total_time\":%u}",
-            str_mac, (unsigned int)(power2 / 10), (unsigned int)(power2 % 10), (unsigned int)total_time);
+            str_mac, (unsigned int)(real_time_power/10), (unsigned int)(real_time_power%10), (unsigned int)total_time);
         UserSend(0, power_buf);
         UserMqttHassPower();
 

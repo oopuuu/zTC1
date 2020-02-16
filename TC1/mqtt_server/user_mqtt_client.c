@@ -621,7 +621,7 @@ void UserMqttHassPower(void)
     if (send_buf != NULL && topic_buf != NULL)
     {
         sprintf(topic_buf, "homeassistant/sensor/%s/power/state", str_mac);
-        sprintf(send_buf, "{\"power\":\"%d.%d\"}", (int)(power/10), (int)(power%10));
+        sprintf(send_buf, "{\"power\":\"%d.%d\"}", (int)(real_time_power/10), (int)(real_time_power%10));
         UserMqttSendTopic(topic_buf, send_buf, 0);
     }
     if (send_buf) free(send_buf);

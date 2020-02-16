@@ -99,11 +99,11 @@ void UserFunctionCmdReceived(int udp_flag, char* pusrdata)
             char *temp_buf = malloc(16);
             if (temp_buf != NULL)
             {
-                sprintf(temp_buf, "%d.%d", (int)(power/10), (int)(power%10));
+                sprintf(temp_buf, "%d.%d", (int)(real_time_power/10), (int)(real_time_power%10));
                 cJSON_AddStringToObject(json_send, "power", temp_buf);
                 free(temp_buf);
             }
-            os_log("power:%d", (int)power);
+            os_log("power:%d", (int)real_time_power);
         }
         //解析主机setting-----------------------------------------------------------------
         cJSON *p_setting = cJSON_GetObjectItem(pJsonRoot, "setting");
