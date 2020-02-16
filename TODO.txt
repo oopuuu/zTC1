@@ -8,4 +8,3 @@
 7. user_config 如何保存
 8. 重复定时任务
 9. 处理计算功率超过3秒的情况
-10.home-assistant没有功率

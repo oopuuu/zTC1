@@ -369,7 +369,7 @@ void MqttClientThread(mico_thread_arg_t arg)
 
                 require_noerr_string(err, MQTT_reconnect, "ERROR: MQTT publish data err");
 
-                mqtt_log("MQTT publish data success! send_topic=[%s], msg=[%ld].", p_send_msg->topic, p_send_msg->datalen);
+                //mqtt_log("MQTT publish data success! send_topic=[%s], msg=[%ld].", p_send_msg->topic, p_send_msg->datalen);
                 no_mqtt_msg_exchange = false;
                 free(p_send_msg);
                 p_send_msg = NULL;
