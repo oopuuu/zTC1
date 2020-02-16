@@ -46,15 +46,20 @@ const unsigned char* GetSocketStatus()
 
 void SetSocketStatus(char* socket_status)
 {
-    int ons[6] = { 0 };
     sscanf(socket_status, "%d,%d,%d,%d,%d,%d,",
-        &ons[0], &ons[1], &ons[2], &ons[3], &ons[4], &ons[5]);
+        (int*)&user_config->socket_configs[0].on,
+        (int*)&user_config->socket_configs[1].on,
+        (int*)&user_config->socket_configs[2].on,
+        (int*)&user_config->socket_configs[3].on,
+        (int*)&user_config->socket_configs[4].on,
+        (int*)&user_config->socket_configs[5].on);
     int i = 0;
     for (i = 0; i < SOCKET_NUM; i++)
     {
-        UserRelaySet(i, ons[i]);
+        UserRelaySet(i, user_config->socket_configs[i].on);
         UserMqttSendSocketState(i);
     }
+    mico_system_context_update(sys_config);
 }
 
 /*UserRelaySet
