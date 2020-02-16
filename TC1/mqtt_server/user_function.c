@@ -215,7 +215,7 @@ bool JsonSocketAnalysis(int udp_flag, unsigned char x, cJSON * pJsonRoot, cJSON 
     if (!pJsonSend) return false;
     bool return_flag = false;
     char socket_str[] = "socket_X";
-    socket_str[5] = x + '0';
+    socket_str[7] = x + '0';
 
     cJSON *p_socket = cJSON_GetObjectItem(pJsonRoot, socket_str);
     if (!p_socket) return_flag = false;

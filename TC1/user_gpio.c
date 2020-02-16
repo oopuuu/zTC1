@@ -53,6 +53,7 @@ void SetSocketStatus(char* socket_status)
     for (i = 0; i < SOCKET_NUM; i++)
     {
         UserRelaySet(i, ons[i]);
+        UserMqttSendSocketState(i);
     }
 }
 

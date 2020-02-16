@@ -167,7 +167,7 @@ exit:
 static int HttpGetWifiConfig(httpd_request_t *req)
 {
     OSStatus err = kNoErr;
-    const unsigned char* status = GetSocketStatus();
+    const unsigned char* status = "???";
     send_http(status, strlen((char*)status), exit, &err);
 exit:
     return err;
@@ -243,7 +243,7 @@ static int HttpSetMqttConfig(httpd_request_t *req)
     require_noerr(err, exit);
 
     sscanf(buf, "%s %d", MQTT_SERVER, &MQTT_SERVER_PORT);
-    //UserMqttInit();
+    mico_system_context_update(sys_config);
 
     send_http("OK", 2, exit, &err);
 
