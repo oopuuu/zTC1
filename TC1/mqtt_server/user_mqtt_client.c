@@ -459,7 +459,7 @@ void UserMqttHassAuto(char socket_id)
     {
         sprintf(topic_buf, "homeassistant/switch/%s/socket_%d/config", str_mac, socket_id);
         sprintf(send_buf, 
-            "{\"name\":\"TC1-%s_Socket_%d\","
+            "{\"name\":\"TC1_%s_Socket_%d\","
             "\"stat_t\":\"homeassistant/switch/%s/socket_%d/state\","
             "\"cmd_t\":\"device/ztc1/set\","
             "\"pl_on\":\"set socket %s %d 1\","
@@ -483,7 +483,7 @@ void UserMqttHassAutoPower(void)
     {
         sprintf(topic_buf, "homeassistant/sensor/%s/power/config", str_mac);
         sprintf(send_buf, 
-            "{\"name\":\"TC1-%s_Power\","
+            "{\"name\":\"TC1_%s_Power\","
             "\"state_topic\":\"homeassistant/sensor/%s/power/state\","
             "\"unit_of_measurement\":\"W\","
             "\"icon\":\"mdi:gauge\","
