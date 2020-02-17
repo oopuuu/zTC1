@@ -4,7 +4,7 @@
 #include "mico.h"
 #include "micokit_ext.h"
 
-#define VERSION "v1.0.11"
+#define VERSION "v1.0.12"
 
 #define TYPE 1
 #define TYPE_NAME "zTC1"

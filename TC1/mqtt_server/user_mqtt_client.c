@@ -71,24 +71,24 @@ void UserMqttTimerFunc(void *arg)
     }
     if (mico_rtos_is_queue_empty(&mqtt_msg_send_queue))
     {
+        timer_status++;
         switch (timer_status)
         {
-        case 0:
         case 1:
         case 2:
         case 3:
         case 4:
         case 5:
+        case 6:
             UserMqttHassAuto(timer_status);
             break;
-        case 6:
+        case 7:
             UserMqttHassAutoPower();
             break;
         default:
             mico_stop_timer(&timer_handle);
             break;
         }
-        timer_status++;
     }
 }
 
@@ -450,6 +450,7 @@ OSStatus UserMqttSendSocketState(char socket_id)
 //hass mqtt自动发现数据开关发送
 void UserMqttHassAuto(char socket_id)
 {
+    socket_id--;
     char *send_buf = NULL;
     char *topic_buf = NULL;
     send_buf = (char *) malloc(300);
@@ -463,7 +464,7 @@ void UserMqttHassAuto(char socket_id)
             "\"cmd_t\":\"device/ztc1/set\","
             "\"pl_on\":\"set socket %s %d 1\","
             "\"pl_off\":\"set socket %s %d 0\"}",
-            str_mac+8, socket_id, str_mac, socket_id, str_mac, socket_id, str_mac, socket_id);
+            str_mac+8, socket_id+1, str_mac, socket_id, str_mac, socket_id, str_mac, socket_id);
         UserMqttSendTopic(topic_buf, send_buf, 0);
     }
     if (send_buf)
