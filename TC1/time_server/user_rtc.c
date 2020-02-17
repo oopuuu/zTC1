@@ -4,7 +4,6 @@
 #include "main.h"
 #include "user_gpio.h"
 #include "sntp.h"
-#include "c_json/c_json.h"
 #include "mqtt_server/user_mqtt_client.h"
 #include "mqtt_server/user_function.h"
 
