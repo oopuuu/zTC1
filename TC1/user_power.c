@@ -28,7 +28,7 @@ char* GetPowerRecord(int idx)
     char* tmp = power_record_str;
     for (; i <= power_record.idx; i++)
     {
-        sprintf(tmp, "%u,", (unsigned int)power_record.powers[i%PW_NUM]);
+        sprintf(tmp, "%lu,", power_record.powers[i%PW_NUM]);
         tmp += strlen(tmp);
     }
     *(--tmp) = 0;
@@ -36,7 +36,7 @@ char* GetPowerRecord(int idx)
 }
 
 uint64_t NS = 1000000000;
-float n_1s = 0;       //在当前一秒秒功率中断次数
+float n_1s = 0;       //在当前这一秒功率中断次数
 uint64_t past_ns = 0; //系统运行的纳秒数
 uint64_t irq_old = 0; //上次中断的时间(纳秒)
 
@@ -52,23 +52,22 @@ static void PowerIrqHandler(void* arg)
     {
         n_1s += 1;
         irq_old = past_ns;
+        return;
     }
-    else
-    {
-        int n = (spend_ns - past_ns % NS) / NS;
-        n_1s += (float)(NS - irq_old % NS) / spend_ns;
-        float power2 = 17.1 * n_1s;
-        SetPowerRecord(&power_record, (int)power2);
 
-        int i = 0;
-        for (; i < n; i++)
-        {
-            power2 = 17.1 * NS / spend_ns;
-            SetPowerRecord(&power_record, (int)power2);
-        }
-        irq_old = past_ns;
-        n_1s = (float)(past_ns % NS) / spend_ns;
+    int n = (spend_ns - past_ns % NS) / NS;
+    n_1s += (float)(NS - irq_old % NS) / spend_ns;
+    float power2 = 17.1 * n_1s;
+    SetPowerRecord(&power_record, (int)power2);
+
+    int i = 0;
+    for (; i < n; i++)
+    {
+        power2 = 17.1 * NS / spend_ns;
+        SetPowerRecord(&power_record, (int)power2);
     }
+    irq_old = past_ns;
+    n_1s = (float)(past_ns % NS) / spend_ns;
 }
 
 void PowerInit(void)
