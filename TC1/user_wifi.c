@@ -5,8 +5,6 @@
 #include "user_gpio.h"
 #include "http_server/web_log.h"
 
-#define os_log(format, ...) do { custom_log("WIFI", format, ##__VA_ARGS__); web_log(format, ##__VA_ARGS__) } while(0)
-
 char wifi_status = WIFI_STATE_NOCONNECT;
 
 mico_timer_t wifi_led_timer;
@@ -19,7 +17,7 @@ static void WifiGetIpCallback(IPStatusTypedef *pnet, void * arg)
     strcpy(ip_status.gateway, pnet->gate);
     strcpy(ip_status.mask, pnet->mask);
 
-    os_log("got IP:%s", pnet->ip);
+    wifi_log("got IP:%s", pnet->ip);
     wifi_status = WIFI_STATE_CONNECTED;
     //UserFunctionCmdReceived(1,"{\"cmd\":\"device report\"}");
 }
@@ -36,7 +34,7 @@ static void WifiStatusCallback(WiFiEvent status, void* arg)
         OSStatus status = micoWlanSuspendSoftAP(); //关闭AP
         if (status != kNoErr)
         {
-            os_log("close ap error[%d]", status);
+            wifi_log("close ap error[%d]", status);
         }
 
         ip_status.mode = 1;
@@ -68,7 +66,7 @@ char* wifi_ret = NULL;
 void WifiScanCallback(ScanResult_adv* scan_ret, void* arg)
 {
     int count = (int)scan_ret->ApNum;
-    os_log("wifi_scan_callback ApNum[%d] ApList[0](%s)", count, scan_ret->ApList[0].ssid);
+    wifi_log("wifi_scan_callback ApNum[%d] ApList[0](%s)", count, scan_ret->ApList[0].ssid);
 
     int i = 0;
     wifi_ret = malloc(sizeof(char)*count * (32 + 2) + 50);
@@ -80,7 +78,7 @@ void WifiScanCallback(ScanResult_adv* scan_ret, void* arg)
     {
         ApInfo* ap = (ApInfo*)&scan_ret->ApList[i];
         uint8_t* mac = (uint8_t*)ap->bssid;
-        os_log("wifi_scan_callback ssid[%16s] bssid[%02X-%02X-%02X-%02X-%02X-%02X] security[%d]",
+        wifi_log("wifi_scan_callback ssid[%16s] bssid[%02X-%02X-%02X-%02X-%02X-%02X] security[%d]",
             ap->ssid, mac[0], mac[1], mac[2], mac[3], mac[4], mac[5], ap->security);
         char* ssid = scan_ret->ApList[i].ssid;
         //排除隐藏的wifi和SSID带'或"的我wifi
@@ -110,7 +108,7 @@ static void WifiLedTimerCallback(void* arg)
     switch (wifi_status)
     {
         case WIFI_STATE_FAIL:
-            os_log("wifi connect fail");
+            wifi_log("wifi connect fail");
             UserLedSet(0);
             mico_rtos_stop_timer(&wifi_led_timer);
             break;
@@ -134,7 +132,7 @@ static void WifiLedTimerCallback(void* arg)
 
 void WifiConnect(char* wifi_ssid, char* wifi_key)
 {
-    os_log("WifiConnect wifi_ssid[%s] wifi_key[%s]", wifi_ssid, wifi_key);
+    wifi_log("WifiConnect wifi_ssid[%s] wifi_key[%s]", wifi_ssid, wifi_key);
     //wifi配置初始化
     network_InitTypeDef_st wNetConfig;
 
@@ -174,7 +172,7 @@ void ApConfig(char* name, char* key)
 {
     strncpy(user_config->ap_name, name, 32);
     strncpy(user_config->ap_key, key, 32);
-    os_log("ApConfig ap_name[%s] ap_key[%s]", user_config->ap_name, user_config->ap_key);
+    wifi_log("ApConfig ap_name[%s] ap_key[%s]", user_config->ap_name, user_config->ap_key);
     micoWlanSuspendStation();
     ApInit(false);
     mico_system_context_update(sys_config);
@@ -186,7 +184,7 @@ void ApInit(bool use_defaul)
     {
         sprintf(user_config->ap_name, ZZ_AP_NAME, str_mac + 6);
         sprintf(user_config->ap_key, "%s", ZZ_AP_KEY);
-        os_log("ApInit ap_name[%s] ap_ke[%s]", user_config->ap_name, user_config->ap_key);
+        wifi_log("ApInit ap_name[%s] ap_ke[%s]", user_config->ap_name, user_config->ap_key);
     }
 
     network_InitTypeDef_st wNetConfig;
@@ -201,6 +199,6 @@ void ApInit(bool use_defaul)
     strcpy((char *)wNetConfig.dnsServer_ip_addr, ZZ_AP_DNS_SERVER);
     micoWlanStart(&wNetConfig);
 
-    os_log("ApInit ssid[%s] key[%s]", wNetConfig.wifi_ssid, wNetConfig.wifi_key);
+    wifi_log("ApInit ssid[%s] key[%s]", wNetConfig.wifi_ssid, wNetConfig.wifi_key);
 }
 

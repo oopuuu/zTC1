@@ -1,5 +1,4 @@
 #include "http_server/web_log.h"
-#define os_log(format, ...) do { custom_log("KEY", format, ##__VA_ARGS__); web_log(format, ##__VA_ARGS__) } while(0)
 
 #include "main.h"
 #include "user_gpio.h"
@@ -104,14 +103,14 @@ void UserRelaySetAll(char y)
 
 static void KeyLongPress(void)
 {
-//  os_log("KeyLongPress");
+//  key_log("KeyLongPress");
 //  UserLedSet(1);
 //  UserMqttSend("mqtt test");
 }
 
 static void KeyLong10sPress(void)
 {
-    os_log("WARNGIN: user params restored!");
+    key_log("WARNGIN: user params restored!");
     appRestoreDefault_callback(user_config, sizeof(user_config_t));
     sys_config->micoSystemConfig.ssid[0] = 0;
     mico_system_context_update(mico_system_context_get());
@@ -152,7 +151,7 @@ static void KeyTimeoutHandler(void* arg)
         key_time++;
         if (key_time <= BUTTON_LONG_PRESS_TIME)
         {
-            os_log("button long pressed:%d",key_time);
+            key_log("button long pressed:%d",key_time);
 
             if (key_time == 30)
             {
@@ -179,7 +178,7 @@ static void KeyTimeoutHandler(void* arg)
         if (key_time < BUTTON_LONG_PRESS_TIME)
         {   //100ms*10=1s 大于1s为长按
             key_time = 0;
-            os_log("button short pressed:%d",key_time);
+            key_log("button short pressed:%d",key_time);
             KeyShortPress();
         }
         else if (key_time > 100)

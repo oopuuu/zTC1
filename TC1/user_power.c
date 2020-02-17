@@ -1,5 +1,4 @@
 #include "http_server/web_log.h"
-#define os_log(format, ...) do { custom_log("OTA", format, ##__VA_ARGS__); web_log(format, ##__VA_ARGS__) } while(0)
 #include "TimeUtils.h"
 
 #include "mico.h"
@@ -70,7 +69,7 @@ static void PowerIrqHandler(void* arg)
 
 void PowerInit(void)
 {
-    os_log("user_power_init");
+    ota_log("user_power_init");
     MicoGpioInitialize(POWER, INPUT_PULL_UP);
     MicoGpioEnableIRQ(POWER, IRQ_TRIGGER_FALLING_EDGE, PowerIrqHandler, NULL);
 }

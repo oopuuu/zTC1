@@ -20,9 +20,6 @@
  */
 #include "http_server/web_log.h"
 
-#define app_log(M, ...) do { custom_log("APP", M, ##__VA_ARGS__); web_log(M, ##__VA_ARGS__) } while(0)
-#define mqtt_log(M, ...) do { custom_log("MQTT", M, ##__VA_ARGS__); web_log(M, ##__VA_ARGS__) } while(0)
-
 #include "main.h"
 #include "mico.h"
 #include "MQTTClient.h"

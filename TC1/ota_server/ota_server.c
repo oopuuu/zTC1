@@ -29,18 +29,12 @@
  *  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  ******************************************************************************
  */
-#include "mico.h"
+#include "main.h"
 #include "HTTPUtils.h"
 #include "SocketUtils.h"
 #include "ota_server.h"
 #include "url.h"
 #include "http_server/web_log.h"
-
-#if OTA_DEBUG
-#define ota_server_log(M, ...) do { custom_log("OTA", M, ##__VA_ARGS__); web_log(M, ##__VA_ARGS__) } while(0)
-#else
-#define ota_server_log(M, ...)
-#endif
 
 static ota_server_context_t *ota_server_context = NULL;
 static HTTPHeader_t *httpHeader = NULL;
@@ -176,7 +170,7 @@ static int OtaServerSendHeader(void)
 
     ret = OtaServerSend((char *) header, strlen(header));
 
-//  ota_server_log("send: %d\r\n%s", strlen(header), header);
+//  ota_log("send: %d\r\n%s", strlen(header), header);
     if (header != NULL) free(header);
     return ret;
 }
@@ -219,7 +213,7 @@ static int OtaServerConnectServer(struct in_addr in_addr)
         return -1;
     }
 
-    ota_server_log("ota server connected!");
+    ota_log("ota server connected!");
     return 0;
 }
 
@@ -253,7 +247,7 @@ static void OtaServerThread(mico_thread_arg_t arg)
     pptr=hostent_content->h_addr_list;
     in_addr.s_addr = *(uint32_t *)(*pptr);
     strcpy(ota_server_context->download_url.ip, inet_ntoa(in_addr));
-    ota_server_log("OTA server address: %s, host ip: %s", ota_server_context->download_url.host, ota_server_context->download_url.ip);
+    ota_log("OTA server address: %s, host ip: %s", ota_server_context->download_url.host, ota_server_context->download_url.ip);
 
     offset = 0;
     MicoFlashErase(MICO_PARTITION_OTA_TEMP, 0x0, ota_partition->partition_length);
@@ -309,7 +303,7 @@ static void OtaServerThread(mico_thread_arg_t arg)
                 case kNoSpaceErr:
                 case kConnectionErr:
                 default:
-                    ota_server_log("ERROR: HTTP Header parse error: %d", err);
+                    ota_log("ERROR: HTTP Header parse error: %d", err);
                     break;
             }
         }
@@ -330,7 +324,7 @@ static void OtaServerThread(mico_thread_arg_t arg)
                 mico_ota_switch_to_new_fw(ota_server_context->download_state.download_len, crc16);
                 mico_system_power_perform(mico_system_context_get(), eState_Software_Reset);
             }else{
-                ota_server_log("OTA md5 check err, Calculation:%s, Get:%s", md5_value_string, ota_server_context->ota_check.md5);
+                ota_log("OTA md5 check err, Calculation:%s, Get:%s", md5_value_string, ota_server_context->ota_check.md5);
                 OtaServerProgressSet(OTA_FAIL);
             }
             goto DELETE;
@@ -354,7 +348,7 @@ DELETE:
         ota_server_context = NULL;
     }
 
-    ota_server_log("ota server thread will delete");
+    ota_log("ota server thread will delete");
     mico_rtos_delete_thread(NULL);
 }
 

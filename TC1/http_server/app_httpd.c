@@ -94,10 +94,10 @@ static int HttpGetIndexPage(httpd_request_t *req)
     OSStatus err = kNoErr;
 
     err = httpd_send_all_header(req, HTTP_RES_200, sizeof(index_html), HTTP_CONTENT_HTML_ZIP);
-    require_noerr_action(err, exit, app_httpd_log("ERROR: Unable to send http wifisetting headers."));
+    require_noerr_action(err, exit, http_log("ERROR: Unable to send http wifisetting headers."));
 
     err = httpd_send_body(req->sock, index_html, sizeof(index_html));
-    require_noerr_action(err, exit, app_httpd_log("ERROR: Unable to send http wifisetting body."));
+    require_noerr_action(err, exit, http_log("ERROR: Unable to send http wifisetting body."));
 
 exit:
     return err;
@@ -284,13 +284,13 @@ static int HttpAddTask(httpd_request_t *req)
 
     pTimedTask task = (pTimedTask)malloc(sizeof(struct TimedTask));
     int re = sscanf(buf, "%ld %d %d", &task->prs_time, &task->socket_idx, &task->on);
-    app_httpd_log("AddTask buf[%s] re[%d] (%ld %d %d)",
+    http_log("AddTask buf[%s] re[%d] (%ld %d %d)",
         buf, re, task->prs_time, task->socket_idx, task->on);
     if (task->prs_time < 1577428136 || task->prs_time > 9577428136
         || task->socket_idx < 0 || task->socket_idx > 5
         || (task->on != 0 && task->on != 1))
     {
-        app_httpd_log("AddTask Error!");
+        http_log("AddTask Error!");
         re = 0;
     }
 
@@ -305,7 +305,7 @@ static int HttpDelTask(httpd_request_t *req)
 {
     //TODO 从url获取时间
     char* time_str = strstr(req->filename, "?time=");
-    app_httpd_log("HttpDelTask url[%s] time_str[%s][%s]", req->filename, time_str, time_str + 6);
+    http_log("HttpDelTask url[%s] time_str[%s][%s]", req->filename, time_str, time_str + 6);
 
     int time1;
     sscanf(time_str + 6, "%d", &time1);
@@ -335,7 +335,7 @@ static int OtaStart(httpd_request_t *req)
     err = httpd_get_data(req, buf, 64);
     require_noerr(err, exit);
 
-    app_httpd_log("OtaStart ota_url[%s]", buf);
+    http_log("OtaStart ota_url[%s]", buf);
     UserOtaStart(buf, NULL);
 
     send_http("OK", 2, exit, &err);
@@ -363,26 +363,26 @@ static void AppHttpRegisterHandlers()
     int rc;
     rc = httpd_register_wsgi_handlers(g_app_handlers, g_app_handlers_no);
     if (rc) {
-        app_httpd_log("failed to register test web handler");
+        http_log("failed to register test web handler");
     }
 }
 
 static int _AppHttpdStart()
 {
     OSStatus err = kNoErr;
-    app_httpd_log("initializing web-services");
+    http_log("initializing web-services");
 
     /*Initialize HTTPD*/
     if(is_http_init == false) {
         err = httpd_init();
-        require_noerr_action(err, exit, app_httpd_log("failed to initialize httpd"));
+        require_noerr_action(err, exit, http_log("failed to initialize httpd"));
         is_http_init = true;
     }
 
     /*Start http thread*/
     err = httpd_start();
     if(err != kNoErr) {
-        app_httpd_log("failed to start httpd thread");
+        http_log("failed to start httpd thread");
         httpd_shutdown();
     }
 exit:
@@ -410,9 +410,9 @@ int AppHttpdStop()
     OSStatus err = kNoErr;
 
     /* HTTPD and services */
-    app_httpd_log("stopping down httpd");
+    http_log("stopping down httpd");
     err = httpd_stop();
-    require_noerr_action(err, exit, app_httpd_log("failed to halt httpd"));
+    require_noerr_action(err, exit, http_log("failed to halt httpd"));
 
 exit:
     return err;

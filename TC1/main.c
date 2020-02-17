@@ -8,8 +8,6 @@
 #include "http_server/app_httpd.h"
 #include "timed_task/timed_task.h"
 
-#define os_log(format, ...) do { custom_log("TC1", format, ##__VA_ARGS__); web_log(format, ##__VA_ARGS__) } while(0)
-
 char rtc_init = 0; //sntp校时成功标志位
 uint32_t total_time = 0;
 char str_mac[16] = { 0 };
@@ -48,7 +46,7 @@ void appRestoreDefault_callback(void * const user_config_data, uint32_t size)
 int application_start(void)
 {
     int i;
-    os_log("start version[%s]", VERSION);
+    tc1_log("start version[%s]", VERSION);
 
     //char main_num=0;
     OSStatus err = kNoErr;
@@ -65,13 +63,13 @@ int application_start(void)
     mico_wlan_get_mac_address(mac);
     sprintf(str_mac, "%02X%02X%02X%02X%02X%02X",
         mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
-    os_log("str_mac[%s]", str_mac);
+    tc1_log("str_mac[%s]", str_mac);
 
     bool open_ap = false;
     MicoGpioInitialize((mico_gpio_t)Button, INPUT_PULL_UP);
     if (!MicoGpioInputGet(Button))
     {   //开机时按钮状态
-        os_log("press ap_init");
+        tc1_log("press ap_init");
         ApInit(false);
         open_ap = true;
     }
@@ -86,7 +84,7 @@ int application_start(void)
 
     if (user_config->version != USER_CONFIG_VERSION)
     {
-        os_log("WARNGIN: user params restored!");
+        tc1_log("WARNGIN: user params restored!");
         err = mico_system_context_restore(sys_config);
         require_noerr(err, exit);
     }
@@ -96,13 +94,13 @@ int application_start(void)
         sprintf(sys_config->micoSystemConfig.name, ZTC1_NAME, str_mac+8);
     }
 
-    os_log("user:%s",user_config->user);
-    os_log("device name:%s",sys_config->micoSystemConfig.name);
-    os_log("mqtt_ip:%s",user_config->mqtt_ip);
-    os_log("mqtt_port:%d",user_config->mqtt_port);
-    os_log("mqtt_user:%s",user_config->mqtt_user);
-    os_log("mqtt_password:%s",user_config->mqtt_password);
-    os_log("version:%d",user_config->version);
+    tc1_log("user:%s",user_config->user);
+    tc1_log("device name:%s",sys_config->micoSystemConfig.name);
+    tc1_log("mqtt_ip:%s",user_config->mqtt_ip);
+    tc1_log("mqtt_port:%d",user_config->mqtt_port);
+    tc1_log("mqtt_user:%s",user_config->mqtt_user);
+    tc1_log("mqtt_password:%s",user_config->mqtt_password);
+    tc1_log("version:%d",user_config->version);
 
     WifiInit();
     if (!open_ap)
@@ -143,20 +141,20 @@ int application_start(void)
         time_t now = time(NULL);
         if (task_top && now >= task_top->prs_time)
         {
-            os_log("process task time[%ld] socket_idx[%d] on[%d]",
+            tc1_log("process task time[%ld] socket_idx[%d] on[%d]",
                 task_top->prs_time, task_top->socket_idx, task_top->on);
             UserRelaySet(task_top->socket_idx, task_top->on);
             DelFirstTask();
         }
         else
         {
-            //os_log("timed task count[%u]", task_count);
+            //tc1_log("timed task count[%u]", task_count);
         }
         mico_thread_msleep(1000);
     }
 
 exit:
-    os_log("application_start ERROR!");
+    tc1_log("application_start ERROR!");
     if (power_buf) free(power_buf);
     return 0;
 }

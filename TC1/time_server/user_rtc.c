@@ -1,6 +1,4 @@
 #include "http_server/web_log.h"
-#define os_log(format, ...) do { custom_log("RTC", format, ##__VA_ARGS__); web_log(format, ##__VA_ARGS__) } while(0)
-
 #include "main.h"
 #include "user_gpio.h"
 #include "sntp.h"
@@ -37,7 +35,7 @@ OSStatus UserSntpGetTime()
             hostent_content = gethostbyname(ntp_hosts[i]);
             if (hostent_content == NULL)
             {
-                os_log("gethostbyname(%s)", ntp_hosts[i]);
+                rtc_log("gethostbyname(%s)", ntp_hosts[i]);
                 continue;
             }
             pptr = hostent_content->h_addr_list;
@@ -52,7 +50,7 @@ OSStatus UserSntpGetTime()
 
     if (err != kNoErr)
     {
-        os_log("sntp_get_time4 err[%d]", err);
+        rtc_log("sntp_get_time4 err[%d]", err);
         return err;
     }
 
@@ -72,7 +70,7 @@ OSStatus UserRtcInit(void)
                                    0x1000, 0);
     require_noerr_string(err, exit, "ERROR: Unable to start the rtc thread.");
 
-    if (kNoErr != err) os_log("ERROR1, app thread exit err: %d kNoErr[%d]", err, kNoErr);
+    if (kNoErr != err) rtc_log("ERROR1, app thread exit err: %d kNoErr[%d]", err, kNoErr);
 
     exit:
     return err;
@@ -94,7 +92,7 @@ void RtcThread(mico_thread_arg_t arg)
             err = UserSntpGetTime();
             if (err == kNoErr)
             {
-                os_log("sntp success!");
+                rtc_log("sntp success!");
                 rtc_init = 1;
                 break;
             }
@@ -143,7 +141,7 @@ void RtcThread(mico_thread_arg_t arg)
     }
 
 //  exit:
-    os_log("EXIT: rtc exit with err = %d.", err);
+    rtc_log("EXIT: rtc exit with err = %d.", err);
     mico_rtos_delete_thread(NULL);
 }
 
