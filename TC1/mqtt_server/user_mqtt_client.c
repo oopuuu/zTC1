@@ -426,6 +426,7 @@ void ProcessHaCmd(char* cmd)
         sscanf(cmd, "set socket %s %d %d", mac, &i, &on);
         app_log("set socket[%d] on[%d]", i, on);
         UserRelaySet(i, on);
+        UserMqttSendSocketState(i);
     }
 }
 
@@ -473,15 +474,13 @@ OSStatus UserMqttSend(char *arg)
 //更新ha开关状态
 OSStatus UserMqttSendSocketState(char socket_id)
 {
-    char *send_buf = NULL;
-    char *topic_buf = NULL;
-    send_buf = malloc(64);
-    topic_buf = malloc(64);
+    char *send_buf = malloc(64);
+    char *topic_buf = malloc(64);
     OSStatus oss_status = kUnknownErr;
     if (send_buf != NULL && topic_buf != NULL)
     {
         sprintf(topic_buf, "homeassistant/switch/%s/socket_%d/state", str_mac, (int)socket_id);
-        sprintf(send_buf, "{\"mac\":\"%s\",\"socket_%d\":{\"on\":%d}}", str_mac, socket_id, (int)user_config->socket_configs[(int)socket_id].on);
+        sprintf(send_buf, "set socket %s %d %d", str_mac, socket_id, (int)user_config->socket_configs[(int)socket_id].on);
         oss_status = UserMqttSendTopic(topic_buf, send_buf, 1);
     }
     if (send_buf) free(send_buf);
@@ -527,7 +526,7 @@ void UserMqttHassAutoName(char socket_id)
                  "\"name\":\"%s\","
                  "\"stat_t\":\"homeassistant/switch/%s/socket_%d/state\","
                  "\"cmd_t\":\"device/ztc1/set\","
-                 "\"pl_on\":\"{\\\"mac\\\":\\\"%s\\\",\\\"socket_%d\\\":{\\\"on\\\":1}}\","
+                 "\"pl_on\":\"set socket %s %d 1\","
                  "\"pl_off\":\"set socket %s %d 0\"}",
                  user_config->socket_configs[(int)socket_id].name, str_mac, socket_id, str_mac, socket_id, str_mac, socket_id);
         UserMqttSendTopic(topic_buf, send_buf, 0);
