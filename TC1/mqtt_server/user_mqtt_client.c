@@ -76,58 +76,33 @@ void UserMqttTimerFunc(void *arg)
         timer_status++;
         switch (timer_status)
         {
-            case 1:
-                UserMqttHassAutoPower();
-                break;
-            case 2:
-                UserMqttHassAuto(0);
-                break;
-            case 3:
-                UserMqttHassAuto(1);
-                break;
-            case 4:
-                UserMqttHassAuto(2);
-                break;
-            case 5:
-                UserMqttHassAuto(3);
-                break;
-            case 6:
-                UserMqttHassAuto(4);
-                break;
-            case 7:
-                UserMqttHassAuto(5);
-                break;
-            case 8:
-                UserMqttHassAutoName(0);
-                break;
-            case 9:
-                UserMqttHassAutoName(1);
-                break;
-            case 10:
-                UserMqttHassAutoName(2);
-                break;
-            case 11:
-                UserMqttHassAutoName(3);
-                break;
-            case 12:
-                UserMqttHassAutoName(4);
-                break;
-            case 13:
-                UserMqttHassAutoName(5);
-                break;
-            case 14:
-                UserMqttHassAutoPowerName();
-                break;
-            case 15:
-                if (buf1 == NULL) break;
-                sprintf(buf1, "{\"mac\":\"%s\",\"version\":null,\"socket_0\":{\"on\":null,\"setting\":{\"name\":null}},\"socket_1\":{\"on\":null,\"setting\":{\"name\":null}},\"socket_2\":{\"on\":null,\"setting\":{\"name\":null}},\"socket_3\":{\"on\":null,\"setting\":{\"name\":null}},\"socket_4\":{\"on\":null,\"setting\":{\"name\":null}},\"socket_5\":{\"on\":null,\"setting\":{\"name\":null}}}", str_mac);
-                //UserFunctionCmdReceived(0, buf1);
-                free(buf1);
-                break;
-            default:
-                mico_stop_timer(&timer_handle);
-//              mico_deinit_timer(&timer_handle);
-                break;
+        case 1:
+            UserMqttHassAutoPower();
+            break;
+        case 2:
+        case 3:
+        case 4:
+        case 5:
+        case 6:
+        case 7:
+            UserMqttHassAuto(timer_status - 2);
+            break;
+        case 8:
+        case 9:
+        case 10:
+        case 11:
+        case 12:
+        case 13:
+            UserMqttHassAutoName(timer_status - 8);
+            break;
+        case 14:
+            UserMqttHassAutoPowerName();
+            break;
+        case 15:
+            break;
+        default:
+            mico_stop_timer(&timer_handle);
+            break;
         }
     }
 }
@@ -478,7 +453,7 @@ OSStatus UserMqttSendSocketState(char socket_id)
     if (send_buf != NULL && topic_buf != NULL)
     {
         sprintf(topic_buf, "homeassistant/switch/%s/socket_%d/state", str_mac, (int)socket_id);
-        sprintf(send_buf, "set socket %s %d %d", str_mac, socket_id, (int)user_config->socket_configs[(int)socket_id].on);
+        sprintf(send_buf, "set socket %s %d %d", str_mac, socket_id, (int)user_config->socket_status[(int)socket_id]);
         oss_status = UserMqttSendTopic(topic_buf, send_buf, 1);
     }
     if (send_buf) free(send_buf);
@@ -526,7 +501,7 @@ void UserMqttHassAutoName(char socket_id)
                  "\"cmd_t\":\"device/ztc1/set\","
                  "\"pl_on\":\"set socket %s %d 1\","
                  "\"pl_off\":\"set socket %s %d 0\"}",
-                 user_config->socket_configs[(int)socket_id].name, str_mac, socket_id, str_mac, socket_id, str_mac, socket_id);
+                 "SSS", str_mac, socket_id, str_mac, socket_id, str_mac, socket_id);
         UserMqttSendTopic(topic_buf, send_buf, 0);
     }
     if (send_buf)

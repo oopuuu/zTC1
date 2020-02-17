@@ -40,17 +40,7 @@ void appRestoreDefault_callback(void * const user_config_data, uint32_t size)
     int i;
     for (i = 0; i < SOCKET_NUM; i++)
     {
-        userConfigDefault->socket_configs[i].on = 1;
-        //插座名称 插口1-6
-        userConfigDefault->socket_configs[i].name[0] = 0xe6;
-        userConfigDefault->socket_configs[i].name[1] = 0x8f;
-        userConfigDefault->socket_configs[i].name[2] = 0x92;
-        userConfigDefault->socket_configs[i].name[3] = 0xe5;
-        userConfigDefault->socket_configs[i].name[4] = 0x8f;
-        userConfigDefault->socket_configs[i].name[5] = 0xa3;
-        userConfigDefault->socket_configs[i].name[6] = i + '1';
-        userConfigDefault->socket_configs[i].name[7] = 0;
-        //sprintf(userConfigDefault->socket[i].name, "插座%d", i);//编码异常
+        userConfigDefault->socket_status[i] = 1;
     }
     //mico_system_context_update(sys_config);
 }
@@ -90,7 +80,7 @@ int application_start(void)
     for (i = 0; i < Relay_NUM; i++)
     {
         MicoGpioInitialize(Relay[i], OUTPUT_PUSH_PULL);
-        UserRelaySet(i, user_config->socket_configs[i].on);
+        UserRelaySet(i, user_config->socket_status[i]);
     }
     MicoSysLed(0);
 

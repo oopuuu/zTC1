@@ -11,7 +11,7 @@
 
 #define ZTC1_NAME "zTC1-%s"
 
-#define USER_CONFIG_VERSION 3
+#define USER_CONFIG_VERSION 5
 #define SETTING_MQTT_STRING_LENGTH_MAX 32 //必须4字节对齐。
 
 #define SOCKET_NAME_LENGTH   32
@@ -32,12 +32,6 @@
 #define Relay_5   MICO_GPIO_18
 #define Relay_NUM SOCKET_NUM
 
-typedef struct
-{
-    char name[SOCKET_NAME_LENGTH];
-    char on;    //记录当前开关
-} user_socket_config_t;
-
 //用户保存参数结构体
 typedef struct
 {
@@ -46,7 +40,7 @@ typedef struct
     int mqtt_port;                                       //mqtt service port
     char mqtt_user[SETTING_MQTT_STRING_LENGTH_MAX];      //mqtt service user
     char mqtt_password[SETTING_MQTT_STRING_LENGTH_MAX];  //mqtt service user
-    user_socket_config_t socket_configs[SOCKET_NUM];
+    char socket_status[SOCKET_NUM]; //记录当前开关
     char user[maxNameLen];
     WiFiEvent last_wifi_status;
 } user_config_t;

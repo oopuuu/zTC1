@@ -22,7 +22,7 @@ bool RelayOut(void)
     int i;
     for (i = 0; i < SOCKET_NUM; i++)
     {
-        if (user_config->socket_configs[i].on != 0)
+        if (user_config->socket_status[i] != 0)
         {
             return true;
         }
@@ -33,28 +33,28 @@ bool RelayOut(void)
 const unsigned char* GetSocketStatus()
 {
     sprintf(socket_status, "%d,%d,%d,%d,%d,%d",
-        user_config->socket_configs[0].on,
-        user_config->socket_configs[1].on,
-        user_config->socket_configs[2].on,
-        user_config->socket_configs[3].on,
-        user_config->socket_configs[4].on,
-        user_config->socket_configs[5].on);
+        user_config->socket_status[0],
+        user_config->socket_status[1],
+        user_config->socket_status[2],
+        user_config->socket_status[3],
+        user_config->socket_status[4],
+        user_config->socket_status[5]);
     return (const unsigned char*)socket_status;
 }
 
 void SetSocketStatus(char* socket_status)
 {
     sscanf(socket_status, "%d,%d,%d,%d,%d,%d,",
-        (int*)&user_config->socket_configs[0].on,
-        (int*)&user_config->socket_configs[1].on,
-        (int*)&user_config->socket_configs[2].on,
-        (int*)&user_config->socket_configs[3].on,
-        (int*)&user_config->socket_configs[4].on,
-        (int*)&user_config->socket_configs[5].on);
+        (int*)&user_config->socket_status[0],
+        (int*)&user_config->socket_status[1],
+        (int*)&user_config->socket_status[2],
+        (int*)&user_config->socket_status[3],
+        (int*)&user_config->socket_status[4],
+        (int*)&user_config->socket_status[5]);
     int i = 0;
     for (i = 0; i < SOCKET_NUM; i++)
     {
-        UserRelaySet(i, user_config->socket_configs[i].on);
+        UserRelaySet(i, user_config->socket_status[i]);
         UserMqttSendSocketState(i);
     }
     mico_system_context_update(sys_config);
@@ -78,7 +78,7 @@ void UserRelaySet(unsigned char i, unsigned char on)
         MicoGpioOutputLow(relay[i]);
     }
 
-    user_config->socket_configs[i].on = on;
+    user_config->socket_status[i] = on;
 
     if (RelayOut())
     {
