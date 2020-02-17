@@ -471,7 +471,7 @@ void UserMqttHassAuto(char socket_id)
     {
         sprintf(topic_buf, "homeassistant/switch/%s/socket_%d/config", str_mac, socket_id);
         sprintf(send_buf, 
-            "{\"name\":\"TC1-Socket-%s-%d\","
+            "{\"name\":\"TC1-%s_Socket_%d\","
             "\"stat_t\":\"homeassistant/switch/%s/socket_%d/state\","
             "\"cmd_t\":\"device/ztc1/set\","
             "\"pl_on\":\"set socket %s %d 1\","
