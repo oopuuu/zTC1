@@ -1,11 +1,9 @@
 
 1. 登录
-2. ota进度
-3. station改回ap并关闭station
-4. mqtt
-5. 删除定时任务
-6. 保存ap及密码到Flash
-7. user_config 如何保存
-8. 重复定时任务
-9. 处理计算功率超过3秒的情况
-10.ha不能控制
+2. station改回ap并关闭station
+3. 删除定时任务
+4. 保存ap及密码到Flash
+5. 重复定时任务
+6. 去掉C_Json
+7. 去除user_udp
+8. 统一os_log

@@ -46,6 +46,7 @@ static void MessageArrived(MessageData* md);
 static OSStatus MqttMsgPublish(Client *c, const char* topic, char qos, char retained, const unsigned char* msg, uint32_t msg_len);
 
 OSStatus UserRecvHandler(void *arg);
+void ProcessHaCmd(char* cmd);
 
 bool isconnect = false;
 mico_queue_t mqtt_msg_send_queue = NULL;
@@ -383,6 +384,7 @@ static void MessageArrived(MessageData* md)
     strncpy(p_recv_msg->topic, md->topicName->lenstring.data, md->topicName->lenstring.len);
     memcpy(p_recv_msg->data, message->payload, message->payloadlen);
 
+    app_log("MessageArrived topic[%s] data[%s]", p_recv_msg->topic, p_recv_msg->data);
     err = mico_rtos_send_asynchronous_event(&mqtt_client_worker_thread, UserRecvHandler, p_recv_msg);
     require_noerr(err, exit);
 
@@ -402,12 +404,29 @@ OSStatus UserRecvHandler(void *arg)
     p_mqtt_recv_msg_t p_recv_msg = arg;
     require(p_recv_msg, exit);
 
-    app_log("user get data success! from_topic=[%s], msg=[%ld].\r\n", p_recv_msg->topic, p_recv_msg->datalen);
-    UserFunctionCmdReceived(0, p_recv_msg->data);
+    app_log("user get data success! from_topic=[%s], msg=[%ld].", p_recv_msg->topic, p_recv_msg->datalen);
+    //UserFunctionCmdReceived(0, p_recv_msg->data);
+
+    ProcessHaCmd(p_recv_msg->data);
+
     free(p_recv_msg);
 
     exit:
     return err;
+}
+
+void ProcessHaCmd(char* cmd)
+{
+    app_log("ProcessHaCmd[%s]", cmd);
+    char mac[20] = { 0 };
+
+    if (strcmp(cmd, "set socket") == ' ')
+    {
+        int i, on;
+        sscanf(cmd, "set socket %s %d %d", mac, &i, &on);
+        app_log("set socket[%d] on[%d]", i, on);
+        UserRelaySet(i, on);
+    }
 }
 
 OSStatus UserMqttSendTopic(char *topic, char *arg, char retained)
@@ -486,7 +505,7 @@ void UserMqttHassAuto(char socket_id)
                  "\"stat_t\":\"homeassistant/switch/%s/socket_%d/state\","
                  "\"cmd_t\":\"device/ztc1/set\","
                  "\"pl_on\":\"{\\\"mac\\\":\\\"%s\\\",\\\"socket_%d\\\":{\\\"on\\\":1}}\","
-                 "\"pl_off\":\"{\\\"mac\\\":\\\"%s\\\",\\\"socket_%d\\\":{\\\"on\\\":0}}\""
+                 "\"pl_off\":\"{\\\"mac\\\":\\\"%s\\\",\\\"socket_%d\\\":{\\\"on\\\":0,\\\"ttt1\\\":1}}\""
                  "}",
                  socket_id, str_mac + 8, str_mac, socket_id, str_mac, socket_id, str_mac, socket_id);
         UserMqttSendTopic(topic_buf, send_buf, 1);
@@ -509,8 +528,7 @@ void UserMqttHassAutoName(char socket_id)
                  "\"stat_t\":\"homeassistant/switch/%s/socket_%d/state\","
                  "\"cmd_t\":\"device/ztc1/set\","
                  "\"pl_on\":\"{\\\"mac\\\":\\\"%s\\\",\\\"socket_%d\\\":{\\\"on\\\":1}}\","
-                 "\"pl_off\":\"{\\\"mac\\\":\\\"%s\\\",\\\"socket_%d\\\":{\\\"on\\\":0}}\""
-                 "}",
+                 "\"pl_off\":\"set socket %s %d 0\"}",
                  user_config->socket_configs[(int)socket_id].name, str_mac, socket_id, str_mac, socket_id, str_mac, socket_id);
         UserMqttSendTopic(topic_buf, send_buf, 0);
     }
