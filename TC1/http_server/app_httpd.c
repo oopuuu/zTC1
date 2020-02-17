@@ -167,8 +167,8 @@ exit:
 static int HttpGetWifiConfig(httpd_request_t *req)
 {
     OSStatus err = kNoErr;
-    const unsigned char* status = "???";
-    send_http(status, strlen((char*)status), exit, &err);
+    char* status = "test";
+    send_http(status, strlen(status), exit, &err);
 exit:
     return err;
 }

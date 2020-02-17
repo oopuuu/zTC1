@@ -74,13 +74,47 @@ char* GetPowerRecord(int idx)
     return power_record_str;
 }
 
+uint64_t NS = 1000000000;
 float n_1s = 0;         //功率中断次数
 uint64_t t_x = 0;       //当前秒*1000,000,000
 uint64_t past_ns = 0;   //系统运行的纳秒数
 uint64_t rest_x_ns = 0; //距离当前秒走过的纳秒数
 uint64_t rest_y_ns = 0; //距离下一秒差的纳秒数
 
+uint64_t irq_old = 0; //上次中断的时间(纳秒)
+uint64_t irq_new = 0; //这次中断的时间(纳秒)
+
 static void PowerIrqHandler(void* arg)
+{
+    p_count++;
+
+    past_ns = mico_nanosecond_clock_value();
+    uint64_t spend_ns = past_ns - irq_old;
+
+    if (irq_old % NS + spend_ns <= NS)
+    {
+        n_1s += 1;
+        irq_old = past_ns;
+    }
+    else
+    {
+        int n = (spend_ns - past_ns % NS) / NS;
+        n_1s += (float)(NS - irq_old % NS) / spend_ns;
+        float power2 = 17.1 * n_1s;
+        SetPowerRecord(&power_record, (int)power2);
+
+        int i = 0;
+        for (; i < n; i++)
+        {
+            power2 = 17.1 * NS / spend_ns;
+            SetPowerRecord(&power_record, (int)power2);
+        }
+        irq_old = past_ns;
+        n_1s = (float)(past_ns % NS) / spend_ns;
+    }
+}
+
+static void PowerIrqHandler2(void* arg)
 {
     //clock_count = mico_nanosecond_clock_value();
     //if (timer_irq_count == 0) clock_count_last = clock_count;
@@ -92,23 +126,23 @@ static void PowerIrqHandler(void* arg)
     past_ns = mico_nanosecond_clock_value();
     if (t_x == 0)
     {
-        t_x = past_ns - past_ns % 1000000000;
+        t_x = past_ns - past_ns % NS;
     }
     rest_x_ns = past_ns - t_x;
-    if (rest_x_ns <= 1000000000)
+    if (rest_x_ns <= NS)
     {
         n_1s += 1;
-        rest_y_ns = t_x + 1000000000 - past_ns;
+        rest_y_ns = t_x + NS - past_ns;
     }
-    else if (rest_x_ns > 1000000000 && rest_x_ns < 2000000000)
+    else if (rest_x_ns > NS && rest_x_ns <= NS*2)
     {
-        n_1s += (float)rest_y_ns / (rest_x_ns - 1000000000 + rest_y_ns);
-        rest_y_ns = 2000000000 - rest_x_ns;
-        t_x = past_ns - past_ns % 1000000000;
+        n_1s += (float)rest_y_ns / (rest_x_ns - NS + rest_y_ns);
+        rest_y_ns = NS*2 - rest_x_ns;
+        t_x = past_ns - past_ns % NS;
 
         float power2 = 17.1 * n_1s;
         SetPowerRecord(&power_record, (int)power2);
-        n_1s = (float)(rest_x_ns - 1000000000) / (rest_x_ns - 1000000000 + rest_y_ns);
+        n_1s = (float)(rest_x_ns - NS) / (rest_x_ns - NS + rest_y_ns);
     }
     else
     {
