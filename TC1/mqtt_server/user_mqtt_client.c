@@ -62,8 +62,6 @@ mico_timer_t timer_handle;
 static char timer_status = 0;
 void UserMqttTimerFunc(void *arg)
 {
-    char* buf1 = malloc(1024); //idx为1位时长度为24
-
     LinkStatusTypeDef LinkStatus;
     micoWlanGetLinkStatus(&LinkStatus);
     if (LinkStatus.is_connected != 1)
@@ -93,7 +91,7 @@ void UserMqttTimerFunc(void *arg)
         case 11:
         case 12:
         case 13:
-            UserMqttHassAutoName(timer_status - 8);
+            UserMqttHassAuto(timer_status - 8);
             break;
         case 14:
             UserMqttHassAutoPowerName();
@@ -467,41 +465,18 @@ void UserMqttHassAuto(char socket_id)
 {
     char *send_buf = NULL;
     char *topic_buf = NULL;
-    send_buf = malloc(512); //
-    topic_buf = malloc(128); //
-    if (send_buf != NULL && topic_buf != NULL)
-    {
-        sprintf(topic_buf, "homeassistant/switch/%s/socket_%d/config", str_mac, socket_id);
-        sprintf(send_buf, "{"
-                 "\"name\":\"zTC1_socket%d_%s\","
-                 "\"stat_t\":\"homeassistant/switch/%s/socket_%d/state\","
-                 "\"cmd_t\":\"device/ztc1/set\","
-                 "\"pl_on\":\"{\\\"mac\\\":\\\"%s\\\",\\\"socket_%d\\\":{\\\"on\\\":1}}\","
-                 "\"pl_off\":\"{\\\"mac\\\":\\\"%s\\\",\\\"socket_%d\\\":{\\\"on\\\":0,\\\"ttt1\\\":1}}\""
-                 "}",
-                 socket_id, str_mac + 8, str_mac, socket_id, str_mac, socket_id, str_mac, socket_id);
-        UserMqttSendTopic(topic_buf, send_buf, 1);
-    }
-    if (send_buf) free(send_buf);
-    if (topic_buf) free(topic_buf);
-
-}
-void UserMqttHassAutoName(char socket_id)
-{
-    char *send_buf = NULL;
-    char *topic_buf = NULL;
     send_buf = (char *) malloc(300);
     topic_buf = (char *) malloc(64);
     if (send_buf != NULL && topic_buf != NULL)
     {
         sprintf(topic_buf, "homeassistant/switch/%s/socket_%d/config", str_mac, socket_id);
-        sprintf(send_buf, "{"
-                 "\"name\":\"%s\","
-                 "\"stat_t\":\"homeassistant/switch/%s/socket_%d/state\","
-                 "\"cmd_t\":\"device/ztc1/set\","
-                 "\"pl_on\":\"set socket %s %d 1\","
-                 "\"pl_off\":\"set socket %s %d 0\"}",
-                 "SSS", str_mac, socket_id, str_mac, socket_id, str_mac, socket_id);
+        sprintf(send_buf, 
+            "{\"name\":\"TC1-Socket-%s-%d\","
+            "\"stat_t\":\"homeassistant/switch/%s/socket_%d/state\","
+            "\"cmd_t\":\"device/ztc1/set\","
+            "\"pl_on\":\"set socket %s %d 1\","
+            "\"pl_off\":\"set socket %s %d 0\"}",
+            str_mac+8, socket_id, str_mac, socket_id, str_mac, socket_id, str_mac, socket_id);
         UserMqttSendTopic(topic_buf, send_buf, 0);
     }
     if (send_buf)

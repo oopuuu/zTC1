@@ -22,7 +22,6 @@ extern OSStatus UserMqttSend(char *arg);
 extern bool UserMqttIsConnect(void);
 extern OSStatus UserMqttSendSocketState(char socket_id);
 extern void UserMqttHassAuto(char socket_id);
-extern void UserMqttHassAutoName(char socket_id);
 extern void UserMqttHassPower(void);
 extern void UserMqttHassAutoPower(void);
 extern void UserMqttHassAutoPowerName(void);
