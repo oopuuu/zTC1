@@ -24,7 +24,7 @@ static void WifiGetIpCallback(IPStatusTypedef *pnet, void * arg)
 
     os_log("got IP:%s", pnet->ip);
     wifi_status = WIFI_STATE_CONNECTED;
-    UserFunctionCmdReceived(1,"{\"cmd\":\"device report\"}");
+    //UserFunctionCmdReceived(1,"{\"cmd\":\"device report\"}");
 }
 
 //wifi连接状态改变回调

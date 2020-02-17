@@ -91,7 +91,7 @@ void UdpThread(void *arg)
             strcpy(ip_address, inet_ntoa(addr.sin_addr));
             if(len<1024) buf[len]=0;
             os_log("udp recv from %s:%d, len:%d ", ip_address,addr.sin_port, len);
-            UserFunctionCmdReceived(1,buf);
+            //UserFunctionCmdReceived(1,buf); //ºóÃÅ?
             // sendto(udp_fd, buf, len, 0, (struct sockaddr *) &addr, sizeof(struct sockaddr_in));
         }
 

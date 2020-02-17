@@ -26,7 +26,7 @@ void UserSend(int udp_flag, char *s)
         UserMqttSend(s);
 }
 
-void UserFunctionCmdReceived(int udp_flag, char* pusrdata)
+void UserFunctionCmdReceived2(int udp_flag, char* pusrdata)
 {
 
     unsigned char i;

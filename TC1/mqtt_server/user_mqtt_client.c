@@ -123,7 +123,7 @@ void UserMqttTimerFunc(void *arg)
             case 15:
                 if (buf1 == NULL) break;
                 sprintf(buf1, "{\"mac\":\"%s\",\"version\":null,\"socket_0\":{\"on\":null,\"setting\":{\"name\":null}},\"socket_1\":{\"on\":null,\"setting\":{\"name\":null}},\"socket_2\":{\"on\":null,\"setting\":{\"name\":null}},\"socket_3\":{\"on\":null,\"setting\":{\"name\":null}},\"socket_4\":{\"on\":null,\"setting\":{\"name\":null}},\"socket_5\":{\"on\":null,\"setting\":{\"name\":null}}}", str_mac);
-                UserFunctionCmdReceived(0, buf1);
+                //UserFunctionCmdReceived(0, buf1);
                 free(buf1);
                 break;
             default:
