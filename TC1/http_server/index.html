@@ -305,28 +305,33 @@ var ap_name = "";
 var ap_pswd = "";
 var station_name = "";
 var station_pswd = "";
-HttpGet("/status", function (re) {
-    var status = JSON.parse(re);
-    var status_arr = status.sockets.split(",");
-    for (var i = 0; i < status_arr.length; i++) {
-        checkboxs[i].checked = status_arr[i] == "1";
-        station_name = status.station_ssid;
-        station_pswd = status.station_pwd;
-        ap_name = status.ap_ssid;
-        ap_pswd = status.ap_pwd;
-        //mode = status.mode;
-        ChangeMode(status.mode);
 
-        mqtt_addr_ipt.value = status.mqtt_addr;
-        mqtt_port_ipt.value = status.mqtt_port;
+function GetTc1Status() {
+    HttpGet("/status", function (re) {
+        var status = JSON.parse(re);
+        var status_arr = status.sockets.split(",");
+        for (var i = 0; i < status_arr.length; i++) {
+            checkboxs[i].checked = status_arr[i] == "1";
+            station_name = status.station_ssid;
+            station_pswd = status.station_pwd;
+            ap_name = status.ap_ssid;
+            ap_pswd = status.ap_pwd;
+            //mode = status.mode;
+            ChangeMode(status.mode);
 
-        info_version.innerHTML = status.version;
-        info_ip.innerHTML = status.ip;
-        info_mask.innerHTML = status.mask;
-        info_gateway.innerHTML = status.gateway;
-        uptime.innerHTML = status.start_time;
-    }
-});
+            mqtt_addr_ipt.value = status.mqtt_addr;
+            mqtt_port_ipt.value = status.mqtt_port;
+
+            info_version.innerHTML = status.version;
+            info_ip.innerHTML = status.ip;
+            info_mask.innerHTML = status.mask;
+            info_gateway.innerHTML = status.gateway;
+            uptime.innerHTML = status.start_time;
+        }
+        window.setTimeout(GetTc1Status, 3000);
+    });
+}
+GetTc1Status();
 
 var power_idx = 0;
 var position = 0;
