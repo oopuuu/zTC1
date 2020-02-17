@@ -254,6 +254,12 @@ void MqttClientThread(mico_thread_arg_t arg)
     /*4.1 连接成功后先更新发送一次数据*/
     isconnect = true;
 
+    int i = 0;
+    for (; i < SOCKET_NUM; i++)
+    {
+        UserMqttSendSocketState(i);
+    }
+
     mico_init_timer(&timer_handle, 150, UserMqttTimerFunc, &arg);
     mico_start_timer(&timer_handle);
     /* 5. client loop for recv msg && keepalive */
