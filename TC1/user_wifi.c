@@ -11,8 +11,6 @@ char wifi_status = WIFI_STATE_NOCONNECT;
 
 mico_timer_t wifi_led_timer;
 IpStatus ip_status = { 0, ZZ_AP_LOCAL_IP, ZZ_AP_LOCAL_IP, ZZ_AP_NET_MASK };
-char ap_name[32] = { 0 };
-char ap_key[32] = { 0 };
 
 //wifi已连接获取到IP地址回调
 static void WifiGetIpCallback(IPStatusTypedef *pnet, void * arg)
@@ -50,7 +48,7 @@ static void WifiStatusCallback(WiFiEvent status, void* arg)
         sys_config->micoSystemConfig.reserved = status;
         mico_system_context_update(sys_config);
 
-        ApInit(); //打开AP
+        ApInit(false); //打开AP
 
         wifi_status = WIFI_STATE_NOCONNECT;
         if (!mico_rtos_is_timer_running(&wifi_led_timer))
@@ -174,26 +172,27 @@ void WifiInit(void)
 
 void ApConfig(char* name, char* key)
 {
-    strncpy(ap_name, name, 32);
-    strncpy(ap_key, key, 32);
-    os_log("ApConfig ap_name[%s] ap_key[%s]", ap_name, ap_key);
-    ApInit();
-    //TODO 保存ap及密码到Flash
+    strncpy(user_config->ap_name, name, 32);
+    strncpy(user_config->ap_key, key, 32);
+    os_log("ApConfig ap_name[%s] ap_key[%s]", user_config->ap_name, user_config->ap_key);
+    micoWlanSuspendStation();
+    ApInit(false);
+    mico_system_context_update(sys_config);
 }
 
-void ApInit()
+void ApInit(bool use_defaul)
 {
-    if (ap_name[0] == 0)
+    if (use_defaul)
     {
-        sprintf(ap_name, ZZ_AP_SSID, str_mac + 6);
-        sprintf(ap_key, "%s", ZZ_AP_KEY);
-        os_log("ApInit ap_name[%s] ap_key[%s]", ap_name, ap_key);
+        sprintf(user_config->ap_name, ZZ_AP_NAME, str_mac + 6);
+        sprintf(user_config->ap_key, "%s", ZZ_AP_KEY);
+        os_log("ApInit ap_name[%s] ap_ke[%s]", user_config->ap_name, user_config->ap_key);
     }
 
     network_InitTypeDef_st wNetConfig;
     memset(&wNetConfig, 0x0, sizeof(network_InitTypeDef_st));
-    strcpy((char *)wNetConfig.wifi_ssid, ap_name);
-    strcpy((char *)wNetConfig.wifi_key, ap_key);
+    strcpy((char *)wNetConfig.wifi_ssid, user_config->ap_name);
+    strcpy((char *)wNetConfig.wifi_key, user_config->ap_key);
     wNetConfig.wifi_mode = Soft_AP;
     wNetConfig.dhcpMode = DHCP_Server;
     wNetConfig.wifi_retry_interval = 100;

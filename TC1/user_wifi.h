@@ -13,7 +13,7 @@ enum
    WIFI_STATE_CONNECTED,
 };
 
-#define ZZ_AP_SSID       "TC1-AP-%s"
+#define ZZ_AP_NAME       "TC1-AP-%s"
 #define ZZ_AP_KEY        "12345678"
 #define ZZ_AP_LOCAL_IP   "192.168.0.1"
 #define ZZ_AP_DNS_SERVER "192.168.0.1"
@@ -22,8 +22,6 @@ enum
 #define WIFI_SCAN_RESULT_JSON "{'success':%d,'ssids':[%s],'secs':[%s]}"
 extern bool scaned;
 extern char* wifi_ret;
-extern char ap_name[32];
-extern char ap_key[32];
 extern char wifi_status;
 
 typedef struct {
@@ -44,7 +42,7 @@ typedef struct {
 extern IpStatus ip_status;
 
 extern void WifiInit(void);
-extern void ApInit(void);
+extern void ApInit(bool use_defaul);
 extern void ApConfig(char* name, char* key);
 extern void WifiConnect(char* wifi_ssid, char* wifi_key);
 

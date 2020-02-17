@@ -4,14 +4,14 @@
 #include "mico.h"
 #include "micokit_ext.h"
 
-#define VERSION "v1.0.14"
+#define VERSION "v1.0.15"
 
 #define TYPE 1
 #define TYPE_NAME "zTC1"
 
 #define ZTC1_NAME "zTC1-%s"
 
-#define USER_CONFIG_VERSION 5
+#define USER_CONFIG_VERSION 6
 #define SETTING_MQTT_STRING_LENGTH_MAX 32 //必须4字节对齐。
 
 #define SOCKET_NAME_LENGTH   32
@@ -36,13 +36,15 @@
 typedef struct
 {
     char version;
-    char mqtt_ip[SETTING_MQTT_STRING_LENGTH_MAX];        //mqtt service ip
-    int mqtt_port;                                       //mqtt service port
-    char mqtt_user[SETTING_MQTT_STRING_LENGTH_MAX];      //mqtt service user
-    char mqtt_password[SETTING_MQTT_STRING_LENGTH_MAX];  //mqtt service user
+    char mqtt_ip[SETTING_MQTT_STRING_LENGTH_MAX];
+    int mqtt_port;
+    char mqtt_user[SETTING_MQTT_STRING_LENGTH_MAX];
+    char mqtt_password[SETTING_MQTT_STRING_LENGTH_MAX];
     char socket_status[SOCKET_NUM]; //记录当前开关
     char user[maxNameLen];
     WiFiEvent last_wifi_status;
+    char ap_name[32];
+    char ap_key[32];
 } user_config_t;
 
 extern char rtc_init;

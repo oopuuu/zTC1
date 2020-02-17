@@ -109,7 +109,7 @@ static int HttpGetTc1Status(httpd_request_t *req)
     char* tc1_status = malloc(412);
     sprintf(tc1_status, TC1_STATUS_JSON, sockets, ip_status.mode,
         sys_config->micoSystemConfig.ssid, sys_config->micoSystemConfig.user_key,
-        ap_name, ap_key, MQTT_SERVER, MQTT_SERVER_PORT, VERSION, ip_status.ip, ip_status.mask, ip_status.gateway, 0L);
+        user_config->ap_name, user_config->ap_key, MQTT_SERVER, MQTT_SERVER_PORT, VERSION, ip_status.ip, ip_status.mask, ip_status.gateway, 0L);
 
     OSStatus err = kNoErr;
     send_http(tc1_status, strlen(tc1_status), exit, &err);

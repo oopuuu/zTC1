@@ -1,10 +1,6 @@
 
 1. 登录
-2. station改回ap并关闭station
 3. 删除定时任务
-4. 保存ap及密码到Flash
 5. 重复定时任务
-6. 去掉C_Json
-7. 去除user_udp
 8. 统一os_log
 9. 更新web socket状态

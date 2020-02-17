@@ -72,7 +72,7 @@ int application_start(void)
     if (!MicoGpioInputGet(Button))
     {   //开机时按钮状态
         os_log("press ap_init");
-        ApInit();
+        ApInit(false);
         open_ap = true;
     }
 
@@ -109,7 +109,7 @@ int application_start(void)
     {
         if (sys_config->micoSystemConfig.reserved != NOTIFY_STATION_UP)
         {
-            ApInit();
+            ApInit(true);
         }
         else
         {
