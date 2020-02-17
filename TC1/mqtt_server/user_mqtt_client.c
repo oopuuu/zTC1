@@ -94,7 +94,6 @@ void UserMqttTimerFunc(void *arg)
             UserMqttHassAuto(timer_status - 8);
             break;
         case 14:
-            UserMqttHassAutoPowerName();
             break;
         case 15:
             break;
@@ -489,54 +488,22 @@ void UserMqttHassAutoPower(void)
 {
     char *send_buf = NULL;
     char *topic_buf = NULL;
-    send_buf = malloc(512); //
-    topic_buf = malloc(128); //
+    send_buf = malloc(512);
+    topic_buf = malloc(128);
     if (send_buf != NULL && topic_buf != NULL)
     {
         sprintf(topic_buf, "homeassistant/sensor/%s/power/config", str_mac);
-        sprintf(send_buf, "{"
-                 "\"name\":\"zTC1_power_%s\","
-                 "\"state_topic\":\"homeassistant/sensor/%s/power/state\","
-                 "\"unit_of_measurement\":\"W\","
-                 "\"icon\":\"mdi:gauge\","
-                 "\"value_template\":\"{{ value_json.power }}\""
-                 "}",
-                 str_mac + 8, str_mac);
-
+        sprintf(send_buf, 
+            "{\"name\":\"TC1-%s_Power\","
+            "\"state_topic\":\"homeassistant/sensor/%s/power/state\","
+            "\"unit_of_measurement\":\"W\","
+            "\"icon\":\"mdi:gauge\","
+            "\"value_template\":\"{{ value_json.power }}\"}",
+            str_mac+8, str_mac);
         UserMqttSendTopic(topic_buf, send_buf, 1);
     }
     if (send_buf) free(send_buf);
     if (topic_buf) free(topic_buf);
-}
-void UserMqttHassAutoPowerName(void)
-{
-    char *send_buf = NULL;
-    char *topic_buf = NULL;
-    send_buf = (char *) malloc(300); //
-    topic_buf = (char *) malloc(64); //
-    if (send_buf != NULL && topic_buf != NULL)
-    {
-        sprintf(topic_buf, "homeassistant/sensor/%s/power/config", str_mac);
-        sprintf(send_buf, "{"
-                 "\"name\":\"zTC1xxxxxx\","
-                 "\"state_topic\":\"homeassistant/sensor/%s/power/state\","
-                 "\"unit_of_measurement\":\"W\","
-                 "\"icon\":\"mdi:gauge\","
-                 "\"value_template\":\"{{ value_json.power }}\""
-                 "}",
-                 str_mac);
-        send_buf[13] = 0xe5;
-        send_buf[14] = 0x8a;
-        send_buf[15] = 0x9f;
-        send_buf[16] = 0xe7;
-        send_buf[17] = 0x8e;
-        send_buf[18] = 0x87;
-        UserMqttSendTopic(topic_buf, send_buf, 0);
-    }
-    if (send_buf)
-        free(send_buf);
-    if (topic_buf)
-        free(topic_buf);
 }
 
 void UserMqttHassPower(void)
