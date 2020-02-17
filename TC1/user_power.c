@@ -69,7 +69,7 @@ static void PowerIrqHandler(void* arg)
 
 void PowerInit(void)
 {
-    ota_log("user_power_init");
+    power_log("PowerInit");
     MicoGpioInitialize(POWER, INPUT_PULL_UP);
     MicoGpioEnableIRQ(POWER, IRQ_TRIGGER_FALLING_EDGE, PowerIrqHandler, NULL);
 }

@@ -99,13 +99,13 @@ OSStatus UserMqttInit(void)
     //TODO size:0x800
     int mqtt_thread_stack_size = 0x2000;
     uint32_t mqtt_lib_version = MQTTClientLibVersion();
-    app_log("MQTT client version: [%ld.%ld.%ld]",
+    mqtt_log("MQTT client version: [%ld.%ld.%ld]",
         0xFF & (mqtt_lib_version >> 16), 0xFF & (mqtt_lib_version >> 8), 0xFF & mqtt_lib_version);
 
     /* create mqtt msg send queue */
     err = mico_rtos_init_queue(&mqtt_msg_send_queue, "mqtt_msg_send_queue", sizeof(p_mqtt_send_msg_t),
     MAX_MQTT_SEND_QUEUE_SIZE);
-    require_noerr_action(err, exit, app_log("ERROR: create mqtt msg send queue err=%d.", err));
+    require_noerr_action(err, exit, mqtt_log("ERROR: create mqtt msg send queue err=%d.", err));
 
     /* start mqtt client */
     err = mico_rtos_create_thread(NULL, MICO_APPLICATION_PRIORITY, "mqtt_client",
@@ -118,7 +118,7 @@ OSStatus UserMqttInit(void)
     require_noerr_string(err, exit, "ERROR: Unable to start the mqtt client worker thread.");
 
     exit:
-    if (kNoErr != err) app_log("ERROR2, app thread exit err: %d kNoErr[%d]", err, kNoErr);
+    if (kNoErr != err) mqtt_log("ERROR2, app thread exit err: %d kNoErr[%d]", err, kNoErr);
     return err;
 }
 
@@ -132,7 +132,7 @@ static OSStatus UserMqttClientRelease(Client *c, Network *n)
 
     if (MQTT_SUCCESS != MQTTClientDeinit(c))
     {
-        app_log("MQTTClientDeinit failed!");
+        mqtt_log("MQTTClientDeinit failed!");
         err = kDeletedErr;
     }
     return err;
@@ -345,14 +345,14 @@ static void MessageArrived(MessageData* md)
     strncpy(p_recv_msg->topic, md->topicName->lenstring.data, md->topicName->lenstring.len);
     memcpy(p_recv_msg->data, message->payload, message->payloadlen);
 
-    app_log("MessageArrived topic[%s] data[%s]", p_recv_msg->topic, p_recv_msg->data);
+    mqtt_log("MessageArrived topic[%s] data[%s]", p_recv_msg->topic, p_recv_msg->data);
     err = mico_rtos_send_asynchronous_event(&mqtt_client_worker_thread, UserRecvHandler, p_recv_msg);
     require_noerr(err, exit);
 
     exit:
     if (err != kNoErr)
     {
-        app_log("ERROR: Recv data err = %d", err);
+        mqtt_log("ERROR: Recv data err = %d", err);
         if (p_recv_msg) free(p_recv_msg);
     }
     return;
@@ -365,7 +365,7 @@ OSStatus UserRecvHandler(void *arg)
     p_mqtt_recv_msg_t p_recv_msg = arg;
     require(p_recv_msg, exit);
 
-    app_log("user get data success! from_topic=[%s], msg=[%ld].", p_recv_msg->topic, p_recv_msg->datalen);
+    mqtt_log("user get data success! from_topic=[%s], msg=[%ld].", p_recv_msg->topic, p_recv_msg->datalen);
     //UserFunctionCmdReceived(0, p_recv_msg->data);
 
     ProcessHaCmd(p_recv_msg->data);
@@ -378,14 +378,14 @@ OSStatus UserRecvHandler(void *arg)
 
 void ProcessHaCmd(char* cmd)
 {
-    app_log("ProcessHaCmd[%s]", cmd);
+    mqtt_log("ProcessHaCmd[%s]", cmd);
     char mac[20] = { 0 };
 
     if (strcmp(cmd, "set socket") == ' ')
     {
         int i, on;
         sscanf(cmd, "set socket %s %d %d", mac, &i, &on);
-        app_log("set socket[%d] on[%d]", i, on);
+        mqtt_log("set socket[%d] on[%d]", i, on);
         UserRelaySet(i, on);
         UserMqttSendSocketState(i);
     }
@@ -396,7 +396,7 @@ OSStatus UserMqttSendTopic(char *topic, char *arg, char retained)
     OSStatus err = kUnknownErr;
     p_mqtt_send_msg_t p_send_msg = NULL;
 
-//  app_log("======App prepare to send ![%d]======", MicoGetMemoryInfo()->free_memory);
+//  mqtt_log("======App prepare to send ![%d]======", MicoGetMemoryInfo()->free_memory);
 
     /* Send queue is full, pop the oldest */
     if (mico_rtos_is_queue_full(&mqtt_msg_send_queue) == true)
@@ -419,7 +419,7 @@ OSStatus UserMqttSendTopic(char *topic, char *arg, char retained)
     err = mico_rtos_push_to_queue(&mqtt_msg_send_queue, &p_send_msg, 0);
     require_noerr(err, exit);
 
-    //app_log("Push user msg into send queue success!");
+    //mqtt_log("Push user msg into send queue success!");
 
     exit:
     if (err != kNoErr && p_send_msg) free(p_send_msg);

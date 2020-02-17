@@ -12,6 +12,7 @@
 #define http_log(M, ...) do { custom_log("HTTP", M, ##__VA_ARGS__); web_log("HTTP", M, ##__VA_ARGS__) } while(0)
 #define mqtt_log(M, ...) do { custom_log("MQTT", M, ##__VA_ARGS__); web_log("MQTT", M, ##__VA_ARGS__) } while(0)
 #define wifi_log(M, ...) do { custom_log("WIFI", M, ##__VA_ARGS__); web_log("WIFI", M, ##__VA_ARGS__) } while(0)
+#define power_log(M, ...) do { custom_log("POWER", M, ##__VA_ARGS__); web_log("POWER", M, ##__VA_ARGS__) } while(0)
 
 #define VERSION "v1.0.16"
 
