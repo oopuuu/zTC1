@@ -51,7 +51,7 @@
 static bool is_http_init;
 static bool is_handlers_registered;
 struct httpd_wsgi_call g_app_handlers[];
-char power_info_json[1536] = { 0 };
+char power_info_json[1548] = { 0 };
 char up_time[16] = "00:00:00";
 
 /*
@@ -158,7 +158,8 @@ static int HttpGetPowerInfo(httpd_request_t *req)
     sprintf(up_time, "%d:%02d:%02d", h, m, s);
 
     char* powers = GetPowerRecord(idx);
-    sprintf(power_info_json, POWER_INFO_JSON, power_record.idx, PW_NUM, p_count, powers, up_time);
+    char* sockets = GetSocketStatus();
+    sprintf(power_info_json, POWER_INFO_JSON, sockets, power_record.idx, PW_NUM, p_count, powers, up_time);
     send_http(power_info_json, strlen(power_info_json), exit, &err);
 exit:
     return err;

@@ -59,7 +59,7 @@
     'start_time':%ld\
 }"
 
-#define POWER_INFO_JSON "{'idx':%d,'len':%d,'p_count':%ld,'powers':[%s],'up_time':'%s'}"
+#define POWER_INFO_JSON "{'sockets':'%s','idx':%d,'len':%d,'p_count':%ld,'powers':[%s],'up_time':'%s'}"
 
 int AppHttpdStart(void);
 int AppHttpdStop();

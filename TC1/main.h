@@ -13,7 +13,7 @@
 #define mqtt_log(M, ...) do { custom_log("MQTT", M, ##__VA_ARGS__); web_log("MQTT", M, ##__VA_ARGS__) } while(0)
 #define wifi_log(M, ...) do { custom_log("WIFI", M, ##__VA_ARGS__); web_log("WIFI", M, ##__VA_ARGS__) } while(0)
 
-#define VERSION "v1.0.15"
+#define VERSION "v1.0.16"
 
 #define TYPE 1
 #define TYPE_NAME "zTC1"
