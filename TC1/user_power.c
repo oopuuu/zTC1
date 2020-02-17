@@ -9,45 +9,6 @@
 #include "mqtt_server/user_function.h"
 #include "user_power.h"
 
-/*
-mico_timer_t power_timer;
-static uint32_t clock_count_last = 0;
-static uint32_t clock_count = 0;     //纳秒数
-static uint32_t timer_count = 0;     //一秒定时器
-static uint32_t timer_irq_count = 0; //功率中断数
-static void PowerTimerHandler(void* arg)
-{
-    uint32_t timer = 0;
-
-    if (timer_irq_count > 1)
-    {
-        timer = (clock_count - clock_count_last);
-
-        if (timer_count > 3)
-        {
-            timer /= 1000;
-            timer += 4294967; //0xffffffff/1000;
-        }
-        else if (clock_count < clock_count_last)
-        {
-            timer += 0xffffffff;
-            timer /= 1000;
-        }
-        else
-        {
-            timer /= 1000;
-        }
-        power = 17100000 * (timer_irq_count - 1) / timer;
-        timer_count = 0;
-        timer_irq_count = 0;
-    }
-    else
-    {
-        timer_count++;
-    }
-}
-*/
-
 uint32_t p_count = 0;
 PowerRecord power_record = { 1,{ 0 } };
 char power_record_str[1101] = { 0 };
@@ -75,20 +36,16 @@ char* GetPowerRecord(int idx)
 }
 
 uint64_t NS = 1000000000;
-float n_1s = 0;         //功率中断次数
-uint64_t t_x = 0;       //当前秒*1000,000,000
-uint64_t past_ns = 0;   //系统运行的纳秒数
-uint64_t rest_x_ns = 0; //距离当前秒走过的纳秒数
-uint64_t rest_y_ns = 0; //距离下一秒差的纳秒数
-
+float n_1s = 0;       //在当前一秒秒功率中断次数
+uint64_t past_ns = 0; //系统运行的纳秒数
 uint64_t irq_old = 0; //上次中断的时间(纳秒)
-uint64_t irq_new = 0; //这次中断的时间(纳秒)
 
 static void PowerIrqHandler(void* arg)
 {
     p_count++;
 
-    past_ns = mico_nanosecond_clock_value();
+    //mico_time_get_time(&past_ns); //系统运行毫秒数
+    past_ns = mico_nanosecond_clock_value(); //系统运行纳秒数
     uint64_t spend_ns = past_ns - irq_old;
 
     if (irq_old % NS + spend_ns <= NS)
@@ -114,55 +71,10 @@ static void PowerIrqHandler(void* arg)
     }
 }
 
-static void PowerIrqHandler2(void* arg)
-{
-    //clock_count = mico_nanosecond_clock_value();
-    //if (timer_irq_count == 0) clock_count_last = clock_count;
-    //timer_irq_count++;
-
-    p_count++;
-
-    //mico_time_get_time(&past_ns);
-    past_ns = mico_nanosecond_clock_value();
-    if (t_x == 0)
-    {
-        t_x = past_ns - past_ns % NS;
-    }
-    rest_x_ns = past_ns - t_x;
-    if (rest_x_ns <= NS)
-    {
-        n_1s += 1;
-        rest_y_ns = t_x + NS - past_ns;
-    }
-    else if (rest_x_ns > NS && rest_x_ns <= NS*2)
-    {
-        n_1s += (float)rest_y_ns / (rest_x_ns - NS + rest_y_ns);
-        rest_y_ns = NS*2 - rest_x_ns;
-        t_x = past_ns - past_ns % NS;
-
-        float power2 = 17.1 * n_1s;
-        SetPowerRecord(&power_record, (int)power2);
-        n_1s = (float)(rest_x_ns - NS) / (rest_x_ns - NS + rest_y_ns);
-    }
-    else
-    {
-        os_log("PowerIrqHandler error past_ns[%llu] t_x[%llu] rest_x_ns[%llu]", past_ns, t_x, rest_x_ns);
-        //一般不会出现这种情况, 所以不管了...哈哈哈~
-        SetPowerRecord(&power_record, 123456);
-        SetPowerRecord(&power_record, past_ns);
-        SetPowerRecord(&power_record, t_x);
-        SetPowerRecord(&power_record, rest_x_ns);
-    }
-}
-
 void PowerInit(void)
 {
     os_log("user_power_init");
-
     MicoGpioInitialize(POWER, INPUT_PULL_UP);
-    //mico_rtos_init_timer(&power_timer, 1000, PowerTimerHandler, NULL);
-    //mico_rtos_start_timer(&power_timer);
-
     MicoGpioEnableIRQ(POWER, IRQ_TRIGGER_FALLING_EDGE, PowerIrqHandler, NULL);
 }
 
