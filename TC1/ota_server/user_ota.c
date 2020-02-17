@@ -6,7 +6,6 @@
 #include "main.h"
 #include "user_udp.h"
 #include "mqtt_server/user_mqtt_client.h"
-#include "mqtt_server/user_function.h"
 
 float ota_progress = 0;
 

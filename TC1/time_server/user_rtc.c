@@ -5,7 +5,6 @@
 #include "user_gpio.h"
 #include "sntp.h"
 #include "mqtt_server/user_mqtt_client.h"
-#include "mqtt_server/user_function.h"
 
 void RtcThread(mico_thread_arg_t arg);
 

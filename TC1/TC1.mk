@@ -25,7 +25,6 @@
 NAME := App_TC1
 
 $(NAME)_SOURCES := main.c\
-				   c_json/c_json.c\
 				   ota_server/ota_server.c\
 				   user_wifi.c\
 				   user_gpio.c\
@@ -34,7 +33,6 @@ $(NAME)_SOURCES := main.c\
 				   mqtt_server/user_mqtt_client.c\
 				   ota_server/user_ota.c\
 				   user_power.c\
-				   mqtt_server/user_function.c\
 				   timed_task/timed_task.c\
 				   http_server/web_log.c\
 				   http_server/app_httpd.c

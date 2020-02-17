@@ -6,7 +6,6 @@
 #include "user_udp.h"
 #include "user_power.h"
 #include "mqtt_server/user_mqtt_client.h"
-#include "mqtt_server/user_function.h"
 #include "http_server/app_httpd.h"
 #include "timed_task/timed_task.h"
 

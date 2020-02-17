@@ -2,7 +2,6 @@
 #define os_log(format, ...) do { custom_log("UDP", format, ##__VA_ARGS__); web_log(format, ##__VA_ARGS__) } while(0)
 
 #include "main.h"
-#include "mqtt_server/user_function.h"
 
 #define LOCAL_UDP_PORT 10182
 #define REMOTE_UDP_PORT 10181
