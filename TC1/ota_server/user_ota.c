@@ -4,7 +4,6 @@
 #include "mico.h"
 #include "ota_server/ota_server.h"
 #include "main.h"
-#include "user_udp.h"
 #include "mqtt_server/user_mqtt_client.h"
 
 float ota_progress = 0;
@@ -31,10 +30,6 @@ static void OtaServerStatusHandler(OTA_STATE_E state, float progress)
             break;
         default:
             break;
-    }
-    if (str[0] > 0)
-    {
-        UserSend(true, str);
     }
 }
 

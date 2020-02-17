@@ -28,7 +28,6 @@
 #include "MQTTClient.h"
 #include "user_gpio.h"
 #include "user_mqtt_client.h"
-#include "user_udp.h"
 
 typedef struct
 {
@@ -609,12 +608,4 @@ void UserMqttHassPower(void)
 bool UserMqttIsConnect()
 {
     return isconnect;
-}
-
-void UserSend(int udp_flag, char *s)
-{
-    if (udp_flag || !UserMqttIsConnect())
-        UserUdpSend(s); //发送数据
-    else
-        UserMqttSend(s);
 }

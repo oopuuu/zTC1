@@ -3,7 +3,6 @@
 #include "user_gpio.h"
 #include "user_wifi.h"
 #include "time_server/user_rtc.h"
-#include "user_udp.h"
 #include "user_power.h"
 #include "mqtt_server/user_mqtt_client.h"
 #include "http_server/app_httpd.h"
@@ -128,7 +127,6 @@ int application_start(void)
                 sys_config->micoSystemConfig.user_key);
         }
     }
-    UserUdpInit();
     KeyInit();
     err = UserMqttInit();
     require_noerr(err, exit);
@@ -150,7 +148,6 @@ int application_start(void)
         //SetPowerRecord(&power_record, real_time_power);
         sprintf(power_buf, "{\"mac\":\"%s\",\"power\":\"%u.%u\",\"total_time\":%u}",
             str_mac, (unsigned int)(real_time_power/10), (unsigned int)(real_time_power%10), (unsigned int)total_time);
-        UserSend(0, power_buf);
         UserMqttHassPower();
 
         time_t now = time(NULL);

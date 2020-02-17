@@ -17,7 +17,6 @@
 #define MQTT_SERVER      user_config->mqtt_ip
 #define MQTT_SERVER_PORT user_config->mqtt_port
 
-void UserSend(int udp_flag, char *s);
 extern OSStatus UserMqttInit(void);
 extern OSStatus UserMqttSend(char *arg);
 extern bool UserMqttIsConnect(void);
