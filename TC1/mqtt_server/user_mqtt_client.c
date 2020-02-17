@@ -69,38 +69,26 @@ void UserMqttTimerFunc(void *arg)
         mico_stop_timer(&timer_handle);
         return;
     }
-    if (mico_rtos_is_queue_empty(&mqtt_msg_send_queue) == true)
+    if (mico_rtos_is_queue_empty(&mqtt_msg_send_queue))
     {
-        timer_status++;
         switch (timer_status)
         {
+        case 0:
         case 1:
-            UserMqttHassAutoPower();
-            break;
         case 2:
         case 3:
         case 4:
         case 5:
+            UserMqttHassAuto(timer_status);
+            break;
         case 6:
-        case 7:
-            UserMqttHassAuto(timer_status - 2);
-            break;
-        case 8:
-        case 9:
-        case 10:
-        case 11:
-        case 12:
-        case 13:
-            UserMqttHassAuto(timer_status - 8);
-            break;
-        case 14:
-            break;
-        case 15:
+            UserMqttHassAutoPower();
             break;
         default:
             mico_stop_timer(&timer_handle);
             break;
         }
+        timer_status++;
     }
 }
 
