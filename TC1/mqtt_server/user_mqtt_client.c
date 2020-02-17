@@ -31,31 +31,6 @@
 #include "user_mqtt_client.h"
 #include "c_json/c_json.h"
 
-//char MQTT_SERVER[64] = "192.168.33.219";
-//int MQTT_SERVER_PORT = 1883;
-
-#ifdef MQTT_CLIENT_SSL_ENABLE
-char* mqtt_server_ssl_cert_str =
-"-----BEGIN CERTIFICATE-----\r\n\
-MIIC8DCCAlmgAwIBAgIJAOD63PlXjJi8MA0GCSqGSIb3DQEBBQUAMIGQMQswCQYD\r\n\
-VQQGEwJHQjEXMBUGA1UECAwOVW5pdGVkIEtpbmdkb20xDjAMBgNVBAcMBURlcmJ5\r\n\
-MRIwEAYDVQQKDAlNb3NxdWl0dG8xCzAJBgNVBAsMAkNBMRYwFAYDVQQDDA1tb3Nx\r\n\
-dWl0dG8ub3JnMR8wHQYJKoZIhvcNAQkBFhByb2dlckBhdGNob28ub3JnMB4XDTEy\r\n\
-MDYyOTIyMTE1OVoXDTIyMDYyNzIyMTE1OVowgZAxCzAJBgNVBAYTAkdCMRcwFQYD\r\n\
-VQQIDA5Vbml0ZWQgS2luZ2RvbTEOMAwGA1UEBwwFRGVyYnkxEjAQBgNVBAoMCU1v\r\n\
-c3F1aXR0bzELMAkGA1UECwwCQ0ExFjAUBgNVBAMMDW1vc3F1aXR0by5vcmcxHzAd\r\n\
-BgkqhkiG9w0BCQEWEHJvZ2VyQGF0Y2hvby5vcmcwgZ8wDQYJKoZIhvcNAQEBBQAD\r\n\
-gY0AMIGJAoGBAMYkLmX7SqOT/jJCZoQ1NWdCrr/pq47m3xxyXcI+FLEmwbE3R9vM\r\n\
-rE6sRbP2S89pfrCt7iuITXPKycpUcIU0mtcT1OqxGBV2lb6RaOT2gC5pxyGaFJ+h\r\n\
-A+GIbdYKO3JprPxSBoRponZJvDGEZuM3N7p3S/lRoi7G5wG5mvUmaE5RAgMBAAGj\r\n\
-UDBOMB0GA1UdDgQWBBTad2QneVztIPQzRRGj6ZHKqJTv5jAfBgNVHSMEGDAWgBTa\r\n\
-d2QneVztIPQzRRGj6ZHKqJTv5jAMBgNVHRMEBTADAQH/MA0GCSqGSIb3DQEBBQUA\r\n\
-A4GBAAqw1rK4NlRUCUBLhEFUQasjP7xfFqlVbE2cRy0Rs4o3KS0JwzQVBwG85xge\r\n\
-REyPOFdGdhBY2P1FNRy0MDr6xr+D2ZOwxs63dG1nnAnWZg7qwoLgpZ4fESPD3PkA\r\n\
-1ZgKJc2zbSQ9fCPxt2W3mdVav66c6fsb7els2W2Iz7gERJSX\r\n\
------END CERTIFICATE-----";
-#endif // MQTT_CLIENT_SSL_ENABLE
-
 typedef struct
 {
     char topic[MAX_MQTT_TOPIC_SIZE];
@@ -165,13 +140,8 @@ OSStatus UserMqttInit(void)
 
     sprintf(topic_set, MQTT_CLIENT_SUB_TOPIC1);
     sprintf(topic_state, MQTT_CLIENT_PUB_TOPIC, str_mac);
-
-#ifdef MQTT_CLIENT_SSL_ENABLE
-    int mqtt_thread_stack_size = 0x3000;
-#else
     //TODO size:0x800
     int mqtt_thread_stack_size = 0x2000;
-#endif
     uint32_t mqtt_lib_version = MQTTClientLibVersion();
     app_log("MQTT client version: [%ld.%ld.%ld]",
         0xFF & (mqtt_lib_version >> 16), 0xFF & (mqtt_lib_version >> 8), 0xFF & mqtt_lib_version);
@@ -274,15 +244,7 @@ void MqttClientThread(mico_thread_arg_t arg)
 
     isconnect = false;
     /* 1. create network connection */
-#ifdef MQTT_CLIENT_SSL_ENABLE
-    ssl_settings.ssl_enable = true;
-    ssl_settings.ssl_debug_enable = false;  // ssl debug log
-    ssl_settings.ssl_version = TLS_V1_2_MODE;
-    ssl_settings.ca_str_len = strlen(mqtt_server_ssl_cert_str);
-    ssl_settings.ca_str = mqtt_server_ssl_cert_str;
-#else
     ssl_settings.ssl_enable = false;
-#endif
     LinkStatusTypeDef LinkStatus;
     while (1)
     {
