@@ -40,6 +40,8 @@ uint64_t irq_old = 0; //上次中断的时间(纳秒)
 
 static void PowerIrqHandler(void* arg)
 {
+    //警告! 不能在此函数里调用任何有关moloc()的操作
+
     p_count++;
 
     //mico_time_get_time(&past_ns); //系统运行毫秒数
@@ -57,14 +59,12 @@ static void PowerIrqHandler(void* arg)
     n_1s += (float)(NS - irq_old % NS) / spend_ns;
     real_time_power = 17.1 * n_1s;
     SetPowerRecord(&power_record, (int)real_time_power);
-    UserMqttHassPower();
 
     int i = 0;
     for (; i < n; i++)
     {
         real_time_power = 17.1 * NS / spend_ns;
         SetPowerRecord(&power_record, (int)real_time_power);
-        UserMqttHassPower();
     }
     irq_old = past_ns;
     n_1s = (float)(past_ns % NS) / spend_ns;

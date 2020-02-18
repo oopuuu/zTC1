@@ -123,6 +123,8 @@ int application_start(void)
 
     while (1)
     {
+        UserMqttHassPower();
+
         time_t now = time(NULL);
         if (task_top && now >= task_top->prs_time)
         {

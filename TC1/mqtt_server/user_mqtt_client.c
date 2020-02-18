@@ -499,20 +499,13 @@ void UserMqttHassAutoPower(void)
     if (topic_buf) free(topic_buf);
 }
 
+char topic_buf[64] = { 0 };
+char send_buf[32] = { 0 };
 void UserMqttHassPower(void)
 {
-    char *send_buf = NULL;
-    char *topic_buf = NULL;
-    send_buf = malloc(512); //
-    topic_buf = malloc(128); //
-    if (send_buf != NULL && topic_buf != NULL)
-    {
-        sprintf(topic_buf, "homeassistant/sensor/%s/power/state", str_mac);
-        sprintf(send_buf, "{\"power\":\"%.3f\"}", real_time_power);
-        UserMqttSendTopic(topic_buf, send_buf, 0);
-    }
-    if (send_buf) free(send_buf);
-    if (topic_buf) free(topic_buf);
+    sprintf(topic_buf, "homeassistant/sensor/%s/power/state", str_mac);
+    sprintf(send_buf, "{\"power\":\"%.3f\"}", real_time_power/10);
+    UserMqttSendTopic(topic_buf, send_buf, 0);
 }
 
 bool UserMqttIsConnect()
