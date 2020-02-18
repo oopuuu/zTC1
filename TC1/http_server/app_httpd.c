@@ -105,7 +105,7 @@ exit:
 
 static int HttpGetTc1Status(httpd_request_t *req)
 {
-    const unsigned char* sockets = GetSocketStatus();
+    char* sockets = GetSocketStatus();
     char* tc1_status = malloc(412);
     sprintf(tc1_status, TC1_STATUS_JSON, sockets, ip_status.mode,
         sys_config->micoSystemConfig.ssid, sys_config->micoSystemConfig.user_key,

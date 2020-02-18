@@ -11,11 +11,9 @@
 char rtc_init = 0; //sntp校时成功标志位
 uint32_t total_time = 0;
 char str_mac[16] = { 0 };
-uint32_t real_time_power = 0;
 
 system_config_t* sys_config;
 user_config_t* user_config;
-char socket_status[32] = { 0 };
 
 mico_gpio_t Relay[Relay_NUM] = { Relay_0, Relay_1, Relay_2, Relay_3, Relay_4, Relay_5 };
 
@@ -121,23 +119,10 @@ int application_start(void)
     err = UserRtcInit();
     require_noerr(err, exit);
     PowerInit();
-
-    //uint32_t power_last = 0xffffffff;
     AppHttpdStart(); // start http server thread
-    char* power_buf = malloc(128);
-    if (!power_buf) goto exit;
 
-    uint32_t last_p_count = p_count;
     while (1)
     {
-        //发送功率数据
-        real_time_power = 171 * (p_count - last_p_count) / 10;
-        last_p_count = p_count;
-        //SetPowerRecord(&power_record, real_time_power);
-        sprintf(power_buf, "{\"mac\":\"%s\",\"power\":\"%u.%u\",\"total_time\":%u}",
-            str_mac, (unsigned int)(real_time_power/10), (unsigned int)(real_time_power%10), (unsigned int)total_time);
-        UserMqttHassPower();
-
         time_t now = time(NULL);
         if (task_top && now >= task_top->prs_time)
         {
@@ -146,16 +131,11 @@ int application_start(void)
             UserRelaySet(task_top->socket_idx, task_top->on);
             DelFirstTask();
         }
-        else
-        {
-            //tc1_log("timed task count[%u]", task_count);
-        }
         mico_thread_msleep(1000);
     }
 
 exit:
     tc1_log("application_start ERROR!");
-    if (power_buf) free(power_buf);
     return 0;
 }
 

@@ -9,6 +9,7 @@
 uint32_t p_count = 0;
 PowerRecord power_record = { 1,{ 0 } };
 char power_record_str[1101] = { 0 };
+float real_time_power = 0;
 
 void SetPowerRecord(PowerRecord* pr, uint32_t pw)
 {
@@ -54,14 +55,16 @@ static void PowerIrqHandler(void* arg)
 
     int n = (spend_ns - past_ns % NS) / NS;
     n_1s += (float)(NS - irq_old % NS) / spend_ns;
-    float power2 = 17.1 * n_1s;
-    SetPowerRecord(&power_record, (int)power2);
+    real_time_power = 17.1 * n_1s;
+    SetPowerRecord(&power_record, (int)real_time_power);
+    UserMqttHassPower();
 
     int i = 0;
     for (; i < n; i++)
     {
-        power2 = 17.1 * NS / spend_ns;
-        SetPowerRecord(&power_record, (int)power2);
+        real_time_power = 17.1 * NS / spend_ns;
+        SetPowerRecord(&power_record, (int)real_time_power);
+        UserMqttHassPower();
     }
     irq_old = past_ns;
     n_1s = (float)(past_ns % NS) / spend_ns;

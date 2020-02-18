@@ -5,6 +5,7 @@
 #include "mqtt_server/user_mqtt_client.h"
 
 mico_gpio_t relay[Relay_NUM] = { Relay_0, Relay_1, Relay_2, Relay_3, Relay_4, Relay_5 };
+char socket_status[32] = { 0 };
 
 void UserLedSet(char x)
 {
@@ -29,7 +30,7 @@ bool RelayOut(void)
     return false;
 }
 
-const unsigned char* GetSocketStatus()
+char* GetSocketStatus()
 {
     sprintf(socket_status, "%d,%d,%d,%d,%d,%d",
         user_config->socket_status[0],
@@ -38,7 +39,7 @@ const unsigned char* GetSocketStatus()
         user_config->socket_status[3],
         user_config->socket_status[4],
         user_config->socket_status[5]);
-    return (const unsigned char*)socket_status;
+    return socket_status;
 }
 
 void SetSocketStatus(char* socket_status)

@@ -14,7 +14,7 @@
 #define wifi_log(M, ...) do { custom_log("WIFI", M, ##__VA_ARGS__); web_log("WIFI", M, ##__VA_ARGS__) } while(0)
 #define power_log(M, ...) do { custom_log("POWER", M, ##__VA_ARGS__); web_log("POWER", M, ##__VA_ARGS__) } while(0)
 
-#define VERSION "v1.0.16"
+#define VERSION "v1.0.17"
 
 #define TYPE 1
 #define TYPE_NAME "zTC1"
@@ -60,10 +60,8 @@ typedef struct
 extern char rtc_init;
 extern uint32_t total_time;
 extern char str_mac[16];
-extern uint32_t real_time_power;
 extern system_config_t* sys_config;
 extern user_config_t* user_config;
-extern char socket_status[32];
 extern mico_gpio_t Relay[Relay_NUM];
 
 #endif

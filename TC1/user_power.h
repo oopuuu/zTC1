@@ -10,6 +10,7 @@ typedef struct
 
 extern PowerRecord power_record;
 extern uint32_t p_count;
+extern float real_time_power;
 
 char* GetPowerRecord(int idx);
 void PowerInit(void);
