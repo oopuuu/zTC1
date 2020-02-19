@@ -24,7 +24,7 @@ def gen(fn):
 
     s = re.sub("((?:0x.+?,){16})", "\\1\n", s)
 
-    fn = fn.replace('.', '_')
+    fn = re.sub(r"[^\w]", "_", fn)
     print("const unsigned char %s[0x%x] = {\n%s};" % (fn, len(dat), s))
 
 for fn in glob.glob('*.html'):
