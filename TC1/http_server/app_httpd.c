@@ -103,6 +103,33 @@ exit:
     return err;
 }
 
+static int HttpGetTestPage(httpd_request_t *req)
+{
+    OSStatus err = kNoErr;
+    int total_sz = sizeof(test_html);
+
+    err = httpd_send_all_header(req, HTTP_RES_200, total_sz, HTTP_CONTENT_HTML_ZIP);
+    require_noerr_action(err, exit, http_log("ERROR: Unable to send http testpage headers."));
+
+    int i = 0;
+    int chunk_sz = 1000;
+    for (; i < total_sz; i += chunk_sz)
+    {
+        if (i + chunk_sz >= total_sz)
+        {
+            chunk_sz = total_sz - i;
+        }
+        err = httpd_send_chunk(req->sock, (const char*)(test_html + i), chunk_sz);
+        require_noerr_action(err, exit, http_log("ERROR: Unable to send http testpage body. i[%d] chunk_sz[%d] total_sz[%d]", i, chunk_sz, total_sz));
+    }
+    err = httpd_send_chunk(req->sock, NULL, 0);
+    require_noerr_action(err, exit, http_log("ERROR: Unable to send http testpage end."));
+    http_log("httpd_send_chunk total_sz[%d] i[%d]", total_sz, i);
+
+exit:
+    return err;
+}
+
 static int HttpGetTc1Status(httpd_request_t *req)
 {
     char* sockets = GetSocketStatus();
@@ -346,6 +373,7 @@ exit:
 
 struct httpd_wsgi_call g_app_handlers[] = {
     { "/", HTTPD_HDR_DEFORT, 0, HttpGetIndexPage, NULL, NULL, NULL },
+    { "/test", HTTPD_HDR_DEFORT, 0, HttpGetTestPage, NULL, NULL, NULL },
     { "/socket", HTTPD_HDR_DEFORT, 0, NULL, HttpSetSocketStatus, NULL, NULL },
     { "/status", HTTPD_HDR_DEFORT, 0, HttpGetTc1Status, NULL, NULL, NULL },
     { "/power", HTTPD_HDR_DEFORT, 0, NULL, HttpGetPowerInfo, NULL, NULL },
@@ -372,6 +400,7 @@ static int _AppHttpdStart()
 {
     OSStatus err = kNoErr;
     http_log("initializing web-services");
+    http_log("sizeof(angular_min_html) = %d sizeof(test_html) = %d", sizeof(angular_min_html), sizeof(test_html));
 
     /*Initialize HTTPD*/
     if(is_http_init == false) {
