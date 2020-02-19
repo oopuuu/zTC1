@@ -386,6 +386,7 @@ void ProcessHaCmd(char* cmd)
     {
         int i, on;
         sscanf(cmd, "set socket %s %d %d", mac, &i, &on);
+        if (strcmp(mac, str_mac)) return;
         mqtt_log("set socket[%d] on[%d]", i, on);
         UserRelaySet(i, on);
         UserMqttSendSocketState(i);
