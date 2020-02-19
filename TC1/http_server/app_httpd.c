@@ -110,12 +110,12 @@ static int HttpGetJs(httpd_request_t *req)
     char* js_name = strstr(req->filename, "?name=");
     http_log("HttpDelTask url[%s] js_name[%s]", req->filename, js_name);
 
-    int total_sz = sizeof(jquery_min_html);
-    const unsigned char* js_data = jquery_min_html;
+    int total_sz = sizeof(jquery_min_js);
+    const unsigned char* js_data = jquery_min_js;
     if (strcmp(js_name + 6, "angular") == 0)
     {
-        total_sz = sizeof(angular_min_html);
-        js_data = angular_min_html;
+        total_sz = sizeof(angular_min_js);
+        js_data = angular_min_js;
     }
 
     err = httpd_send_all_header(req, HTTP_RES_200, total_sz, HTTP_CONTENT_JS_ZIP);
@@ -415,7 +415,7 @@ static int _AppHttpdStart()
 {
     OSStatus err = kNoErr;
     http_log("initializing web-services");
-    http_log("sizeof(angular_min_html) = %d sizeof(test_html) = %d", sizeof(angular_min_html), sizeof(jquery_min_html));
+    http_log("sizeof(angular_min_js) = %d sizeof(jquery_min_js) = %d", sizeof(angular_min_js), sizeof(jquery_min_js));
 
     /*Initialize HTTPD*/
     if(is_http_init == false) {
