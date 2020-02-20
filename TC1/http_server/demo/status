@@ -1,1 +1,0 @@
-{    'sockets':'1,1,1,1,0,1',    'mode':1,    'station_ssid':'TL-5408',    'station_pwd':'stu@5408',    'ap_ssid':'TC1-AP',    'ap_pwd':'12345678',    'mqtt_addr':'MQTT.ADDR',    'mqtt_port':1883,    'ip':'192.168.33.222',    'mask':'255.255.255.0',    'gateway':'192.168.33.1',    'start_time':0}
