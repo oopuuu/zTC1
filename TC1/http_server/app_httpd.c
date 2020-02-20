@@ -159,6 +159,16 @@ static int HttpGetCss(httpd_request_t *req)
         total_sz = sizeof(web_material_cyan_light_blue_min_css);
         js_data = web_material_cyan_light_blue_min_css;
     }
+    else if (strcmp(js_name + 6, "roboto") == 0)
+    {
+        total_sz = sizeof(web_roboto_css);
+        js_data = web_roboto_css;
+    }
+    else if (strcmp(js_name + 6, "icon") == 0)
+    {
+        total_sz = sizeof(web_icon_css);
+        js_data = web_icon_css;
+    }
 
     err = httpd_send_all_header(req, HTTP_RES_200, total_sz, HTTP_CONTENT_CSS_ZIP);
     require_noerr_action(err, exit, http_log("ERROR: Unable to send http testpage headers."));
