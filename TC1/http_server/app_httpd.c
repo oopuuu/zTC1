@@ -50,7 +50,7 @@
 
 static bool is_http_init;
 static bool is_handlers_registered;
-struct httpd_wsgi_call g_app_handlers[];
+const struct httpd_wsgi_call g_app_handlers[];
 char power_info_json[1548] = { 0 };
 char up_time[16] = "00:00:00";
 
@@ -386,7 +386,7 @@ exit:
     return err;
 }
 
-struct httpd_wsgi_call g_app_handlers[] = {
+const struct httpd_wsgi_call g_app_handlers[] = {
     { "/", HTTPD_HDR_DEFORT, 0, HttpGetIndexPage, NULL, NULL, NULL },
     { "/js", HTTPD_HDR_DEFORT, 0, HttpGetJs, NULL, NULL, NULL },
     { "/socket", HTTPD_HDR_DEFORT, 0, NULL, HttpSetSocketStatus, NULL, NULL },
@@ -405,7 +405,7 @@ static int g_app_handlers_no = sizeof(g_app_handlers)/sizeof(struct httpd_wsgi_c
 static void AppHttpRegisterHandlers()
 {
     int rc;
-    rc = httpd_register_wsgi_handlers(g_app_handlers, g_app_handlers_no);
+    rc = httpd_register_wsgi_handlers((struct httpd_wsgi_call *)g_app_handlers, g_app_handlers_no);
     if (rc) {
         http_log("failed to register test web handler");
     }
