@@ -93,12 +93,24 @@ static int HttpGetIndexPage(httpd_request_t *req)
 {
     OSStatus err = kNoErr;
 
-    err = httpd_send_all_header(req, HTTP_RES_200, sizeof(index_html), HTTP_CONTENT_HTML_ZIP);
+    err = httpd_send_all_header(req, HTTP_RES_200, sizeof(web_index_html), HTTP_CONTENT_HTML_ZIP);
     require_noerr_action(err, exit, http_log("ERROR: Unable to send http wifisetting headers."));
 
-    err = httpd_send_body(req->sock, index_html, sizeof(index_html));
+    err = httpd_send_body(req->sock, web_index_html, sizeof(web_index_html));
     require_noerr_action(err, exit, http_log("ERROR: Unable to send http wifisetting body."));
 
+exit:
+    return err;
+}
+
+static int HttpGetDemoPage(httpd_request_t *req)
+{
+    OSStatus err = kNoErr;
+    err = httpd_send_all_header(req, HTTP_RES_200, sizeof(web_demo_html), HTTP_CONTENT_HTML_ZIP);
+    require_noerr_action(err, exit, http_log("ERROR: Unable to send http wifisetting headers."));
+
+    err = httpd_send_body(req->sock, web_demo_html, sizeof(web_demo_html));
+    require_noerr_action(err, exit, http_log("ERROR: Unable to send http wifisetting body."));
 exit:
     return err;
 }
@@ -110,12 +122,17 @@ static int HttpGetJs(httpd_request_t *req)
     char* js_name = strstr(req->filename, "?name=");
     http_log("HttpDelTask url[%s] js_name[%s]", req->filename, js_name);
 
-    int total_sz = sizeof(jquery_min_js);
-    const unsigned char* js_data = jquery_min_js;
+    int total_sz = sizeof(web_jquery_min_js);
+    const unsigned char* js_data = web_jquery_min_js;
     if (strcmp(js_name + 6, "angular") == 0)
     {
-        total_sz = sizeof(angular_min_js);
-        js_data = angular_min_js;
+        total_sz = sizeof(web_angular_min_js);
+        js_data = web_angular_min_js;
+    }
+    if (strcmp(js_name + 6, "material") == 0)
+    {
+        total_sz = sizeof(web_material_min_js);
+        js_data = web_material_min_js;
     }
 
     err = httpd_send_all_header(req, HTTP_RES_200, total_sz, HTTP_CONTENT_JS_ZIP);
@@ -124,22 +141,30 @@ static int HttpGetJs(httpd_request_t *req)
     err = httpd_send_body(req->sock, js_data, total_sz);
     require_noerr_action(err, exit, http_log("ERROR: Unable to send http wifisetting body."));
 
-    /*
-    int i = 0;
-    int chunk_sz = 1000;
-    for (; i < total_sz; i += chunk_sz)
+exit:
+    return err;
+}
+
+static int HttpGetCss(httpd_request_t *req)
+{
+    OSStatus err = kNoErr;
+
+    char* js_name = strstr(req->filename, "?name=");
+    http_log("HttpDelTask url[%s] js_name[%s]", req->filename, js_name);
+
+    int total_sz = sizeof(web_styles_css);
+    const unsigned char* js_data = web_styles_css;
+    if (strcmp(js_name + 6, "material") == 0)
     {
-        if (i + chunk_sz >= total_sz)
-        {
-            chunk_sz = total_sz - i;
-        }
-        err = httpd_send_chunk(req->sock, (const char*)(angular_min_html + i), chunk_sz);
-        require_noerr_action(err, exit, http_log("ERROR: Unable to send http testpage body. i[%d] chunk_sz[%d] total_sz[%d]", i, chunk_sz, total_sz));
+        total_sz = sizeof(web_material_cyan_light_blue_min_css);
+        js_data = web_material_cyan_light_blue_min_css;
     }
-    err = httpd_send_chunk(req->sock, NULL, 0);
-    require_noerr_action(err, exit, http_log("ERROR: Unable to send http testpage end."));
-    http_log("httpd_send_chunk total_sz[%d] i[%d]", total_sz, i);
-    */
+
+    err = httpd_send_all_header(req, HTTP_RES_200, total_sz, HTTP_CONTENT_CSS_ZIP);
+    require_noerr_action(err, exit, http_log("ERROR: Unable to send http testpage headers."));
+
+    err = httpd_send_body(req->sock, js_data, total_sz);
+    require_noerr_action(err, exit, http_log("ERROR: Unable to send http wifisetting body."));
 
 exit:
     return err;
@@ -388,7 +413,9 @@ exit:
 
 const struct httpd_wsgi_call g_app_handlers[] = {
     { "/", HTTPD_HDR_DEFORT, 0, HttpGetIndexPage, NULL, NULL, NULL },
+    { "/demo", HTTPD_HDR_DEFORT, 0, HttpGetDemoPage, NULL, NULL, NULL },
     { "/js", HTTPD_HDR_DEFORT, 0, HttpGetJs, NULL, NULL, NULL },
+    { "/css", HTTPD_HDR_DEFORT, 0, HttpGetCss, NULL, NULL, NULL },
     { "/socket", HTTPD_HDR_DEFORT, 0, NULL, HttpSetSocketStatus, NULL, NULL },
     { "/status", HTTPD_HDR_DEFORT, 0, HttpGetTc1Status, NULL, NULL, NULL },
     { "/power", HTTPD_HDR_DEFORT, 0, NULL, HttpGetPowerInfo, NULL, NULL },
@@ -415,7 +442,6 @@ static int _AppHttpdStart()
 {
     OSStatus err = kNoErr;
     http_log("initializing web-services");
-    http_log("sizeof(angular_min_js) = %d sizeof(jquery_min_js) = %d", sizeof(angular_min_js), sizeof(jquery_min_js));
 
     /*Initialize HTTPD*/
     if(is_http_init == false) {

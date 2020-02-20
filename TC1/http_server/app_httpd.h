@@ -34,6 +34,7 @@
 
 #define HTTP_CONTENT_HTML_ZIP "text/html\r\nContent-Encoding: gzip"
 #define HTTP_CONTENT_JS_ZIP "text/javascript\r\nContent-Encoding: gzip"
+#define HTTP_CONTENT_CSS_ZIP "text/css\r\nContent-Encoding: gzip"
 
 #define HTTPD_HDR_DEFORT (HTTPD_HDR_ADD_SERVER|HTTPD_HDR_ADD_CONN_CLOSE|HTTPD_HDR_ADD_PRAGMA_NO_CACHE)
 

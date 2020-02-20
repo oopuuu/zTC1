@@ -27,8 +27,11 @@ def gen(fn):
     fn = re.sub(r"[^\w]", "_", fn)
     print("const unsigned char %s[0x%x] = {\n%s};" % (fn, len(dat), s))
 
-for fn in glob.glob('*.html'):
+for fn in glob.glob('web/*.html'):
     gen(fn)
 
-for fn in glob.glob('*.js'):
+for fn in glob.glob('web/*.js'):
+    gen(fn)
+
+for fn in glob.glob('web/*.css'):
     gen(fn)
