@@ -220,9 +220,9 @@ void MqttClientThread(mico_thread_arg_t arg)
         rc = NewNetwork(&n, MQTT_SERVER, MQTT_SERVER_PORT, ssl_settings);
         if (rc == MQTT_SUCCESS) break;
 
-        mqtt_log("ERROR: MQTT network connection err=%d, reconnect after 3s...", rc);
+        //mqtt_log("ERROR: MQTT network connect err=%d, reconnect after 3s...", rc);
     }
-    mqtt_log("MQTT network connection success!");
+    mqtt_log("MQTT network connect success!");
 
     /* 2. init mqtt client */
     //c.heartbeat_retry_max = 2;
