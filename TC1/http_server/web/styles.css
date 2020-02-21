@@ -235,4 +235,9 @@ _:-ms-input-placeholder, :root .demo-graph {
   -webkit-font-feature-settings: 'liga';
   -webkit-font-smoothing: antialiased;
 }
+/* zogodo */
 .page{display:none;}
+.mdl-nav-active {
+    background-color: #00BCD4;
+    color: #37474F;
+}

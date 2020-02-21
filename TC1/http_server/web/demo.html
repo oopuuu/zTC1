@@ -62,7 +62,7 @@
           </div>
         </header>
         <nav class="demo-navigation mdl-navigation mdl-color--blue-grey-800">
-          <a class="mdl-navigation__link" href="javascript:ShowPage(1);"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">home</i>Home</a>
+          <a class="mdl-navigation__link mdl-nav-active" href="javascript:ShowPage(1);"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">home</i>Home</a>
           <a class="mdl-navigation__link" href="javascript:ShowPage(2);"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">inbox</i>Demo</a>
           <a class="mdl-navigation__link" href="javascript:ShowPage(3);"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">delete</i>Network Config</a>
           <a class="mdl-navigation__link" href="javascript:ShowPage(4);"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">report</i>MQTT Config</a>
@@ -295,19 +295,24 @@
       </svg>
       <script type="text/javascript" src="assets/js_pack.js"></script>
       <script>
+      var chart_par = document.getElementById("ct-chart-par");
+      chart_par.scrollTo(chart_par.scrollWidth, 0);
+
       function ShowPage(id) {
         $(".page").hide();
         $(".page"+id).show();
+
         $(".is-small-screen >> .mdl-layout__drawer-button").click()
+        chart_par.scrollTo(chart_par.scrollWidth, 0);
+        $(".mdl-navigation__link").removeClass("mdl-nav-active");
+
+        $(".mdl-navigation__link:eq("+(id-1)+")").addClass("mdl-nav-active");
       }
       ShowPage(1);
 
       function AjaxErr(re) {
         alert(re.status);
       }
-
-      var chart_par = document.getElementById("ct-chart-par");
-      chart_par.scrollTo(chart_par.scrollWidth, 0);
 
       var data = {
         series: [
