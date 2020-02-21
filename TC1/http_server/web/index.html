@@ -223,13 +223,14 @@
     <!-- <button class="submit_bt" onclick="DelTimedTask()">TestDelete</button> -->
     <table id="timed_task_tb">
         <tr>
-            <th>Index</th>
+            <th></th>
             <th>Time</th>
             <th>Socket</th>
             <th>On</th>
+            <th>Option</th>
         </tr>
         <tr>
-            <td colspan="4">Please Sync</td>
+            <td colspan="5">Please Sync</td>
         </tr>
     </table>
     <button onclick="GetTimedTask()">Sync</button>
@@ -544,15 +545,16 @@ function GetTimedTask() {
     HttpGet("/task", function (re) {
         var tb_html = "\
         <tr>\
-            <th>Index</th>\
+            <th></th>\
             <th>Time</th>\
             <th>Socket</th>\
             <th>On</th>\
+            <th>Option</th>\
         </tr>";
         console.log(re);
         var tasks = JSON.parse(re);
         if (tasks.length == 0) {
-            tb_html += "<tr><td colspan='4'>No Timed Task</td></tr>";
+            tb_html += "<tr><td colspan='5'>No Timed Task</td></tr>";
         }
         for (var i = 0; i < tasks.length; i++) {
             tb_html += "\
@@ -561,6 +563,7 @@ function GetTimedTask() {
                 <td>" + tasks[i].prs_time + "</td>\
                 <td>" + tasks[i].socket_idx + "</td>\
                 <td>" + tasks[i].on + "</td>\
+                <td><a href='javasvript:DeleteTask(" + tasks[i].socket_idx + ");'>Delete</a></td>\
             </tr>";
         }
         document.getElementById("timed_task_tb").innerHTML = tb_html;
