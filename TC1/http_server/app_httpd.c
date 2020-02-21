@@ -123,10 +123,15 @@ static int HttpGetAssets(httpd_request_t *req)
     if (!file_name) return err;
     http_log("HttpGetAssets url[%s] file_name[%s]", req->filename, file_name);
 
-    int total_sz = sizeof(web_jquery_min_js);
-    const unsigned char* file_data = web_jquery_min_js;
+    int total_sz = 0;
+    const unsigned char* file_data = NULL;
     const char* content_type = HTTP_CONTENT_JS_ZIP;
-    if (strcmp(file_name + 8, "angular.js") == 0)
+    if (strcmp(file_name + 8, "jquery.js") == 0)
+    {
+        total_sz = sizeof(web_jquery_min_js);
+        file_data = web_jquery_min_js;
+    }
+    else if (strcmp(file_name + 8, "angular.js") == 0)
     {
         total_sz = sizeof(web_angular_min_js);
         file_data = web_angular_min_js;
@@ -154,12 +159,14 @@ static int HttpGetAssets(httpd_request_t *req)
         file_data = web_roboto_css;
         content_type = HTTP_CONTENT_CSS_ZIP;
     }
-    else if (strcmp(file_name + 8, "icon.css") == 0)
-    {
-        total_sz = sizeof(web_icon_css);
-        file_data = web_icon_css;
-        content_type = HTTP_CONTENT_CSS_ZIP;
-    }
+    //else if (strcmp(file_name + 8, "icon.css") == 0)
+    //{
+    //    total_sz = sizeof(web_icon_css);
+    //    file_data = web_icon_css;
+    //    content_type = HTTP_CONTENT_CSS_ZIP;
+    //}
+
+    if (total_sz == 0) return err;
 
     err = httpd_send_all_header(req, HTTP_RES_200, total_sz, content_type);
     require_noerr_action(err, exit, http_log("ERROR: Unable to send http testpage headers."));
