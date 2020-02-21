@@ -298,7 +298,7 @@
       function ShowPage(id) {
         $(".page").hide();
         $(".page"+id).show();
-        $(".mdl-layout__obfuscator").click()
+        $(".is-small-screen >> .mdl-layout__drawer-button").click()
       }
       ShowPage(1);
 
@@ -343,7 +343,9 @@
           error: AjaxErr
         });
       }
-      GetPowerRecord();
+      $(document).ready(function(){
+        GetPowerRecord();
+      })
     </script>
   </body>
 </html>
