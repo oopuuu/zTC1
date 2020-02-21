@@ -23,7 +23,7 @@
     <link rel="stylesheet" href="/assets/material.css">
     <link rel="stylesheet" href="/assets/styles.css">
     -->
-    <link rel="stylesheet" href="/assets/css_pack.css">
+    <link rel="stylesheet" href="assets/css_pack.css">
   </head>
   <body>
     <div class="demo-layout mdl-layout mdl-js-layout mdl-layout--fixed-drawer mdl-layout--fixed-header">
@@ -68,7 +68,6 @@
           </div>
         </header>
         <nav class="demo-navigation mdl-navigation mdl-color--blue-grey-800">
-          <a class="mdl-navigation__link" href="javascript:ShowPage(0);"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">home</i>Home0</a>
           <a class="mdl-navigation__link" href="javascript:ShowPage(1);"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">home</i>Home</a>
           <a class="mdl-navigation__link" href="javascript:ShowPage(2);"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">inbox</i>Inbox</a>
           <a class="mdl-navigation__link" href="javascript:ShowPage(3);"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">delete</i>Trash</a>
@@ -84,8 +83,7 @@
         <div class="mdl-grid demo-content">
 
 
-
-          <div id="page0" class="page demo-cards mdl-cell mdl-cell--4-col mdl-cell--8-col-tablet mdl-grid mdl-grid--no-spacing">
+          <div class="page page1 demo-cards mdl-cell mdl-cell--4-col mdl-cell--8-col-tablet mdl-grid mdl-grid--no-spacing">
             <div class="demo-options mdl-card mdl-shadow--2dp mdl-cell mdl-cell--4-col mdl-cell--3-col-tablet mdl-cell--12-col-desktop">
               <div class="mdl-card__supporting-text">
 
@@ -158,10 +156,17 @@
             </div>
           </div>
 
+          <div class="page page1 demo-graphs mdl-shadow--2dp mdl-cell mdl-cell--8-col">
+            <svg fill="currentColor" viewBox="0 0 500 250" class="demo-graph">
+              <use xlink:href="#chart" />
+            </svg>
+            <svg fill="currentColor" viewBox="0 0 500 250" class="demo-graph">
+              <use xlink:href="#chart" />
+            </svg>
+          </div>
 
 
-
-          <div id="page1" class="page demo-charts mdl-shadow--2dp mdl-cell mdl-cell--12-col mdl-grid">
+          <div class="page page2 demo-charts mdl-shadow--2dp mdl-cell mdl-cell--12-col mdl-grid">
             <svg fill="currentColor" width="200px" height="200px" viewBox="0 0 1 1" class="demo-chart mdl-cell mdl-cell--4-col mdl-cell--3-col-desktop">
               <use xlink:href="#piechart" mask="url(#piemask)" />
               <text x="0.5" y="0.5" font-family="Roboto" font-size="0.3" fill="#888" text-anchor="middle" dy="0.1">82<tspan font-size="0.2" dy="-0.07">%</tspan></text>
@@ -180,7 +185,7 @@
             </svg>
           </div>
 
-          <div id="page2" class="page demo-graphs mdl-shadow--2dp mdl-cell mdl-cell--8-col">
+          <div class="page page2 demo-graphs mdl-shadow--2dp mdl-cell mdl-cell--8-col">
             <svg fill="currentColor" viewBox="0 0 500 250" class="demo-graph">
               <use xlink:href="#chart" />
             </svg>
@@ -189,7 +194,7 @@
             </svg>
           </div>
 
-          <div id="page3" class="page demo-cards mdl-cell mdl-cell--4-col mdl-cell--8-col-tablet mdl-grid mdl-grid--no-spacing">
+          <div class="page page2 demo-cards mdl-cell mdl-cell--4-col mdl-cell--8-col-tablet mdl-grid mdl-grid--no-spacing">
             <div class="demo-updates mdl-card mdl-shadow--2dp mdl-cell mdl-cell--4-col mdl-cell--4-col-tablet mdl-cell--12-col-desktop">
               <div class="mdl-card__title mdl-card--expand mdl-color--teal-300">
                 <h2 class="mdl-card__title-text">Updates</h2>
@@ -303,13 +308,13 @@
       <script type="text/javascript" src="/assets/material.js"></script>
       <script type="text/javascript" src="/assets/jquery.js"></script>
       -->
-      <script type="text/javascript" src="/assets/js_pack.js"></script>
+      <script type="text/javascript" src="assets/js_pack.js"></script>
       <script>
       function ShowPage(id) {
         $(".page").hide();
-        $("#page"+id).show();
+        $(".page"+id).show();
       }
-      ShowPage(0);
+      ShowPage(1);
     </script>
   </body>
 </html>
