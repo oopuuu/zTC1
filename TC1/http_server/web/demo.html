@@ -17,12 +17,6 @@
     <meta name="msapplication-TileImage" content="http://119.23.191.79/tc1/images/touch/ms-touch-icon-144x144-precomposed.png">
     <meta name="msapplication-TileColor" content="#3372DF">
     <link rel="shortcut icon" href="http://119.23.191.79/tc1/images/favicon.png">
-    <!--
-    <link rel="stylesheet" href="/assets/roboto.css">
-    <link rel="stylesheet" href="/assets/icon.css">
-    <link rel="stylesheet" href="/assets/material.css">
-    <link rel="stylesheet" href="/assets/styles.css">
-    -->
     <link rel="stylesheet" href="assets/css_pack.css">
   </head>
   <body>
@@ -69,12 +63,12 @@
         </header>
         <nav class="demo-navigation mdl-navigation mdl-color--blue-grey-800">
           <a class="mdl-navigation__link" href="javascript:ShowPage(1);"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">home</i>Home</a>
-          <a class="mdl-navigation__link" href="javascript:ShowPage(2);"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">inbox</i>Inbox</a>
-          <a class="mdl-navigation__link" href="javascript:ShowPage(3);"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">delete</i>Trash</a>
-          <a class="mdl-navigation__link" href="javascript:ShowPage(4);"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">report</i>Spam</a>
-          <a class="mdl-navigation__link" href="javascript:ShowPage(5);"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">forum</i>Forums</a>
-          <a class="mdl-navigation__link" href="javascript:ShowPage(6);"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">flag</i>Updates</a>
-          <a class="mdl-navigation__link" href="javascript:ShowPage(7);"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">local_offer</i>Promos</a>
+          <a class="mdl-navigation__link" href="javascript:ShowPage(2);"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">inbox</i>Demo</a>
+          <a class="mdl-navigation__link" href="javascript:ShowPage(3);"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">delete</i>Network Config</a>
+          <a class="mdl-navigation__link" href="javascript:ShowPage(4);"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">report</i>MQTT Config</a>
+          <a class="mdl-navigation__link" href="javascript:ShowPage(5);"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">forum</i>Timed Task</a>
+          <a class="mdl-navigation__link" href="javascript:ShowPage(6);"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">flag</i>OTA</a>
+          <a class="mdl-navigation__link" href="javascript:ShowPage(7);"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">local_offer</i>System Log</a>
           <a class="mdl-navigation__link" href="javascript:ShowPage(8);"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">shopping_cart</i>Purchases</a>
           <a class="mdl-navigation__link" href="javascript:ShowPage(9);"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">people</i>Social</a>
         </nav>
@@ -304,10 +298,6 @@
           </g>
         </defs>
       </svg>
-      <!--
-      <script type="text/javascript" src="/assets/material.js"></script>
-      <script type="text/javascript" src="/assets/jquery.js"></script>
-      -->
       <script type="text/javascript" src="assets/js_pack.js"></script>
       <script>
       function ShowPage(id) {
@@ -315,6 +305,28 @@
         $(".page"+id).show();
       }
       ShowPage(1);
+
+      function AjaxErr(re) {
+        alert(re.status);
+      }
+
+      var power_idx = 0;
+      function GetPowerRecord() {
+        $.ajax({
+          url: "/power",
+          type: "POST",
+          data: power_idx.toString(),
+          success: function (re) {
+            re = re.replace(/'/g, '"');
+            var power = JSON.parse(re);
+            power_idx = power.idx + 1;
+            alert(power.powers);
+            window.setTimeout(GetPowerRecord, 3000);
+          },
+          error: AjaxErr
+        });
+      }
+      GetPowerRecord();
     </script>
   </body>
 </html>
