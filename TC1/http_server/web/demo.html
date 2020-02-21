@@ -150,13 +150,10 @@
             </div>
           </div>
 
-          <div class="page page1 demo-graphs mdl-shadow--2dp mdl-cell mdl-cell--8-col">
-            <div class="ct-chart ct-perfect-fourth"></div>
-            <svg fill="currentColor" viewBox="0 0 500 250" class="demo-graph">
-              <use xlink:href="#chart" />
-            </svg>
+          <div id="ct-chart-par" class="page page1 mdl-card__supporting-text mdl-shadow--2dp mdl-cell mdl-cell--8-col"
+           style="height:300px;overflow-x:scroll;overflow-y:hidden;">
+            <div id="ct-chart" class="ct-chart ct-perfect-fourth" style="height:280px;"></div>
           </div>
-
 
           <div class="page page2 demo-charts mdl-shadow--2dp mdl-cell mdl-cell--12-col mdl-grid">
             <svg fill="currentColor" width="200px" height="200px" viewBox="0 0 1 1" class="demo-chart mdl-cell mdl-cell--4-col mdl-cell--3-col-desktop">
@@ -308,6 +305,9 @@
         alert(re.status);
       }
 
+      var chart_par = document.getElementById("ct-chart-par");
+      chart_par.scrollTo(chart_par.scrollWidth, 0);
+
       var data = {
         series: [
           []
@@ -315,6 +315,7 @@
       };
       var t = new Chartist.Line('.ct-chart', data, {showArea: true});
       var power_idx = 0;
+      var chart_wth = 0;
       function GetPowerRecord() {
         $.ajax({
           url: "/power",
@@ -324,10 +325,18 @@
             re = re.replace(/'/g, '"');
             var power = JSON.parse(re);
             power_idx = power.idx + 1;
-            power.powers.array.forEach(element => {
+
+            var x = chart_par.scrollWidth - chart_par.offsetWidth - chart_par.scrollLeft;
+
+            power.powers.forEach(element => {
               data.series[0].push(element/10);
             });
+            chart_wth += power.powers.length;
+            $("#ct-chart").width(chart_wth * 10);
             t.update(data);
+            if (power.powers.length != 0 && x < 100) {
+              chart_par.scrollTo(chart_par.scrollWidth, 0);
+            }
             window.setTimeout(GetPowerRecord, 3000);
           },
           error: AjaxErr
