@@ -305,6 +305,9 @@
         alert(re.status);
       }
 
+      var chart_par = document.getElementById("ct-chart-par");
+      chart_par.scrollTo(chart_par.scrollWidth, 0);
+
       var data = {
         series: [
           []
@@ -323,8 +326,7 @@
             var power = JSON.parse(re);
             power_idx = power.idx + 1;
 
-            var power_line = document.getElementById("ct-chart-par");
-            var x = power_line.scrollWidth - power_line.offsetWidth - power_line.scrollLeft;
+            var x = chart_par.scrollWidth - chart_par.offsetWidth - chart_par.scrollLeft;
 
             power.powers.forEach(element => {
               data.series[0].push(element/10);
@@ -333,7 +335,7 @@
             $("#ct-chart").width(chart_wth * 10);
             t.update(data);
             if (power.powers.length != 0 && x < 100) {
-              power_line.scrollTo(power_line.scrollWidth, 0); //滑动到最后
+              chart_par.scrollTo(chart_par.scrollWidth, 0);
             }
             window.setTimeout(GetPowerRecord, 3000);
           },
