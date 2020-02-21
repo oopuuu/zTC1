@@ -178,7 +178,7 @@ _:-ms-input-placeholder, :root .demo-graph {
 }
 .demo-updates .mdl-card__title {
   min-height: 200px;
-  /* background-image: url('images/dog.png'); */
+  background-image: url('http://119.23.191.79/tc1/images/dog.png');
   background-position: 90% 100%;
   background-repeat: no-repeat;
 }
