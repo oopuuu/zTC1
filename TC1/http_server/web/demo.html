@@ -313,7 +313,7 @@
           []
         ]
       };
-      var t = new Chartist.Line('.ct-chart', data);
+      var t = new Chartist.Line('.ct-chart', data, {showArea: true});
       var power_idx = 0;
       function GetPowerRecord() {
         $.ajax({
@@ -324,7 +324,9 @@
             re = re.replace(/'/g, '"');
             var power = JSON.parse(re);
             power_idx = power.idx + 1;
-            data.series[0].push(power_idx/10);
+            power.powers.array.forEach(element => {
+              data.series[0].push(element/10);
+            });
             t.update(data);
             window.setTimeout(GetPowerRecord, 3000);
           },
