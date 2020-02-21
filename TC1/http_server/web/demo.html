@@ -17,10 +17,13 @@
     <meta name="msapplication-TileImage" content="http://119.23.191.79/tc1/images/touch/ms-touch-icon-144x144-precomposed.png">
     <meta name="msapplication-TileColor" content="#3372DF">
     <link rel="shortcut icon" href="http://119.23.191.79/tc1/images/favicon.png">
+    <!--
     <link rel="stylesheet" href="/assets/roboto.css">
-    <!-- <link rel="stylesheet" href="/assets/icon.css"> -->
+    <link rel="stylesheet" href="/assets/icon.css">
     <link rel="stylesheet" href="/assets/material.css">
     <link rel="stylesheet" href="/assets/styles.css">
+    -->
+    <link rel="stylesheet" href="/assets/css_pack.css">
   </head>
   <body>
     <div class="demo-layout mdl-layout mdl-js-layout mdl-layout--fixed-drawer mdl-layout--fixed-header">
@@ -65,6 +68,7 @@
           </div>
         </header>
         <nav class="demo-navigation mdl-navigation mdl-color--blue-grey-800">
+          <a class="mdl-navigation__link" href="javascript:ShowPage(0);"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">home</i>Home0</a>
           <a class="mdl-navigation__link" href="javascript:ShowPage(1);"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">home</i>Home</a>
           <a class="mdl-navigation__link" href="javascript:ShowPage(2);"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">inbox</i>Inbox</a>
           <a class="mdl-navigation__link" href="javascript:ShowPage(3);"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">delete</i>Trash</a>
@@ -80,6 +84,84 @@
       </div>
       <main class="mdl-layout__content mdl-color--grey-100">
         <div class="mdl-grid demo-content">
+
+
+
+          <div id="page0" class="page demo-cards mdl-cell mdl-cell--4-col mdl-cell--8-col-tablet mdl-grid mdl-grid--no-spacing">
+            <div class="demo-options mdl-card mdl-color--deep-purple-500 mdl-shadow--2dp mdl-cell mdl-cell--4-col mdl-cell--3-col-tablet mdl-cell--12-col-desktop">
+              <div class="mdl-card__supporting-text mdl-color-text--blue-grey-50">
+
+                <h3>Power Control</h3>
+
+                <ul class="demo-list-control mdl-list">
+                  <li class="mdl-list__item">
+                    <span class="mdl-color-text--blue-grey-50 mdl-list__item-primary-content">
+                      Socket-1
+                    </span>
+                    <span class="mdl-list__item-secondary-action">
+                      <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="list-switch-1">
+                        <input type="checkbox" id="list-switch-1" class="mdl-switch__input" checked />
+                      </label>
+                    </span>
+                  </li>
+                  <li class="mdl-list__item">
+                    <span class="mdl-color-text--blue-grey-50 mdl-list__item-primary-content">
+                      Socket-2
+                    </span>
+                    <span class="mdl-list__item-secondary-action">
+                      <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="list-switch-2">
+                        <input type="checkbox" id="list-switch-2" class="mdl-switch__input" checked />
+                      </label>
+                    </span>
+                  </li>
+                  <li class="mdl-list__item">
+                    <span class="mdl-color-text--blue-grey-50 mdl-list__item-primary-content">
+                      Socket-3
+                    </span>
+                    <span class="mdl-list__item-secondary-action">
+                      <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="list-switch-3">
+                        <input type="checkbox" id="list-switch-3" class="mdl-switch__input" checked />
+                      </label>
+                    </span>
+                  </li>
+                  <li class="mdl-list__item">
+                    <span class="mdl-color-text--blue-grey-50 mdl-list__item-primary-content">
+                      Socket-4
+                    </span>
+                    <span class="mdl-list__item-secondary-action">
+                      <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="list-switch-4">
+                        <input type="checkbox" id="list-switch-4" class="mdl-switch__input" checked />
+                      </label>
+                    </span>
+                  </li>
+                  <li class="mdl-list__item">
+                    <span class="mdl-color-text--blue-grey-50 mdl-list__item-primary-content">
+                      Socket-5
+                    </span>
+                    <span class="mdl-list__item-secondary-action">
+                      <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="list-switch-5">
+                        <input type="checkbox" id="list-switch-5" class="mdl-switch__input" checked />
+                      </label>
+                    </span>
+                  </li>
+                  <li class="mdl-list__item">
+                    <span class="mdl-color-text--blue-grey-50 mdl-list__item-primary-content">
+                      Socket-6
+                    </span>
+                    <span class="mdl-list__item-secondary-action">
+                      <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="list-switch-6">
+                        <input type="checkbox" id="list-switch-6" class="mdl-switch__input" checked />
+                      </label>
+                    </span>
+                  </li>
+                </ul>
+
+              </div>
+            </div>
+          </div>
+
+
+
 
           <div id="page1" class="page demo-charts mdl-color--white mdl-shadow--2dp mdl-cell mdl-cell--12-col mdl-grid">
             <svg fill="currentColor" width="200px" height="200px" viewBox="0 0 1 1" class="demo-chart mdl-cell mdl-cell--4-col mdl-cell--3-col-desktop">
@@ -167,8 +249,8 @@
                 <i class="material-icons">location_on</i>
               </div>
             </div>
-
           </div>
+
         </div>
       </main>
     </div>
@@ -219,14 +301,17 @@
           </g>
         </defs>
       </svg>
+      <!--
       <script type="text/javascript" src="/assets/material.js"></script>
       <script type="text/javascript" src="/assets/jquery.js"></script>
-    <script>
+      -->
+      <script type="text/javascript" src="/assets/js_pack.js"></script>
+      <script>
       function ShowPage(id) {
         $(".page").hide();
         $("#page"+id).show();
       }
-      ShowPage(2);
+      ShowPage(0);
     </script>
   </body>
 </html>

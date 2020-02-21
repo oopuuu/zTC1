@@ -126,45 +126,17 @@ static int HttpGetAssets(httpd_request_t *req)
     int total_sz = 0;
     const unsigned char* file_data = NULL;
     const char* content_type = HTTP_CONTENT_JS_ZIP;
-    if (strcmp(file_name + 8, "jquery.js") == 0)
+    if (strcmp(file_name + 8, "js_pack.js") == 0)
     {
-        total_sz = sizeof(web_jquery_min_js);
-        file_data = web_jquery_min_js;
+        total_sz = sizeof(js_pack);
+        file_data = js_pack;
     }
-    else if (strcmp(file_name + 8, "angular.js") == 0)
+    else if (strcmp(file_name + 8, "css_pack.css") == 0)
     {
-        total_sz = sizeof(web_angular_min_js);
-        file_data = web_angular_min_js;
-    }
-    if (strcmp(file_name + 8, "material.js") == 0)
-    {
-        total_sz = sizeof(web_material_min_js);
-        file_data = web_material_min_js;
-    }
-    else if (strcmp(file_name + 8, "styles.css") == 0)
-    {
-        total_sz = sizeof(web_styles_css);
-        file_data = web_styles_css;
+        total_sz = sizeof(css_pack);
+        file_data = css_pack;
         content_type = HTTP_CONTENT_CSS_ZIP;
     }
-    else if (strcmp(file_name + 8, "material.css") == 0)
-    {
-        total_sz = sizeof(web_material_cyan_light_blue_min_css);
-        file_data = web_material_cyan_light_blue_min_css;
-        content_type = HTTP_CONTENT_CSS_ZIP;
-    }
-    else if (strcmp(file_name + 8, "roboto.css") == 0)
-    {
-        total_sz = sizeof(web_roboto_css);
-        file_data = web_roboto_css;
-        content_type = HTTP_CONTENT_CSS_ZIP;
-    }
-    //else if (strcmp(file_name + 8, "icon.css") == 0)
-    //{
-    //    total_sz = sizeof(web_icon_css);
-    //    file_data = web_icon_css;
-    //    content_type = HTTP_CONTENT_CSS_ZIP;
-    //}
 
     if (total_sz == 0) return err;
 
