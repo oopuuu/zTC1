@@ -301,11 +301,11 @@
       function ShowPage(id) {
         $(".page").hide();
         $(".page"+id).show();
-
         $(".is-small-screen >> .mdl-layout__drawer-button").click()
-        chart_par.scrollTo(chart_par.scrollWidth, 0);
-        $(".mdl-navigation__link").removeClass("mdl-nav-active");
 
+        chart_par.scrollTo(chart_par.scrollWidth, 0);
+
+        $(".mdl-navigation__link").removeClass("mdl-nav-active");
         $(".mdl-navigation__link:eq("+(id-1)+")").addClass("mdl-nav-active");
       }
       ShowPage(1);
