@@ -322,17 +322,19 @@
             re = re.replace(/'/g, '"');
             var power = JSON.parse(re);
             power_idx = power.idx + 1;
+
+            var power_line = document.getElementById("ct-chart-par");
+            var x = power_line.scrollWidth - power_line.offsetWidth - power_line.scrollLeft;
+
             power.powers.forEach(element => {
               data.series[0].push(element/10);
             });
             chart_wth += power.powers.length;
             $("#ct-chart").width(chart_wth * 10);
             t.update(data);
-            var power_line = document.getElementById("ct-chart-par");
-            if (power.powers.length != 0 && power_line.scrollWidth - power_line.offsetWidth - power_line.scrollLeft < 10) {
+            if (power.powers.length != 0 && x < 100) {
               power_line.scrollTo(power_line.scrollWidth, 0); //滑动到最后
             }
-            power_line.scrollTo(power_line.scrollWidth, 0); //滑动到最后
             window.setTimeout(GetPowerRecord, 3000);
           },
           error: AjaxErr
