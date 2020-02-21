@@ -424,8 +424,8 @@ exit:
 const struct httpd_wsgi_call g_app_handlers[] = {
     { "/", HTTPD_HDR_DEFORT, 0, HttpGetIndexPage, NULL, NULL, NULL },
     { "/demo", HTTPD_HDR_DEFORT, 0, HttpGetDemoPage, NULL, NULL, NULL },
-    { "/js", HTTPD_HDR_CACHE, 0, HttpGetJs, NULL, NULL, NULL },
-    { "/css", HTTPD_HDR_CACHE, 0, HttpGetCss, NULL, NULL, NULL },
+    { "/js", HTTPD_HDR_ADD_SERVER|HTTPD_HDR_ADD_CONN_CLOSE, 0, HttpGetJs, NULL, NULL, NULL },
+    { "/css", HTTPD_HDR_ADD_SERVER|HTTPD_HDR_ADD_CONN_CLOSE, 0, HttpGetCss, NULL, NULL, NULL },
     { "/socket", HTTPD_HDR_DEFORT, 0, NULL, HttpSetSocketStatus, NULL, NULL },
     { "/status", HTTPD_HDR_DEFORT, 0, HttpGetTc1Status, NULL, NULL, NULL },
     { "/power", HTTPD_HDR_DEFORT, 0, NULL, HttpGetPowerInfo, NULL, NULL },
