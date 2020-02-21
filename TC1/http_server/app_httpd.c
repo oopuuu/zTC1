@@ -115,65 +115,56 @@ exit:
     return err;
 }
 
-static int HttpGetJs(httpd_request_t *req)
+static int HttpGetAssets(httpd_request_t *req)
 {
     OSStatus err = kNoErr;
 
-    char* js_name = strstr(req->filename, "?name=");
-    http_log("HttpDelTask url[%s] js_name[%s]", req->filename, js_name);
+    char* file_name = strstr(req->filename, "/assets/");
+    if (!file_name) return err;
+    http_log("HttpGetAssets url[%s] file_name[%s]", req->filename, file_name);
 
     int total_sz = sizeof(web_jquery_min_js);
-    const unsigned char* js_data = web_jquery_min_js;
-    if (strcmp(js_name + 6, "angular") == 0)
+    const unsigned char* file_data = web_jquery_min_js;
+    const char* content_type = HTTP_CONTENT_JS_ZIP;
+    if (strcmp(file_name + 8, "angular.js") == 0)
     {
         total_sz = sizeof(web_angular_min_js);
-        js_data = web_angular_min_js;
+        file_data = web_angular_min_js;
     }
-    if (strcmp(js_name + 6, "material") == 0)
+    if (strcmp(file_name + 8, "material.js") == 0)
     {
         total_sz = sizeof(web_material_min_js);
-        js_data = web_material_min_js;
+        file_data = web_material_min_js;
     }
-
-    err = httpd_send_all_header(req, HTTP_RES_200, total_sz, HTTP_CONTENT_JS_ZIP);
-    require_noerr_action(err, exit, http_log("ERROR: Unable to send http testpage headers."));
-
-    err = httpd_send_body(req->sock, js_data, total_sz);
-    require_noerr_action(err, exit, http_log("ERROR: Unable to send http wifisetting body."));
-
-exit:
-    return err;
-}
-
-static int HttpGetCss(httpd_request_t *req)
-{
-    OSStatus err = kNoErr;
-
-    char* js_name = strstr(req->filename, "?name=");
-    http_log("HttpDelTask url[%s] js_name[%s]", req->filename, js_name);
-
-    int total_sz = sizeof(web_styles_css);
-    const unsigned char* js_data = web_styles_css;
-    if (strcmp(js_name + 6, "material") == 0)
+    else if (strcmp(file_name + 8, "style.css") == 0)
+    {
+        total_sz = sizeof(web_styles_css);
+        file_data = web_styles_css;
+        content_type = HTTP_CONTENT_CSS_ZIP;
+    }
+    else if (strcmp(file_name + 8, "material.css") == 0)
     {
         total_sz = sizeof(web_material_cyan_light_blue_min_css);
-        js_data = web_material_cyan_light_blue_min_css;
+        file_data = web_material_cyan_light_blue_min_css;
+        content_type = HTTP_CONTENT_CSS_ZIP;
     }
-    else if (strcmp(js_name + 6, "roboto") == 0)
+    else if (strcmp(file_name + 8, "roboto.css") == 0)
     {
         total_sz = sizeof(web_roboto_css);
-        js_data = web_roboto_css;
+        file_data = web_roboto_css;
+        content_type = HTTP_CONTENT_CSS_ZIP;
     }
-    else if (strcmp(js_name + 6, "icon") == 0)
+    else if (strcmp(file_name + 8, "icon.css") == 0)
     {
         total_sz = sizeof(web_icon_css);
-        js_data = web_icon_css;
+        file_data = web_icon_css;
+        content_type = HTTP_CONTENT_CSS_ZIP;
     }
 
-    err = httpd_send_all_header(req, HTTP_RES_200, total_sz, HTTP_CONTENT_CSS_ZIP);
+    err = httpd_send_all_header(req, HTTP_RES_200, total_sz, content_type);
     require_noerr_action(err, exit, http_log("ERROR: Unable to send http testpage headers."));
 
-    err = httpd_send_body(req->sock, js_data, total_sz);
+    err = httpd_send_body(req->sock, file_data, total_sz);
     require_noerr_action(err, exit, http_log("ERROR: Unable to send http wifisetting body."));
 
 exit:
@@ -424,8 +415,7 @@ exit:
 const struct httpd_wsgi_call g_app_handlers[] = {
     { "/", HTTPD_HDR_DEFORT, 0, HttpGetIndexPage, NULL, NULL, NULL },
     { "/demo", HTTPD_HDR_DEFORT, 0, HttpGetDemoPage, NULL, NULL, NULL },
-    { "/js", HTTPD_HDR_ADD_SERVER|HTTPD_HDR_ADD_CONN_CLOSE, 0, HttpGetJs, NULL, NULL, NULL },
-    { "/css", HTTPD_HDR_ADD_SERVER|HTTPD_HDR_ADD_CONN_CLOSE, 0, HttpGetCss, NULL, NULL, NULL },
+    { "/assets", HTTPD_HDR_ADD_SERVER|HTTPD_HDR_ADD_CONN_CLOSE, APP_HTTP_FLAGS_NO_EXACT_MATCH, HttpGetAssets, NULL, NULL, NULL },
     { "/socket", HTTPD_HDR_DEFORT, 0, NULL, HttpSetSocketStatus, NULL, NULL },
     { "/status", HTTPD_HDR_DEFORT, 0, HttpGetTc1Status, NULL, NULL, NULL },
     { "/power", HTTPD_HDR_DEFORT, 0, NULL, HttpGetPowerInfo, NULL, NULL },
