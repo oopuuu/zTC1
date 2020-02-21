@@ -136,7 +136,7 @@ static int HttpGetAssets(httpd_request_t *req)
         total_sz = sizeof(web_material_min_js);
         file_data = web_material_min_js;
     }
-    else if (strcmp(file_name + 8, "style.css") == 0)
+    else if (strcmp(file_name + 8, "styles.css") == 0)
     {
         total_sz = sizeof(web_styles_css);
         file_data = web_styles_css;
