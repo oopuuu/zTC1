@@ -37,6 +37,7 @@
 #define HTTP_CONTENT_CSS_ZIP "text/css\r\nContent-Encoding: gzip"
 
 #define HTTPD_HDR_DEFORT (HTTPD_HDR_ADD_SERVER|HTTPD_HDR_ADD_CONN_CLOSE|HTTPD_HDR_ADD_PRAGMA_NO_CACHE)
+#define HTTPD_HDR_CACHE (HTTPD_HDR_ADD_SERVER|HTTPD_HDR_ADD_CONN_CLOSE|HTTPD_HDR_ADD_CACHE_CTRL_NO_CHK)
 
 #define send_http(DATA, LEN, LABEL, P_ERR)                                                                 \
     *(P_ERR) = httpd_send_all_header(req, HTTP_RES_200, LEN , HTTP_CONTENT_HTML_STR);                 \
