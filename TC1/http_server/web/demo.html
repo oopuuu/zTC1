@@ -150,13 +150,9 @@
             </div>
           </div>
 
-          <div class="page page1 demo-graphs mdl-shadow--2dp mdl-cell mdl-cell--8-col">
+          <div class="page page1 mdl-card__supporting-text mdl-shadow--2dp mdl-cell mdl-cell--8-col">
             <div class="ct-chart ct-perfect-fourth"></div>
-            <svg fill="currentColor" viewBox="0 0 500 250" class="demo-graph">
-              <use xlink:href="#chart" />
-            </svg>
           </div>
-
 
           <div class="page page2 demo-charts mdl-shadow--2dp mdl-cell mdl-cell--12-col mdl-grid">
             <svg fill="currentColor" width="200px" height="200px" viewBox="0 0 1 1" class="demo-chart mdl-cell mdl-cell--4-col mdl-cell--3-col-desktop">
@@ -324,7 +320,7 @@
             re = re.replace(/'/g, '"');
             var power = JSON.parse(re);
             power_idx = power.idx + 1;
-            power.powers.array.forEach(element => {
+            power.powers.forEach(element => {
               data.series[0].push(element/10);
             });
             t.update(data);
