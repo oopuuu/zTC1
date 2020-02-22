@@ -283,7 +283,7 @@ function HttpPost(url, onsuccess, data) {
     Ajax(url, onsuccess, "POST", data);
 }
 function HttpDel(url, onsuccess, data) {
-    Ajax(url, onsuccess, "DELET", data);
+    Ajax(url, onsuccess, "DELETE", data);
 }
 
 var submit_bts = document.getElementsByClassName("submit_bt");
@@ -586,7 +586,7 @@ function AddTimedTask() {
 }
 
 function DelTimedTask(timestamp) {
-    HttpGet("/xxxx/"+timestamp, function (re) {
+    HttpDel("/task/"+timestamp, function (re) {
         GetTimedTask();
     });
 }

@@ -344,7 +344,7 @@ function ShowToask(mess) {
 
 //Ajax-start
 function AjaxErr(re) {
-  //alert(re.status);
+  ShowToask("Ajax err: " + re.status);
 }
 function Ajax(url, onsuccess, type, data) {
   $.ajax({
@@ -364,7 +364,7 @@ function HttpPost(url, onsuccess, data) {
   Ajax(url, onsuccess, "POST", data);
 }
 function HttpDel(url, onsuccess, data) {
-  Ajax(url, onsuccess, "DELET", data);
+  Ajax(url, onsuccess, "DELETE", data);
 }
 //Ajax-end
 
