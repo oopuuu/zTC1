@@ -354,7 +354,9 @@ function Ajax(url, onsuccess, type, data) {
     url: url,
     type: type,
     data: data,
-    success: onsuccess,
+    success: function(re) {
+      onsuccess(re.replace(/'/g, '"'));
+    },
     error: AjaxErr
   });
 }
@@ -442,6 +444,7 @@ function GetTimedTask() {
     document.getElementById("timed_task_tb").innerHTML = tb_html;
   });
 }
+GetTimedTask();
 function AddTimedTask() {
   var tim = document.getElementById("task_time").value;
   var idx = document.getElementById("task_skt_idx").value;
