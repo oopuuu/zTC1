@@ -165,29 +165,29 @@
             </div>
             <div class="mdl-card__supporting-text" style="overflow: unset;">
             <form action="#">
-              <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label getmdl-select getmdl-select__fix-height">
-                <input id="wifi_sel_name" type="text" value="" class="mdl-textfield__input" readonly>
-                <input id="wifi_sel_data" type="hidden" value="" name="sample4">
+              <div id="div_wifi_sel" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label getmdl-select getmdl-select__fix-height">
+                <input id="wifi_sel" type="text" value="" class="mdl-textfield__input" readonly>
+                <input type="hidden" value="" name="wifi_sel">
                 <i class="mdl-icon-toggle__label material-icons">keyboard_arrow_down</i>
-                <label for="sample4" class="mdl-textfield__label">SSID</label>
-                <ul id="ssid_sel_list" for="sample4" class="mdl-menu mdl-menu--bottom-left mdl-js-menu">
+                <label for="wifi_sel" class="mdl-textfield__label">SSID</label>
+                <ul id="ssid_sel_list" for="wifi_sel" class="mdl-menu mdl-menu--bottom-left mdl-js-menu">
                 </ul>
               </div>
               <div id="div_custom_ssid" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" hidden>
-                <input id="custom_ssid" class="mdl-textfield__input" type="text" id="sample3">
-                <label class="mdl-textfield__label" for="sample3">SSID</label>
+                <input id="custom_ssid" class="mdl-textfield__input" type="text">
+                <label class="mdl-textfield__label" for="custom_ssid">SSID</label>
               </div>
               <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                <input class="mdl-textfield__input" type="text" id="sample3">
-                <label class="mdl-textfield__label" for="sample3">Password</label>
+                <input class="mdl-textfield__input" type="text" id="custom_password">
+                <label class="mdl-textfield__label" for="custom_password">Password</label>
               </div>
               <div>
-                <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="option-1">
-                  <input type="radio" id="option-1" class="mdl-radio__button" name="options" value="1" checked>
+                <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="custom_ap">
+                  <input type="radio" id="custom_ap" class="mdl-radio__button" name="options" value="1">
                   <span class="mdl-radio__label">AP</span>
                 </label>
-                <label class="station-radio mdl-radio mdl-js-radio mdl-js-ripple-effect" for="option-2">
-                  <input type="radio" id="option-2" class="mdl-radio__button" name="options" value="2">
+                <label class="station-radio mdl-radio mdl-js-radio mdl-js-ripple-effect" for="custom_station">
+                  <input type="radio" id="custom_station" class="mdl-radio__button" name="options" value="2" checked>
                   <span class="mdl-radio__label">Station</span>
                 </label>
               </div>
@@ -373,10 +373,6 @@ var chart_par = document.getElementById("ct-chart-par");
 chart_par.scrollTo(chart_par.scrollWidth, 0);
 
 var ssid_slt = document.getElementById("ssid_sel_list");
-var div_custom_ssid = document.getElementById("div_custom_ssid");
-var input_div_custom_ssid = document.getElementById("custom_ssid");
-var input_wifi_sel_data = document.getElementById("wifi_sel_data");
-var input_wifi_sel_name = document.getElementById("wifi_sel_name");
 
 var rescan_timer;
 
@@ -400,13 +396,27 @@ function ShowPage(id) {
 ShowPage(3);
 //Menu-end
 
-$("#wifi_sel_name").on("change", function() {
-    if (input_wifi_sel_data.value == "0") {
-      $("#div_custom_ssid")[0].hidden = false;
+$("#wifi_sel").on("change", function() {
+    var div_custom = $("#div_custom_ssid")[0];
+    var wifi_sel_id = $("input[name='wifi_sel']")[0];
+    var wifi_sel_name = $("#wifi_sel")[0];
+    var custom_ssid = $("#custom_ssid")[0];
+    if (wifi_sel_id.value == "0") {
+        div_custom.hidden = false;
+        custom_ssid.parentElement.MaterialTextfield.change("");
     } else {
-      $("#div_custom_ssid")[0].hidden = true;
-      input_div_custom_ssid.value = input_wifi_sel_name.value;
+        div_custom.hidden = true;
+        custom_ssid.parentElement.MaterialTextfield.change(wifi_sel_name.value);
     }
+});
+
+$("#custom_ap").on("change", function(){
+  $("#div_custom_ssid")[0].hidden = false;
+  $("#div_wifi_sel")[0].hidden = true;
+});
+$("#custom_station").on("change", function(){
+  $("#div_custom_ssid")[0].hidden = true;
+  $("#div_wifi_sel")[0].hidden = false;
 });
 
 function Rescan() {
@@ -422,10 +432,22 @@ function Rescan() {
 function GetScanResult() {
     HttpGet("/wifi/scan", function (re) {
         if (re != "NO") {
+            var wifi_sel_name = $("#wifi_sel")[0];
+            var wifi_sel_id = $("input[name='wifi_sel']")[0];
             var ret = JSON.parse(re.replace(/'/g, '"')); //TODO: Fix this later
-            var html = "<li class='mdl-menu__item' data-val='0'>Manual</li>";
+            if(wifi_sel_id.value === "0") {
+                var html = "<li class='mdl-menu__item' data-val='0' data-selected='true'>Manual</li>";
+            }
+            else {
+                var html = "<li class='mdl-menu__item' data-val='0'>Manual</li>";
+            }
             for (var i = 0; i < ret.ssids.length; i++) {
-                html += "<li class='mdl-menu__item' data-val='"+(i+1)+"'>"+ret.ssids[i]+"</li>";
+                if(wifi_sel_name.value == ret.ssids[i]) {
+                    html += "<li class='mdl-menu__item' data-val='"+(i+1)+"' data-selected='true'>"+ret.ssids[i]+"</li>";
+                }
+                else {
+                    html += "<li class='mdl-menu__item' data-val='"+(i+1)+"'>"+ret.ssids[i]+"</li>";
+                }
             }
             ssid_slt.innerHTML = html;
             getmdlSelect.init(".getmdl-select");
