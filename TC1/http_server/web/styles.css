@@ -224,3 +224,24 @@ _:-ms-input-placeholder, :root .demo-graph {
 .station-radio {
   margin-left: 20px;
 }
+table {
+  width: 100%;
+}
+.mdl-data-table th {
+  font-weight: bold;
+}
+.mdl-data-table td, .mdl-data-table th {
+  text-align: center;
+}
+.sys-log {
+  height: 400px;
+  overflow: scroll;
+}
+.demo-card-event > .mdl-card__actions {
+  display: flex;
+  box-sizing:border-box;
+  align-items: center;
+}
+element.style {
+  padding: 2px 6px 0 6px;
+}
