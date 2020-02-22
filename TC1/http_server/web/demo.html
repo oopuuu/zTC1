@@ -311,45 +311,10 @@
               <h2 class="mdl-card__title-text">System Log</h2>
             </div>
             <div class="sys-log mdl-card__supporting-text">
-<pre>[1970-01-01 08:00:00][TC1 main.c:47] start version[v1.0.32]
-[1970-01-01 08:00:01][TC1 main.c:64] str_mac[D0BAE464077B]
-[1970-01-01 08:00:01][TC1 main.c:95] user:
-[1970-01-01 08:00:01][TC1 main.c:96] device name:zTC1-077B
-[1970-01-01 08:00:01][TC1 main.c:97] mqtt_ip:192.168.33.219
-[1970-01-01 08:00:01][TC1 main.c:98] mqtt_port:1883
-[1970-01-01 08:00:01][TC1 main.c:99] mqtt_user:
-[1970-01-01 08:00:01][TC1 main.c:100] mqtt_password:
-[1970-01-01 08:00:01][TC1 main.c:101] version:6
-[1970-01-01 08:00:01][WIFI user_wifi.c:135] WifiConnect wifi_ssid[TL-5408] wifi_key[stu@5408]
-[1970-01-01 08:00:02][MQTT user_mqtt_client.c:104] MQTT client version: [0.1.8]
-[1970-01-01 08:00:02][POWER user_power.c:75] PowerInit
-[1970-01-01 08:00:02][HTTP app_httpd.c:423] initializing web-services
-[1970-01-01 08:00:02][MQTT user_mqtt_client.c:191] MQTT client thread started...
-[1970-01-01 08:00:03][WIFI user_wifi.c:20] got IP:192.168.33.222
-[2020-02-22 02:01:39][RTC user_rtc.c:95] sntp success!
-[2020-02-22 02:03:03][HTTP app_httpd.c:124] HttpGetAssets url[/assets/css_pack.css] file_name[/assets/css_pack.css]
-[2020-02-22 02:03:03][HTTP app_httpd.c:124] HttpGetAssets url[/assets/js_pack.js] file_name[/assets/js_pack.js]
-[1970-01-01 08:00:00][TC1 main.c:47] start version[v1.0.32]
-[1970-01-01 08:00:01][TC1 main.c:64] str_mac[D0BAE464077B]
-[1970-01-01 08:00:01][TC1 main.c:95] user:
-[1970-01-01 08:00:01][TC1 main.c:96] device name:zTC1-077B
-[1970-01-01 08:00:01][TC1 main.c:97] mqtt_ip:192.168.33.219
-[1970-01-01 08:00:01][TC1 main.c:98] mqtt_port:1883
-[1970-01-01 08:00:01][TC1 main.c:99] mqtt_user:
-[1970-01-01 08:00:01][TC1 main.c:100] mqtt_password:
-[1970-01-01 08:00:01][TC1 main.c:101] version:6
-[1970-01-01 08:00:01][WIFI user_wifi.c:135] WifiConnect wifi_ssid[TL-5408] wifi_key[stu@5408]
-[1970-01-01 08:00:02][MQTT user_mqtt_client.c:104] MQTT client version: [0.1.8]
-[1970-01-01 08:00:02][POWER user_power.c:75] PowerInit
-[1970-01-01 08:00:02][HTTP app_httpd.c:423] initializing web-services
-[1970-01-01 08:00:02][MQTT user_mqtt_client.c:191] MQTT client thread started...
-[1970-01-01 08:00:03][WIFI user_wifi.c:20] got IP:192.168.33.222
-[2020-02-22 02:01:39][RTC user_rtc.c:95] sntp success!
-[2020-02-22 02:03:03][HTTP app_httpd.c:124] HttpGetAssets url[/assets/css_pack.css] file_name[/assets/css_pack.css]
-[2020-02-22 02:03:03][HTTP app_httpd.c:124] HttpGetAssets url[/assets/js_pack.js] file_name[/assets/js_pack.js]</pre>
+              <pre id="sys_log"></pre>
             </div>
             <div class="mdl-card__actions mdl-card--border">
-              <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+              <a href="javascript:GetSysLog();" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
                 Refresh
               </a>
             </div>
@@ -363,79 +328,102 @@
       <div class="mdl-snackbar__text"></div>
       <button class="mdl-snackbar__action" type="button"></button>
     </div>
-    <script>
-    (function() {
-      'use strict';
-      window['counter'] = 0;
-      var snackbarContainer = document.querySelector('#demo-toast-example');
-      var showToastButton = document.querySelector('#demo-show-toast');
-      showToastButton.addEventListener('click', function() {
-        'use strict';
-        var data = {message: 'Config Success # ' + ++counter};
-        snackbarContainer.MaterialSnackbar.showSnackbar(data);
-      });
-    }());
-    </script>
 
+<script type="text/javascript" src="assets/js_pack.js"></script>
+<script>
+//弹框
+(function() {
+  'use strict';
+  window['counter'] = 0;
+  var snackbarContainer = document.querySelector('#demo-toast-example');
+  var showToastButton = document.querySelector('#demo-show-toast');
+  showToastButton.addEventListener('click', function() {
+    'use strict';
+    var data = {message: 'Config Success # ' + ++counter};
+    snackbarContainer.MaterialSnackbar.showSnackbar(data);
+  });
+}());
 
-    <script type="text/javascript" src="assets/js_pack.js"></script>
-    <script>
-    var chart_par = document.getElementById("ct-chart-par");
-    chart_par.scrollTo(chart_par.scrollWidth, 0);
+//Ajax
+function AjaxErr(re) {
+  //alert(re.status);
+}
+function Ajax(url, onsuccess, type, data) {
+  $.ajax({
+    url: url,
+    type: type,
+    data: data,
+    success: onsuccess,
+    error: AjaxErr
+  });
+}
+function HttpGet(url, onsuccess) {
+  Ajax(url, onsuccess, "GET", null);
+}
+function HttpPost(url, onsuccess, data) {
+  Ajax(url, onsuccess, "POST", data);
+}
+function HttpDel(url, onsuccess, data) {
+  Ajax(url, onsuccess, "DELET", data);
+}
 
-    function ShowPage(id) {
-      $(".page").hide();
-      $(".page"+id).show();
-      $(".is-small-screen >> .mdl-layout__drawer-button").click()
+var chart_par = document.getElementById("ct-chart-par");
+chart_par.scrollTo(chart_par.scrollWidth, 0);
 
+function ShowPage(id) {
+  $(".page").hide();
+  $(".page"+id).show();
+  $(".is-small-screen >> .mdl-layout__drawer-button").click()
+
+  chart_par.scrollTo(chart_par.scrollWidth, 0);
+
+  $(".mdl-navigation__link").removeClass("mdl-nav-active");
+  $(".mdl-navigation__link:eq("+(id-1)+")").addClass("mdl-nav-active");
+}
+ShowPage(6);
+
+var data = {
+  series: [
+    []
+  ]
+};
+var t = new Chartist.Line('.ct-chart', data, {showArea: true, axisY: {position: 'end'}});
+var power_idx = 0;
+var chart_wth = 0;
+function GetPowerRecord() {
+  HttpPost("/power", function (re) {
+    re = re.replace(/'/g, '"');
+    var power = JSON.parse(re);
+    power_idx = power.idx + 1;
+
+    var x = chart_par.scrollWidth - chart_par.offsetWidth - chart_par.scrollLeft;
+
+    power.powers.forEach(element => {
+      data.series[0].push(element/10);
+    });
+    chart_wth += power.powers.length;
+    $("#ct-chart").width(chart_wth * 10);
+    t.update(data);
+    if (power.powers.length != 0 && x < 100) {
       chart_par.scrollTo(chart_par.scrollWidth, 0);
-
-      $(".mdl-navigation__link").removeClass("mdl-nav-active");
-      $(".mdl-navigation__link:eq("+(id-1)+")").addClass("mdl-nav-active");
     }
-    ShowPage(6);
+    window.setTimeout(GetPowerRecord, 3000);
+  }, power_idx.toString());
+}
+$(document).ready(function(){
+  GetPowerRecord();
+})
 
-    function AjaxErr(re) {
-      //alert(re.status);
-    }
+var sys_log = document.getElementById("sys_log");
+var log_div = document.getElementsByClassName("sys-log")[0];
+function GetSysLog() {
+    HttpGet("/log", function (re) {
+        sys_log.innerHTML = re;
+        log_div.scrollTo(0, log_div.scrollHeight);
+    });
+}
+GetSysLog();
 
-    var data = {
-      series: [
-        []
-      ]
-    };
-    var t = new Chartist.Line('.ct-chart', data, {showArea: true, axisY: {position: 'end'}});
-    var power_idx = 0;
-    var chart_wth = 0;
-    function GetPowerRecord() {
-      $.ajax({
-        url: "/power",
-        type: "POST",
-        data: power_idx.toString(),
-        success: function (re) {
-          re = re.replace(/'/g, '"');
-          var power = JSON.parse(re);
-          power_idx = power.idx + 1;
-
-          var x = chart_par.scrollWidth - chart_par.offsetWidth - chart_par.scrollLeft;
-
-          power.powers.forEach(element => {
-            data.series[0].push(element/10);
-          });
-          chart_wth += power.powers.length;
-          $("#ct-chart").width(chart_wth * 10);
-          t.update(data);
-          if (power.powers.length != 0 && x < 100) {
-            chart_par.scrollTo(chart_par.scrollWidth, 0);
-          }
-          window.setTimeout(GetPowerRecord, 3000);
-        },
-        error: AjaxErr
-      });
-    }
-    $(document).ready(function(){
-      GetPowerRecord();
-    })
-  </script>
+</script>
   </body>
 </html>
