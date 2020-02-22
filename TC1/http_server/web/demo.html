@@ -197,7 +197,7 @@
             </form>
             </div>
             <div class="mdl-card__actions mdl-card--border">
-              <a id="demo-show-toast" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+              <a href="javascript:ShowToask('Config Success')" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
                 Submit
               </a>
             </div>
@@ -332,17 +332,11 @@
 <script type="text/javascript" src="assets/js_pack.js"></script>
 <script>
 //弹框
-(function() {
-  'use strict';
-  window['counter'] = 0;
-  var snackbarContainer = document.querySelector('#demo-toast-example');
-  var showToastButton = document.querySelector('#demo-show-toast');
-  showToastButton.addEventListener('click', function() {
-    'use strict';
-    var data = {message: 'Config Success # ' + ++counter};
-    snackbarContainer.MaterialSnackbar.showSnackbar(data);
-  });
-}());
+var snackbarContainer = document.querySelector('#demo-toast-example');
+function ShowToask(mess) {
+  var data = {message: mess};
+  snackbarContainer.MaterialSnackbar.showSnackbar(data);
+}
 
 //Ajax
 function AjaxErr(re) {
