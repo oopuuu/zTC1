@@ -717,8 +717,14 @@ table {
   text-align: center;
 }
 .sys-log {
+  width: 100%;
   height: 400px;
+  box-sizing: border-box;
   overflow: scroll;
+  padding-top: 0;
+}
+.sys-log pre {
+  margin: 0;
 }
 .demo-card-event > .mdl-card__actions {
   display: flex;

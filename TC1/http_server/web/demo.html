@@ -154,12 +154,12 @@
             </div>
           </div>
 
-          <div id="ct-chart-par" class="page page1 mdl-card__supporting-text mdl-shadow--2dp mdl-cell mdl-cell--8-col"
+          <div id="ct-chart-par" class="page page1 mdl-card__supporting-text mdl-shadow--2dp mdl-cell mdl-cell--6-col"
            style="height:300px;overflow-x:scroll;overflow-y:hidden;">
             <div id="ct-chart" class="ct-chart ct-perfect-fourth" style="height:280px;"></div>
           </div>
 
-          <div class="page page2 mdl-cell demo-card-square mdl-card mdl-shadow--2dp">
+          <div class="page page2 mdl-cell mdl-cell--5-col demo-card-square mdl-card mdl-shadow--2dp">
             <div class="mdl-card__title mdl-card--expand">
               <h2 class="mdl-card__title-text">Network Config</h2>
             </div>
@@ -184,14 +184,16 @@
                 <input class="mdl-textfield__input" type="text" id="sample3">
                 <label class="mdl-textfield__label" for="sample3">Password</label>
               </div>
-              <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="option-1">
-                <input type="radio" id="option-1" class="mdl-radio__button" name="options" value="1" checked>
-                <span class="mdl-radio__label">AP</span>
-              </label>
-              <label class="station-radio mdl-radio mdl-js-radio mdl-js-ripple-effect" for="option-2">
-                <input type="radio" id="option-2" class="mdl-radio__button" name="options" value="2">
-                <span class="mdl-radio__label">Station</span>
-              </label>
+              <div>
+                <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="option-1">
+                  <input type="radio" id="option-1" class="mdl-radio__button" name="options" value="1" checked>
+                  <span class="mdl-radio__label">AP</span>
+                </label>
+                <label class="station-radio mdl-radio mdl-js-radio mdl-js-ripple-effect" for="option-2">
+                  <input type="radio" id="option-2" class="mdl-radio__button" name="options" value="2">
+                  <span class="mdl-radio__label">Station</span>
+                </label>
+              </div>
             </form>
             </div>
             <div class="mdl-card__actions mdl-card--border">
@@ -201,7 +203,7 @@
             </div>
           </div>
 
-          <div class="page page2 mdl-cell demo-card-square mdl-card mdl-shadow--2dp">
+          <div class="page page2 mdl-cell mdl-cell--5-col demo-card-square mdl-card mdl-shadow--2dp">
             <div class="mdl-card__title mdl-card--expand">
               <h2 class="mdl-card__title-text">MQTT Config</h2>
             </div>
@@ -224,7 +226,7 @@
             </div>
           </div>
 
-          <div class="page page3 mdl-cell demo-card-event mdl-card mdl-shadow--2dp">
+          <div class="page page3 mdl-cell mdl-cell--12-col demo-card-event mdl-card mdl-shadow--2dp">
             <table class="mdl-data-table mdl-js-data-table">
               <tr>
                 <th>Index</th>
@@ -246,7 +248,7 @@
             </table>
           </div>
 
-          <div class="page page4 mdl-cell demo-card-event mdl-card mdl-shadow--2dp">
+          <div class="page page4 mdl-cell mdl-cell--12-col demo-card-event mdl-card mdl-shadow--2dp">
             <table class="mdl-data-table mdl-js-data-table">
               <tr>
                 <th>Version</th>
@@ -279,7 +281,7 @@
             </div>
           </div>
 
-          <div class="page page5 mdl-cell demo-card-square mdl-card mdl-shadow--2dp">
+          <div class="page page5 mdl-cell mdl-cell--12-col demo-card-square mdl-card mdl-shadow--2dp">
             <div class="mdl-card__title mdl-card--expand">
               <h2 class="mdl-card__title-text">OTA</h2>
             </div>
@@ -304,13 +306,12 @@
             </script>
           </div>
 
-          <div class="page page6 mdl-cell demo-card-square mdl-card mdl-shadow--2dp">
+          <div class="page page6 mdl-cell mdl-cell--12-col demo-card-square mdl-card mdl-shadow--2dp">
             <div class="mdl-card__title mdl-card--expand">
               <h2 class="mdl-card__title-text">System Log</h2>
             </div>
             <div class="sys-log mdl-card__supporting-text">
-<pre>
-[1970-01-01 08:00:00][TC1 main.c:47] start version[v1.0.32]
+<pre>[1970-01-01 08:00:00][TC1 main.c:47] start version[v1.0.32]
 [1970-01-01 08:00:01][TC1 main.c:64] str_mac[D0BAE464077B]
 [1970-01-01 08:00:01][TC1 main.c:95] user:
 [1970-01-01 08:00:01][TC1 main.c:96] device name:zTC1-077B
@@ -345,8 +346,7 @@
 [1970-01-01 08:00:03][WIFI user_wifi.c:20] got IP:192.168.33.222
 [2020-02-22 02:01:39][RTC user_rtc.c:95] sntp success!
 [2020-02-22 02:03:03][HTTP app_httpd.c:124] HttpGetAssets url[/assets/css_pack.css] file_name[/assets/css_pack.css]
-[2020-02-22 02:03:03][HTTP app_httpd.c:124] HttpGetAssets url[/assets/js_pack.js] file_name[/assets/js_pack.js]
-</pre>
+[2020-02-22 02:03:03][HTTP app_httpd.c:124] HttpGetAssets url[/assets/js_pack.js] file_name[/assets/js_pack.js]</pre>
             </div>
             <div class="mdl-card__actions mdl-card--border">
               <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
