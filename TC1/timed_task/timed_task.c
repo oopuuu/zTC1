@@ -107,7 +107,7 @@ char* GetTaskStr()
         tm_info = localtime(&prs_time);
         strftime(buffer, 26, "%m-%d %H:%M:%S", tm_info);
 
-        sprintf(tmp_str, "{'timestamp':%d,'prs_time':'%s','socket_idx':%d,'on':%d},",
+        sprintf(tmp_str, "{'timestamp':%ld,'prs_time':'%s','socket_idx':%d,'on':%d},",
             tmp_tsk->prs_time, buffer, tmp_tsk->socket_idx, tmp_tsk->on);
         tmp_str += strlen(tmp_str);
         tmp_tsk = tmp_tsk->next;

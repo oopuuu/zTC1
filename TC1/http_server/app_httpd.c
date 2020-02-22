@@ -91,15 +91,6 @@ void GetPraFromUrl(char* url, char* pra, char* val)
 
 static int HttpGetIndexPage(httpd_request_t *req)
 {
-    char* buf = "1678369623 4 0";
-    pTimedTask task = (pTimedTask)malloc(sizeof(struct TimedTask));
-    sscanf(buf, "%ld %d %d", &task->prs_time, &task->socket_idx, &task->on);
-    AddTask(task);
-
-
-
-
-
     OSStatus err = kNoErr;
 
     err = httpd_send_all_header(req, HTTP_RES_200, sizeof(web_index_html), HTTP_CONTENT_HTML_ZIP);
