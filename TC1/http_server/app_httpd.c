@@ -120,7 +120,11 @@ static int HttpGetAssets(httpd_request_t *req)
     OSStatus err = kNoErr;
 
     char* file_name = strstr(req->filename, "/assets/");
-    if (!file_name) return err;
+    if (!file_name)
+    {
+        http_log("HttpGetAssets url[%s] err", req->filename);
+        return err;
+    }
     http_log("HttpGetAssets url[%s] file_name[%s]", req->filename, file_name);
 
     int total_sz = 0;
@@ -351,17 +355,23 @@ exit:
 
 static int HttpDelTask(httpd_request_t *req)
 {
-    //TODO 从url获取时间
-    char* time_str = strstr(req->filename, "?time=");
+    OSStatus err = kNoErr;
+
+    char* time_str = strstr(req->filename, "/task/");
+    if (!time_str)
+    {
+        http_log("HttpDelTask url[%s] err", req->filename);
+        return err;
+    }
     http_log("HttpDelTask url[%s] time_str[%s][%s]", req->filename, time_str, time_str + 6);
 
-    int time1;
-    sscanf(time_str + 6, "%d", &time1);
+    //int time1;
+    //sscanf(time_str + 6, "%d", &time1);
 
-    char* mess = DelTask(time1) ? "OK" : "NO";
+    //char* mess = DelTask(time1) ? "OK" : "NO";
 
-    OSStatus err = kNoErr;
-    send_http(mess, strlen(mess), exit, &err);
+    //OSStatus err = kNoErr;
+    //send_http(mess, strlen(mess), exit, &err);
 exit:
     return err;
 }
@@ -402,7 +412,7 @@ const struct httpd_wsgi_call g_app_handlers[] = {
     { "/wifi/scan", HTTPD_HDR_DEFORT, 0, HttpGetWifiScan, HttpSetWifiScan, NULL, NULL },
     { "/mqtt/config", HTTPD_HDR_DEFORT, 0, NULL, HttpSetMqttConfig, NULL, NULL },
     { "/log", HTTPD_HDR_DEFORT, 0, HttpGetLog, NULL, NULL, NULL },
-    { "/task", HTTPD_HDR_DEFORT, 0, HttpGetTasks, HttpAddTask, NULL, HttpDelTask },
+    { "/task", HTTPD_HDR_DEFORT, APP_HTTP_FLAGS_NO_EXACT_MATCH, HttpGetTasks, HttpAddTask, NULL, HttpDelTask },
     { "/ota", HTTPD_HDR_DEFORT, 0, Otastatus, OtaStart, NULL, NULL },
 };
 

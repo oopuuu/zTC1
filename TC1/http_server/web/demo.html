@@ -438,13 +438,14 @@ function GetTimedTask() {
         <td>" + tasks[i].prs_time + "</td>\
         <td>" + tasks[i].socket_idx + "</td>\
         <td>" + tasks[i].on + "</td>\
-        <td><a href='javasvript:DeleteTask(" + tasks[i].socket_idx + ");'>Delete</a></td>\
+        <td><a href='javascript:DelTimedTask(" + tasks[i].timestamp + ");'>Delete</a></td>\
       </tr>";
     }
     document.getElementById("timed_task_tb").innerHTML = tb_html;
   });
 }
 GetTimedTask();
+
 function AddTimedTask() {
   var tim = document.getElementById("task_time").value;
   var idx = document.getElementById("task_skt_idx").value;
@@ -460,19 +461,15 @@ function AddTimedTask() {
   if (cmd.length >= 16) {
     alert("CMD ERROR!");
   }
-
-  SetIng(2);
   HttpPost("/task", function (re) {
-    SetOK(2);
     GetTimedTask();
   }, cmd);
 }
-function DelTimedTask() {
-  var time = "123456";
-  HttpPost("/task?time="+time, function (re) {
-    SetOK(2);
+function DelTimedTask(timestamp) {
+  HttpDel("/task/"+timestamp, function (re) {
+    ShowToask("Delete timed task OK!");
     GetTimedTask();
-  }, time);
+  }, timestamp);
 }
 //定时任务-end
 
