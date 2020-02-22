@@ -159,25 +159,22 @@
             <div id="ct-chart" class="ct-chart ct-perfect-fourth" style="height:280px;"></div>
           </div>
 
-          <div class="page page2 mdl-cell mdl-cell--5-col demo-card-square mdl-card mdl-shadow--2dp">
+          <div class="page page2 mdl-cell mdl-cell--5-col demo-card-square mdl-card mdl-shadow--2dp" style="overflow: unset;">
             <div class="mdl-card__title mdl-card--expand">
               <h2 class="mdl-card__title-text">Network Config</h2>
             </div>
-            <div class="mdl-card__supporting-text">
+            <div class="mdl-card__supporting-text" style="overflow: unset;">
             <form action="#">
-              <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label getmdl-select">
-                <input type="text" value="" class="mdl-textfield__input" id="sample4" readonly>
-                <input type="hidden" value="" name="sample4">
+              <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label getmdl-select getmdl-select__fix-height">
+                <input id="wifi_sel_name" type="text" value="" class="mdl-textfield__input" readonly>
+                <input id="wifi_sel_data" type="hidden" value="" name="sample4">
                 <i class="mdl-icon-toggle__label material-icons">keyboard_arrow_down</i>
-                <label for="sample4" class="mdl-textfield__label">Country</label>
-                <ul for="sample4" class="mdl-menu mdl-menu--bottom-left mdl-js-menu">
-                    <li class="mdl-menu__item" data-val="DEU">Germany</li>
-                    <li class="mdl-menu__item" data-val="BLR">Belarus</li>
-                    <li class="mdl-menu__item" data-val="RUS">Russia</li>
+                <label for="sample4" class="mdl-textfield__label">SSID</label>
+                <ul id="ssid_sel_list" for="sample4" class="mdl-menu mdl-menu--bottom-left mdl-js-menu">
                 </ul>
               </div>
-              <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                <input class="mdl-textfield__input" type="text" id="sample3">
+              <div id="div_custom_ssid" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" hidden>
+                <input id="custom_ssid" class="mdl-textfield__input" type="text" id="sample3">
                 <label class="mdl-textfield__label" for="sample3">SSID</label>
               </div>
               <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
@@ -203,7 +200,7 @@
             </div>
           </div>
 
-          <div class="page page2 mdl-cell mdl-cell--5-col demo-card-square mdl-card mdl-shadow--2dp">
+          <div class="page page2 mdl-cell mdl-cell--5-col demo-card-square mdl-card mdl-shadow--2dp" style="z-index: unset;">
             <div class="mdl-card__title mdl-card--expand">
               <h2 class="mdl-card__title-text">MQTT Config</h2>
             </div>
@@ -370,6 +367,14 @@ function HttpDel(url, onsuccess, data) {
 var chart_par = document.getElementById("ct-chart-par");
 chart_par.scrollTo(chart_par.scrollWidth, 0);
 
+var ssid_slt = document.getElementById("ssid_sel_list");
+var div_custom_ssid = document.getElementById("div_custom_ssid");
+var input_div_custom_ssid = document.getElementById("custom_ssid");
+var input_wifi_sel_data = document.getElementById("wifi_sel_data");
+var input_wifi_sel_name = document.getElementById("wifi_sel_name");
+
+var rescan_timer;
+
 function ShowPage(id) {
   $(".page").hide();
   $(".page"+id).show();
@@ -379,8 +384,51 @@ function ShowPage(id) {
 
   $(".mdl-navigation__link").removeClass("mdl-nav-active");
   $(".mdl-navigation__link:eq("+(id-1)+")").addClass("mdl-nav-active");
+
+  if(id == 2) {
+    Rescan();
+  }
+  else {
+    window.clearTimeout(rescan_timer);
+  }
 }
 ShowPage(6);
+
+$("#wifi_sel_name").on("change", function() {
+    if (input_wifi_sel_data.value == "0") {
+      $("#div_custom_ssid")[0].hidden = false;
+    } else {
+      $("#div_custom_ssid")[0].hidden = true;
+      input_div_custom_ssid.value = input_wifi_sel_name.value;
+    }
+});
+
+function Rescan() {
+    HttpPost("/wifi/scan", function (re) {
+        if (re == "OK") {
+            window.setTimeout(GetScanResult, 1000);
+        } else {
+            alert(re);
+        }
+    });
+}
+
+function GetScanResult() {
+    HttpGet("/wifi/scan", function (re) {
+        if (re != "NO") {
+            var ret = JSON.parse(re.replace(/'/g, '"')); //TODO: Fix this later
+            var html = "<li class='mdl-menu__item' data-val='0'>Manual</li>";
+            for (var i = 0; i < ret.ssids.length; i++) {
+                html += "<li class='mdl-menu__item' data-val='"+(i+1)+"'>"+ret.ssids[i]+"</li>";
+            }
+            ssid_slt.innerHTML = html;
+            getmdlSelect.init(".getmdl-select");
+            rescan_timer = window.setTimeout(Rescan, 20000);
+            return;
+        }
+        window.setTimeout(GetScanResult, 1000);
+    });
+}
 
 var data = {
   series: [
