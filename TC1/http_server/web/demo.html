@@ -227,24 +227,30 @@
           </div>
 
           <div class="page page3 mdl-cell mdl-cell--12-col demo-card-event mdl-card mdl-shadow--2dp">
-            <table class="mdl-data-table mdl-js-data-table">
+            <table id="timed_task_tb" class="mdl-data-table mdl-js-data-table">
               <tr>
-                <th>Index</th>
                 <th>Time</th>
                 <th>Socket</th>
                 <th>On</th>
                 <th>Option</th>
               </tr>
               <tr>
-                <td>1</td>
-                <td>2020-02-15<br>07:11:08</td>
+                <td>02-15 07:11:08</td>
                 <td>1</td>
                 <td>0</td>
                 <td><a>Delete</a></td>
               </tr>
               <tr>
+                <td>2020-02-15<br>07:11:08</td>
+                <td>1</td>
+                <td>0</td>
+                <td><a>Delete</a></td>
+              </tr>
+              <!--
+              <tr>
                 <td colspan="5">No Timed Task</td>
               </tr>
+              -->
             </table>
           </div>
 
@@ -331,14 +337,15 @@
 
 <script type="text/javascript" src="assets/js_pack.js"></script>
 <script>
-//弹框
+//弹框-start
 var snackbarContainer = document.querySelector('#demo-toast-example');
 function ShowToask(mess) {
   var data = {message: mess};
   snackbarContainer.MaterialSnackbar.showSnackbar(data);
 }
+//弹框-end
 
-//Ajax
+//Ajax-start
 function AjaxErr(re) {
   //alert(re.status);
 }
@@ -360,10 +367,11 @@ function HttpPost(url, onsuccess, data) {
 function HttpDel(url, onsuccess, data) {
   Ajax(url, onsuccess, "DELET", data);
 }
+//Ajax-end
 
+//Menu-start
 var chart_par = document.getElementById("ct-chart-par");
 chart_par.scrollTo(chart_par.scrollWidth, 0);
-
 function ShowPage(id) {
   $(".page").hide();
   $(".page"+id).show();
@@ -374,13 +382,11 @@ function ShowPage(id) {
   $(".mdl-navigation__link").removeClass("mdl-nav-active");
   $(".mdl-navigation__link:eq("+(id-1)+")").addClass("mdl-nav-active");
 }
-ShowPage(6);
+ShowPage(3);
+//Menu-end
 
-var data = {
-  series: [
-    []
-  ]
-};
+//图表-start
+var data = { series: [ [] ] };
 var t = new Chartist.Line('.ct-chart', data, {showArea: true, axisY: {position: 'end'}});
 var power_idx = 0;
 var chart_wth = 0;
@@ -407,16 +413,77 @@ function GetPowerRecord() {
 $(document).ready(function(){
   GetPowerRecord();
 })
+//图表-end
 
+//定时任务-start
+function GetTimedTask() {
+  HttpGet("/task", function (re) {
+    var tb_html = "\
+    <tr>\
+      <th>Time</th>\
+      <th>Socket</th>\
+      <th>On</th>\
+      <th>Option</th>\
+    </tr>";
+    console.log(re);
+    var tasks = JSON.parse(re);
+    if (tasks.length == 0) {
+      tb_html += "<tr><td colspan='4'>No Timed Task</td></tr>";
+    }
+    for (var i = 0; i < tasks.length; i++) {
+      tb_html += "\
+      <tr>\
+        <td>" + tasks[i].prs_time + "</td>\
+        <td>" + tasks[i].socket_idx + "</td>\
+        <td>" + tasks[i].on + "</td>\
+        <td><a href='javasvript:DeleteTask(" + tasks[i].socket_idx + ");'>Delete</a></td>\
+      </tr>";
+    }
+    document.getElementById("timed_task_tb").innerHTML = tb_html;
+  });
+}
+function AddTimedTask() {
+  var tim = document.getElementById("task_time").value;
+  var idx = document.getElementById("task_skt_idx").value;
+  var  on = document.getElementById("task_on").value;
+
+  if (tim == null || tim == "" || tim.length < 10) {
+    alert("task time invalid!");
+    return;
+  }
+  var prs_time = Math.round(new Date(tim) / 1000);
+  //prs_time = prs_time + parseInt(sec);
+  var cmd = prs_time + " " + idx + " " + on;
+  if (cmd.length >= 16) {
+    alert("CMD ERROR!");
+  }
+
+  SetIng(2);
+  HttpPost("/task", function (re) {
+    SetOK(2);
+    GetTimedTask();
+  }, cmd);
+}
+function DelTimedTask() {
+  var time = "123456";
+  HttpPost("/task?time="+time, function (re) {
+    SetOK(2);
+    GetTimedTask();
+  }, time);
+}
+//定时任务-end
+
+//日志-start
 var sys_log = document.getElementById("sys_log");
 var log_div = document.getElementsByClassName("sys-log")[0];
 function GetSysLog() {
-    HttpGet("/log", function (re) {
-        sys_log.innerHTML = re;
-        log_div.scrollTo(0, log_div.scrollHeight);
-    });
+  HttpGet("/log", function (re) {
+    sys_log.innerHTML = re;
+    log_div.scrollTo(0, log_div.scrollHeight);
+  });
 }
 GetSysLog();
+//日志-end
 
 </script>
   </body>
