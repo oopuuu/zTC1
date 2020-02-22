@@ -704,3 +704,6 @@ _:-ms-input-placeholder, :root .demo-graph {
     background-color: #00BCD4;
     color: #37474F;
 }
+.station-radio {
+  margin-left: 20px;
+}
