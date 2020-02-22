@@ -5,5 +5,3 @@ zTC1.*
 *.bin
 *.rar
 TC1/http_server/index.c
-TC1/http_server/web/assets/
-
