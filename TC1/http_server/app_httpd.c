@@ -365,13 +365,12 @@ static int HttpDelTask(httpd_request_t *req)
     }
     http_log("HttpDelTask url[%s] time_str[%s][%s]", req->filename, time_str, time_str + 6);
 
-    //int time1;
-    //sscanf(time_str + 6, "%d", &time1);
+    int time1;
+    sscanf(time_str + 6, "%d", &time1);
 
-    //char* mess = DelTask(time1) ? "OK" : "NO";
+    char* mess = DelTask(time1) ? "OK" : "NO";
 
-    //OSStatus err = kNoErr;
-    //send_http(mess, strlen(mess), exit, &err);
+    send_http(mess, strlen(mess), exit, &err);
 exit:
     return err;
 }

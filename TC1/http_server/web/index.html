@@ -283,7 +283,7 @@ function HttpPost(url, onsuccess, data) {
     Ajax(url, onsuccess, "POST", data);
 }
 function HttpDel(url, onsuccess, data) {
-    Ajax(url, onsuccess, "DELET", data);
+    Ajax(url, onsuccess, "DELETE", data);
 }
 
 var submit_bts = document.getElementsByClassName("submit_bt");
@@ -554,12 +554,13 @@ function GetTimedTask() {
                 <td>" + tasks[i].prs_time + "</td>\
                 <td>" + tasks[i].socket_idx + "</td>\
                 <td>" + tasks[i].on + "</td>\
-                <td><a href='javasvript:DeleteTask(" + tasks[i].socket_idx + ");'>Delete</a></td>\
+                <td><a href='javascript:DelTimedTask(" + tasks[i].timestamp + ");'>Delete</a></td>\
             </tr>";
         }
         document.getElementById("timed_task_tb").innerHTML = tb_html;
     });
 }
+GetTimedTask();
 
 function AddTimedTask() {
     var tim = document.getElementById("task_time").value;
@@ -584,12 +585,10 @@ function AddTimedTask() {
     }, cmd);
 }
 
-function DelTimedTask() {
-    var time = "123456";
-    HttpPost("/task?time="+time, function (re) {
-        SetOK(2);
+function DelTimedTask(timestamp) {
+    HttpDel("/task/"+timestamp, function (re) {
         GetTimedTask();
-    }, time);
+    });
 }
 
 function OtaStart() {

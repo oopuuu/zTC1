@@ -223,7 +223,7 @@
             </div>
           </div>
 
-          <div class="page page3 mdl-cell mdl-cell--12-col demo-card-event mdl-card mdl-shadow--2dp">
+          <div class="page page3 mdl-cell mdl-cell--5-col demo-card-event mdl-card mdl-shadow--2dp">
             <table id="timed_task_tb" class="mdl-data-table mdl-js-data-table">
               <tr>
                 <th>Time</th>
@@ -243,13 +243,48 @@
                 <td>0</td>
                 <td><a>Delete</a></td>
               </tr>
-              <!--
-              <tr>
-                <td colspan="5">No Timed Task</td>
-              </tr>
-              -->
             </table>
           </div>
+
+          <div class="page page3 mdl-cell mdl-cell--5-col demo-card-square mdl-card mdl-shadow--2dp" style="z-index: unset;">
+            <div class="mdl-card__title mdl-card--expand">
+              <h2 class="mdl-card__title-text">Add Task</h2>
+            </div>
+            <div class="mdl-card__supporting-text">
+              <form action="#">
+                <!-- Simple Select with arrow -->
+                <div class="mdl-textfield mdl-js-textfield getmdl-select">
+                  <input type="text" value="" class="mdl-textfield__input" id="sample2" readonly>
+                  <input type="hidden" value="" name="sample2">
+                  <i class="mdl-icon-toggle__label material-icons">keyboard_arrow_down</i>
+                  <label for="sample2" class="mdl-textfield__label">Socket</label>
+                  <ul for="sample2" class="mdl-menu mdl-menu--bottom-left mdl-js-menu">
+                      <li class="mdl-menu__item" data-val="1">Socket-1</li>
+                      <li class="mdl-menu__item" data-val="2">Socket-2</li>
+                      <li class="mdl-menu__item" data-val="3">Socket-3</li>
+                      <li class="mdl-menu__item" data-val="4">Socket-4</li>
+                      <li class="mdl-menu__item" data-val="5">Socket-5</li>
+                      <li class="mdl-menu__item" data-val="6">Socket-6</li>
+                  </ul>
+                </div>
+                <div class="mdl-textfield mdl-js-textfield">
+                  <input class="mdl-textfield__input" type="datetime-local" id="sample1">
+                  <label class="mdl-textfield__label" for="sample1"></label>
+                </div>
+                <span class="mdl-list__item-secondary-action">
+                  <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="task-on">
+                    <input type="checkbox" id="task-on" class="mdl-switch__input" checked />
+                  </label>
+                </span>
+              </form>
+            </div>
+            <div class="mdl-card__actions mdl-card--border">
+              <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+                Submit
+              </a>
+            </div>
+          </div>
+
 
           <div class="page page4 mdl-cell mdl-cell--12-col demo-card-event mdl-card mdl-shadow--2dp">
             <table class="mdl-data-table mdl-js-data-table">
@@ -344,7 +379,7 @@ function ShowToask(mess) {
 
 //Ajax-start
 function AjaxErr(re) {
-  //alert(re.status);
+  ShowToask("Ajax err: " + re.status);
 }
 function Ajax(url, onsuccess, type, data) {
   $.ajax({
@@ -364,7 +399,7 @@ function HttpPost(url, onsuccess, data) {
   Ajax(url, onsuccess, "POST", data);
 }
 function HttpDel(url, onsuccess, data) {
-  Ajax(url, onsuccess, "DELET", data);
+  Ajax(url, onsuccess, "DELETE", data);
 }
 //Ajax-end
 
