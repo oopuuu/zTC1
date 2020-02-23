@@ -246,19 +246,23 @@
             </table>
           </div>
 
-          <div class="page page3 mdl-cell mdl-cell--5-col demo-card-square mdl-card mdl-shadow--2dp" style="z-index: unset;">
+          <div class="page page3 over-unset mdl-cell mdl-cell--5-col demo-card-square mdl-card mdl-shadow--2dp" style="z-index: unset;">
             <div class="mdl-card__title mdl-card--expand">
               <h2 class="mdl-card__title-text">Add Task</h2>
             </div>
-            <div class="mdl-card__supporting-text">
+            <div class="over-unset mdl-card__supporting-text">
               <form action="#">
+                <div class="mdl-textfield mdl-js-textfield">
+                  <input class="mdl-textfield__input" type="datetime-local" id="task_time">
+                  <label class="mdl-textfield__label" for="sample1"></label>
+                </div>
                 <!-- Simple Select with arrow -->
                 <div class="mdl-textfield mdl-js-textfield getmdl-select">
-                  <input type="text" value="" class="mdl-textfield__input" id="sample2" readonly>
-                  <input type="hidden" value="" name="sample2">
+                  <input type="text" value="" class="mdl-textfield__input" readonly>
+                  <input type="hidden" value=""  id="task_skt_idx" name="task_skt_idx">
                   <i class="mdl-icon-toggle__label material-icons">keyboard_arrow_down</i>
-                  <label for="sample2" class="mdl-textfield__label">Socket</label>
-                  <ul for="sample2" class="mdl-menu mdl-menu--bottom-left mdl-js-menu">
+                  <label for="task_skt_idx" class="mdl-textfield__label">Socket</label>
+                  <ul for="task_skt_idx" class="mdl-menu mdl-menu--bottom-left mdl-js-menu">
                       <li class="mdl-menu__item" data-val="1">Socket-1</li>
                       <li class="mdl-menu__item" data-val="2">Socket-2</li>
                       <li class="mdl-menu__item" data-val="3">Socket-3</li>
@@ -268,18 +272,17 @@
                   </ul>
                 </div>
                 <div class="mdl-textfield mdl-js-textfield">
-                  <input class="mdl-textfield__input" type="datetime-local" id="sample1">
-                  <label class="mdl-textfield__label" for="sample1"></label>
-                </div>
-                <span class="mdl-list__item-secondary-action">
-                  <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="task-on">
-                    <input type="checkbox" id="task-on" class="mdl-switch__input" checked />
-                  </label>
-                </span>
+                  <span>On or Off: </span>
+                  <span class="on-off mdl-list__item-secondary-action">
+                    <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="task_on">
+                      <input type="checkbox" id="task_on" class="mdl-switch__input" checked />
+                    </label>
+                  </span>
+              </div>
               </form>
             </div>
             <div class="mdl-card__actions mdl-card--border">
-              <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+              <a href="javascript:AddTimedTask();" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
                 Submit
               </a>
             </div>
@@ -603,7 +606,7 @@ GetTimedTask();
 function AddTimedTask() {
   var tim = document.getElementById("task_time").value;
   var idx = document.getElementById("task_skt_idx").value;
-  var  on = document.getElementById("task_on").value;
+  var  on = document.getElementById("task_on").checked;
 
   if (tim == null || tim == "" || tim.length < 10) {
     alert("task time invalid!");
@@ -611,6 +614,7 @@ function AddTimedTask() {
   }
   var prs_time = Math.round(new Date(tim) / 1000);
   //prs_time = prs_time + parseInt(sec);
+  on = on ? "1" : "0";
   var cmd = prs_time + " " + idx + " " + on;
   if (cmd.length >= 16) {
     alert("CMD ERROR!");
