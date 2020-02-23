@@ -290,23 +290,23 @@
             <table class="mdl-data-table mdl-js-data-table">
               <tr>
                 <th>Version</th>
-                <th>v1.0.33</th>
+                <th id="info_version">v1.0.33</th>
               </tr>
               <tr>
                 <td>IP</td>
-                <td>192.168.33.222</td>
+                <td id="info_ip">192.168.33.222</td>
               </tr>
               <tr>
                 <td>Mask</td>
-                <td>255.255.255.0</td>
+                <td id="info_mask">255.255.255.0</td>
               </tr>
               <tr>
                 <td>Gateway</td>
-                <td>192.168.33.1</td>
+                <td id="info_gateway">192.168.33.1</td>
               </tr>
               <tr>
                 <td>Uptime</td>
-                <td>10:13:43</td>
+                <td id="uptime">10:13:43</td>
               </tr>
             </table>
             <div class="mdl-card__actions mdl-card--border">
@@ -403,6 +403,35 @@ function HttpDel(url, onsuccess, data) {
 }
 //Ajax-end
 
+var info_station_name;
+var info_wifi_password;
+
+HttpGet("/status", function (re) {
+  var status = JSON.parse(re);
+  var status_arr = status.sockets.split(",");
+  // for (var i = 0; i < status_arr.length; i++) {
+  //     checkboxs[i].checked = status_arr[i] == "1";
+  // }
+
+  if(status.mode == 1) {
+    $("#custom_station").click();
+    info_station_name = status.station_ssid;
+    info_wifi_password = status.station_pwd;
+  } else {
+    $("#custom_ap").click();
+    $("#custom_ssid")[0].parentElement.MaterialTextfield.change(status.ap_ssid);
+    info_wifi_password = status.ap_pwd;
+  }
+
+  $("#mqtt_addr")[0].parentElement.MaterialTextfield.change(status.mqtt_addr);
+  $("#mqtt_port")[0].parentElement.MaterialTextfield.change(status.mqtt_port);
+  $("#info_version").html(status.version);
+  $("#info_ip").html(status.ip);
+  $("#info_mask").html(status.mask);
+  $("#info_gateway").html(status.gateway);
+  $("#uptime").html(status.start_time);
+});
+
 //Menu-start
 var chart_par = document.getElementById("ct-chart-par");
 chart_par.scrollTo(chart_par.scrollWidth, 0);
@@ -423,8 +452,8 @@ function ShowPage(id) {
 
   if(id == 2) {
     Rescan();
-  }
-  else {
+    $("#custom_password")[0].parentElement.MaterialTextfield.change(info_wifi_password);
+  } else {
     window.clearTimeout(rescan_timer);
   }
 }
@@ -467,20 +496,21 @@ function Rescan() {
 function GetScanResult() {
   HttpGet("/wifi/scan", function (re) {
     if (re != "NO") {
-      var wifi_sel_name = $("#wifi_sel")[0];
-      var wifi_sel_id = $("input[name='wifi_sel']")[0];
-      var ret = JSON.parse(re.replace(/'/g, '"')); //TODO: Fix this later
-      if(wifi_sel_id.value === "0") {
-        var html = "<li class='mdl-menu__item' data-val='0' data-selected='true'>Manual</li>";
+      var wifi_sel_name = $("#wifi_sel").val();
+      if(!wifi_sel_name) {
+        wifi_sel_name = info_station_name;
       }
-      else {
+      var wifi_sel_id = $("input[name='wifi_sel']").val();
+      var ret = JSON.parse(re.replace(/'/g, '"')); //TODO: Fix this later
+      if(wifi_sel_id === "0") {
+        var html = "<li class='mdl-menu__item' data-val='0' data-selected='true'>Manual</li>";
+      } else {
         var html = "<li class='mdl-menu__item' data-val='0'>Manual</li>";
       }
       for (var i = 0; i < ret.ssids.length; i++) {
-        if(wifi_sel_name.value == ret.ssids[i]) {
+        if(wifi_sel_name == ret.ssids[i]) {
           html += "<li class='mdl-menu__item' data-val='"+(i+1)+"' data-selected='true'>"+ret.ssids[i]+"</li>";
-        }
-        else {
+        } else {
           html += "<li class='mdl-menu__item' data-val='"+(i+1)+"'>"+ret.ssids[i]+"</li>";
         }
       }
@@ -563,6 +593,7 @@ function GetPowerRecord() {
     if (power.powers.length != 0 && x < 100) {
       chart_par.scrollTo(chart_par.scrollWidth, 0);
     }
+    $("#uptime").html(power.up_time);
     window.setTimeout(GetPowerRecord, 3000);
   }, power_idx.toString());
 }
