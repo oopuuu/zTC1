@@ -455,7 +455,7 @@ function ShowPage(id) {
     window.clearTimeout(rescan_timer);
   }
 }
-ShowPage(5);
+ShowPage(1);
 //Menu-end
 
 $("#wifi_sel").on("change", function() {
@@ -563,12 +563,6 @@ $("#wifi_submit").on("click", function() {
   }, params);
 });
 
-var data = {
-  series: [
-    []
-  ]
-};
-
 //图表-start
 var data = { series: [ [] ] };
 var t = new Chartist.Line('.ct-chart', data, {showArea: true, axisY: {position: 'end'}});
@@ -666,7 +660,7 @@ function OtaStart() {
 }
 var ota_status = document.querySelector('#ota_status');
 ota_status.addEventListener('mdl-componentupgraded', function() {
-  this.MaterialProgress.setProgress(50);
+  this.MaterialProgress.setProgress(0);
 });
 function OtaStatus() {
   HttpGet("/ota", function (re) {
