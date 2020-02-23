@@ -80,12 +80,14 @@
               <div class="mdl-card__supporting-text">
 
                 <h3>Power Control</h3>
+                <!--
                 <span class="mdl-list__item-secondary-action">
                   <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="list-switch-0">
                     <input type="checkbox" id="list-switch-0" class="mdl-switch__input" checked />
                   </label>
                 </span>
-                <ul class="demo-list-control mdl-list">
+                -->
+                <ul id="socket_ul" class="demo-list-control mdl-list">
                   <li class="mdl-list__item">
                     <span class="mdl-list__item-primary-content">
                       Socket-1
@@ -176,7 +178,7 @@
                 <label class="mdl-textfield__label" for="custom_ssid">SSID</label>
               </div>
               <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                <input id="custom_password" class="mdl-textfield__input" type="text">
+                <input id="custom_password" class="mdl-textfield__input" type="password">
                 <label class="mdl-textfield__label" for="custom_password">Password</label>
               </div>
               <div>
@@ -440,9 +442,9 @@ var info_wifi_password;
 HttpGet("/status", function (re) {
   var status = JSON.parse(re);
   var status_arr = status.sockets.split(",");
-  // for (var i = 0; i < status_arr.length; i++) {
-  //     checkboxs[i].checked = status_arr[i] == "1";
-  // }
+  for (var i = 0; i < status_arr.length; i++) {
+      checkboxs[i].checked = status_arr[i] == "1";
+  }
 
   if(status.mode == 1) {
     $("#custom_station").click();
@@ -491,6 +493,20 @@ function ShowPage(id) {
 ShowPage(1);
 //Menu-end
 
+//Socket-start
+var socket_ul = document.getElementById("socket_ul");
+var checkboxs = socket_ul.getElementsByClassName("mdl-switch__input");
+$(".mdl-switch__input").on("click", function() {
+  var sockets_st = "";
+  for (var i = 0; i < checkboxs.length; i++) {
+    sockets_st += (checkboxs[i].checked ? "1," : "0,");
+  }
+  HttpPost("/socket", function (re) {
+  }, sockets_st);
+});
+//Socket-end
+
+//Config-start
 $("#wifi_sel").on("change", function() {
   var div_custom = $("#div_custom_ssid")[0];
   var wifi_sel_id = $("input[name='wifi_sel']")[0];

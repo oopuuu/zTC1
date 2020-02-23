@@ -93,10 +93,10 @@ static int HttpGetIndexPage(httpd_request_t *req)
 {
     OSStatus err = kNoErr;
 
-    err = httpd_send_all_header(req, HTTP_RES_200, sizeof(web_index_html), HTTP_CONTENT_HTML_ZIP);
+    err = httpd_send_all_header(req, HTTP_RES_200, sizeof(web_demo_html), HTTP_CONTENT_HTML_ZIP);
     require_noerr_action(err, exit, http_log("ERROR: Unable to send http wifisetting headers."));
 
-    err = httpd_send_body(req->sock, web_index_html, sizeof(web_index_html));
+    err = httpd_send_body(req->sock, web_demo_html, sizeof(web_demo_html));
     require_noerr_action(err, exit, http_log("ERROR: Unable to send http wifisetting body."));
 
 exit:
