@@ -178,7 +178,7 @@
                 <label class="mdl-textfield__label" for="custom_ssid">SSID</label>
               </div>
               <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                <input class="mdl-textfield__input" type="text" id="custom_password">
+                <input id="custom_password" class="mdl-textfield__input" type="text">
                 <label class="mdl-textfield__label" for="custom_password">Password</label>
               </div>
               <div>
@@ -194,7 +194,7 @@
             </form>
             </div>
             <div class="mdl-card__actions mdl-card--border">
-              <a href="javascript:ShowToask('Config Success')" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+              <a id="wifi_submit" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
                 Submit
               </a>
             </div>
@@ -207,17 +207,17 @@
             <div class="mdl-card__supporting-text">
             <form action="#">
               <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                <input class="mdl-textfield__input" type="text" id="sample3">
-                <label class="mdl-textfield__label" for="sample3">MQTT Addr</label>
+                <input class="mdl-textfield__input" type="text" id="mqtt_addr">
+                <label class="mdl-textfield__label" for="mqtt_addr">MQTT Addr</label>
               </div>
               <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                <input class="mdl-textfield__input" type="text" id="sample3">
-                <label class="mdl-textfield__label" for="sample3">MQTT Port</label>
+                <input class="mdl-textfield__input" type="text" id="mqtt_port">
+                <label class="mdl-textfield__label" for="mqtt_port">MQTT Port</label>
               </div>
             </form>
             </div>
             <div class="mdl-card__actions mdl-card--border">
-              <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+              <a id="mqtt_submit" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
                 Submit
               </a>
             </div>
@@ -432,17 +432,17 @@ ShowPage(3);
 //Menu-end
 
 $("#wifi_sel").on("change", function() {
-    var div_custom = $("#div_custom_ssid")[0];
-    var wifi_sel_id = $("input[name='wifi_sel']")[0];
-    var wifi_sel_name = $("#wifi_sel")[0];
-    var custom_ssid = $("#custom_ssid")[0];
-    if (wifi_sel_id.value == "0") {
-        div_custom.hidden = false;
-        custom_ssid.parentElement.MaterialTextfield.change("");
-    } else {
-        div_custom.hidden = true;
-        custom_ssid.parentElement.MaterialTextfield.change(wifi_sel_name.value);
-    }
+  var div_custom = $("#div_custom_ssid")[0];
+  var wifi_sel_id = $("input[name='wifi_sel']")[0];
+  var wifi_sel_name = $("#wifi_sel")[0];
+  var custom_ssid = $("#custom_ssid")[0];
+  if (wifi_sel_id.value == "0") {
+    div_custom.hidden = false;
+    custom_ssid.parentElement.MaterialTextfield.change("");
+  } else {
+    div_custom.hidden = true;
+    custom_ssid.parentElement.MaterialTextfield.change(wifi_sel_name.value);
+  }
 });
 
 $("#custom_ap").on("change", function(){
@@ -455,43 +455,85 @@ $("#custom_station").on("change", function(){
 });
 
 function Rescan() {
-    HttpPost("/wifi/scan", function (re) {
-        if (re == "OK") {
-            window.setTimeout(GetScanResult, 1000);
-        } else {
-            alert(re);
-        }
-    });
+  HttpPost("/wifi/scan", function (re) {
+    if (re == "OK") {
+      window.setTimeout(GetScanResult, 1000);
+    } else {
+      alert(re);
+    }
+  });
 }
 
 function GetScanResult() {
-    HttpGet("/wifi/scan", function (re) {
-        if (re != "NO") {
-            var wifi_sel_name = $("#wifi_sel")[0];
-            var wifi_sel_id = $("input[name='wifi_sel']")[0];
-            var ret = JSON.parse(re.replace(/'/g, '"')); //TODO: Fix this later
-            if(wifi_sel_id.value === "0") {
-                var html = "<li class='mdl-menu__item' data-val='0' data-selected='true'>Manual</li>";
-            }
-            else {
-                var html = "<li class='mdl-menu__item' data-val='0'>Manual</li>";
-            }
-            for (var i = 0; i < ret.ssids.length; i++) {
-                if(wifi_sel_name.value == ret.ssids[i]) {
-                    html += "<li class='mdl-menu__item' data-val='"+(i+1)+"' data-selected='true'>"+ret.ssids[i]+"</li>";
-                }
-                else {
-                    html += "<li class='mdl-menu__item' data-val='"+(i+1)+"'>"+ret.ssids[i]+"</li>";
-                }
-            }
-            ssid_slt.innerHTML = html;
-            getmdlSelect.init(".getmdl-select");
-            rescan_timer = window.setTimeout(Rescan, 20000);
-            return;
+  HttpGet("/wifi/scan", function (re) {
+    if (re != "NO") {
+      var wifi_sel_name = $("#wifi_sel")[0];
+      var wifi_sel_id = $("input[name='wifi_sel']")[0];
+      var ret = JSON.parse(re.replace(/'/g, '"')); //TODO: Fix this later
+      if(wifi_sel_id.value === "0") {
+        var html = "<li class='mdl-menu__item' data-val='0' data-selected='true'>Manual</li>";
+      }
+      else {
+        var html = "<li class='mdl-menu__item' data-val='0'>Manual</li>";
+      }
+      for (var i = 0; i < ret.ssids.length; i++) {
+        if(wifi_sel_name.value == ret.ssids[i]) {
+          html += "<li class='mdl-menu__item' data-val='"+(i+1)+"' data-selected='true'>"+ret.ssids[i]+"</li>";
         }
-        window.setTimeout(GetScanResult, 1000);
-    });
+        else {
+          html += "<li class='mdl-menu__item' data-val='"+(i+1)+"'>"+ret.ssids[i]+"</li>";
+        }
+      }
+      ssid_slt.innerHTML = html;
+      getmdlSelect.init(".getmdl-select");
+      rescan_timer = window.setTimeout(Rescan, 20000);
+      return;
+    }
+    window.setTimeout(GetScanResult, 1000);
+  });
 }
+
+$("#mqtt_submit").on("click", function() {
+  var mqtt_addr = $("#mqtt_addr").val();
+  var mqtt_port = $("#mqtt_port").val();
+  var params = mqtt_addr + " " + mqtt_port;
+  HttpPost("/mqtt/config", function (re) {
+      alert(re);
+  }, params);
+});
+
+//Quotation Marks
+function ContainQM(str) {
+  if (str == ""
+      || str.indexOf("'") >= 0
+      || str.indexOf('"') >= 0
+      || str.indexOf(' ') >= 0
+      || str.length > 32) {
+    return true;
+  }
+  return false;
+}
+
+var qm_mess = "Sorry, can't use ' or \" or space or empty.\n\nAlso, length <= 32."
+var le_mess = "Sorry, length < 8."
+
+$("#wifi_submit").on("click", function() {
+  var mode = $("#custom_station").prop("checked") ? 1 : 0;
+  var ssid = $("#custom_ssid").val();
+  var passwd = $("#custom_password").val();
+  if (ContainQM(ssid) || ContainQM(passwd)) {
+    alert(qm_mess);
+    return;
+  }
+  if (passwd.length < 8) {
+    alert(le_mess);
+    return;
+  }
+  var params = mode + " " + ssid + " " + passwd;
+  HttpPost("/wifi/config", function (re) {
+    alert(re);
+  }, params);
+});
 
 var data = {
   series: [
