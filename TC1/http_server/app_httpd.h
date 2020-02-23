@@ -59,7 +59,7 @@
     'ip':'%s',\
     'mask':'%s',\
     'gateway':'%s',\
-    'start_time':%ld\
+    'up_time':%ld\
 }"
 
 #define POWER_INFO_JSON "{'sockets':'%s','idx':%d,'len':%d,'p_count':%ld,'powers':[%s],'up_time':'%s'}"
