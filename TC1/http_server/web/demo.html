@@ -438,6 +438,8 @@ function HttpDel(url, onsuccess, data) {
 
 var info_station_name;
 var info_wifi_password;
+var mqtt_addr;
+var mqtt_port;
 
 HttpGet("/status", function (re) {
   var status = JSON.parse(re);
@@ -456,8 +458,8 @@ HttpGet("/status", function (re) {
     info_wifi_password = status.ap_pwd;
   }
 
-  $("#mqtt_addr")[0].parentElement.MaterialTextfield.change(status.mqtt_addr);
-  $("#mqtt_port")[0].parentElement.MaterialTextfield.change(status.mqtt_port);
+  mqtt_addr = status.mqtt_addr;
+  mqtt_port = status.mqtt_port;
   $("#info_version").html(status.version);
   $("#info_ip").html(status.ip);
   $("#info_mask").html(status.mask);
@@ -486,6 +488,8 @@ function ShowPage(id) {
   if(id == 2) {
     Rescan();
     $("#custom_password")[0].parentElement.MaterialTextfield.change(info_wifi_password);
+    $("#mqtt_addr")[0].parentElement.MaterialTextfield.change(mqtt_addr);
+    $("#mqtt_port")[0].parentElement.MaterialTextfield.change(mqtt_port);
   } else {
     window.clearTimeout(rescan_timer);
   }
