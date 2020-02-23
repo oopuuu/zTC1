@@ -371,7 +371,7 @@
 <script>
 //弹框-start
 var snackbarContainer = document.querySelector('#demo-toast-example');
-function ShowToask(mess) {
+function ShowToast(mess) {
   var data = {message: mess};
   snackbarContainer.MaterialSnackbar.showSnackbar(data);
 }
@@ -379,7 +379,7 @@ function ShowToask(mess) {
 
 //Ajax-start
 function AjaxErr(re) {
-  ShowToask("Ajax err: " + re.status);
+  ShowToast("Ajax err: " + re.status);
 }
 function Ajax(url, onsuccess, type, data) {
   $.ajax({
@@ -488,7 +488,7 @@ function Rescan() {
     if (re == "OK") {
       window.setTimeout(GetScanResult, 1000);
     } else {
-      alert(re);
+      ShowToast(re);
     }
   });
 }
@@ -528,7 +528,7 @@ $("#mqtt_submit").on("click", function() {
   var mqtt_port = $("#mqtt_port").val();
   var params = mqtt_addr + " " + mqtt_port;
   HttpPost("/mqtt/config", function (re) {
-      alert(re);
+    ShowToast(re);
   }, params);
 });
 
@@ -561,7 +561,7 @@ $("#wifi_submit").on("click", function() {
   }
   var params = mode + " " + ssid + " " + passwd;
   HttpPost("/wifi/config", function (re) {
-    alert(re);
+    ShowToast(re);
   }, params);
 });
 
@@ -652,7 +652,7 @@ function AddTimedTask() {
 }
 function DelTimedTask(timestamp) {
   HttpDel("/task/"+timestamp, function (re) {
-    ShowToask("Delete timed task OK!");
+    ShowToast("Delete timed task OK!");
     GetTimedTask();
   }, timestamp);
 }
