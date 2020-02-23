@@ -329,22 +329,17 @@
             <div class="mdl-card__supporting-text">
             <form action="#">
               <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                <input class="mdl-textfield__input" type="text" id="sample3" value="http://119.23.191.79/tc1/tc1ota.bin">
-                <label class="mdl-textfield__label" for="sample3">OTA Url</label>
+                <input class="mdl-textfield__input" type="text" id="ota_url" value="http://119.23.191.79/tc1/tc1ota.bin">
+                <label class="mdl-textfield__label" for="ota_url">OTA Url</label>
               </div>
             </form>
             </div>
             <div class="mdl-card__actions mdl-card--border">
-              <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+              <a href="javascript:OtaStart();" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
                 Submit
               </a>
             </div>
-            <div id="p1" class="mdl-progress mdl-js-progress"></div>
-            <script>
-              document.querySelector('#p1').addEventListener('mdl-componentupgraded', function() {
-                this.MaterialProgress.setProgress(44);
-              });
-            </script>
+            <div id="ota_status" class="mdl-progress mdl-js-progress"></div>
           </div>
 
           <div class="page page6 mdl-cell mdl-cell--12-col demo-card-square mdl-card mdl-shadow--2dp">
@@ -460,7 +455,7 @@ function ShowPage(id) {
     window.clearTimeout(rescan_timer);
   }
 }
-ShowPage(3);
+ShowPage(5);
 //Menu-end
 
 $("#wifi_sel").on("change", function() {
@@ -661,6 +656,29 @@ function DelTimedTask(timestamp) {
   }, timestamp);
 }
 //定时任务-end
+
+//OTA-start
+function OtaStart() {
+  var ota_url = document.getElementById("ota_url").value;
+  HttpPost("/ota", function (re) {
+    OtaStatus();
+  }, ota_url);
+}
+var ota_status = document.querySelector('#ota_status');
+ota_status.addEventListener('mdl-componentupgraded', function() {
+  this.MaterialProgress.setProgress(50);
+});
+function OtaStatus() {
+  HttpGet("/ota", function (re) {
+    var percent = parseInt(re);
+    ota_status.MaterialProgress.setProgress(percent);
+    if (percent == 0) {
+      //location.reload();
+    }
+    window.setTimeout(OtaStatus, 1000);
+  });
+}
+//OTA-end
 
 //日志-start
 var sys_log = document.getElementById("sys_log");
