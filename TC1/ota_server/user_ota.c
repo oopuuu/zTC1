@@ -5,7 +5,7 @@
 #include "main.h"
 #include "mqtt_server/user_mqtt_client.h"
 
-float ota_progress = 0;
+float ota_progress = -2;
 
 static void OtaServerStatusHandler(OTA_STATE_E state, float progress)
 {

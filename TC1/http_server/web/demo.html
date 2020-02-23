@@ -671,9 +671,10 @@ ota_status.addEventListener('mdl-componentupgraded', function() {
 function OtaStatus() {
   HttpGet("/ota", function (re) {
     var percent = parseInt(re);
+    //console.log(re + " " + parseInt(re));
     ota_status.MaterialProgress.setProgress(percent);
-    if (percent == 0) {
-      //location.reload();
+    if (percent < 0) {
+      location.reload();
     }
     window.setTimeout(OtaStatus, 1000);
   });
