@@ -257,3 +257,12 @@ table {
 .on-off {
   display: inherit;
 }
+.mdl-progress {
+  width: 100%;
+}
+svg {
+  height: 24px;
+  width: 24px;
+  fill: #78909c;
+  padding-bottom: 6px;
+}
