@@ -740,3 +740,6 @@ table {
 .on-off {
   display: inherit;
 }
+.mdl-progress {
+  width: 100%;
+}
