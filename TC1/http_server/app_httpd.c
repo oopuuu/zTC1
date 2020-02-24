@@ -141,6 +141,12 @@ static int HttpGetAssets(httpd_request_t *req)
         file_data = css_pack;
         content_type = HTTP_CONTENT_CSS_ZIP;
     }
+    else if (strcmp(file_name + 8, "web_icons.woff2") == 0)
+    {
+        total_sz = sizeof(web_icons_woff2);
+        file_data = web_icons_woff2;
+        content_type = HTTP_CONTENT_WOFF2;
+    }
 
     if (total_sz == 0) return err;
 
