@@ -409,6 +409,10 @@ function ShowToast(mess) {
   snackbarContainer.MaterialSnackbar.showSnackbar(data);
 }
 //弹框-end
+$(document).ready(function() {
+  componentHandler.upgradeAllRegistered();
+  //Material加载完成
+});
 
 //Ajax-start
 function AjaxErr(re) {
@@ -445,8 +449,13 @@ HttpGet("/status", function (re) {
   var status = JSON.parse(re);
   var status_arr = status.sockets.split(",");
   for (var i = 0; i < status_arr.length; i++) {
-      checkboxs[i].checked = status_arr[i] == "1";
-  }
+      //checkboxs[i].checked = status_arr[i] == "1";
+      if (status_arr[i] == "1") {
+        switch_lables[i].MaterialSwitch.on();
+      } else {
+        switch_lables[i].MaterialSwitch.off();
+      }
+    }
 
   if(status.mode == 1) {
     $("#custom_station").click();
@@ -500,6 +509,7 @@ ShowPage(1);
 //Socket-start
 var socket_ul = document.getElementById("socket_ul");
 var checkboxs = socket_ul.getElementsByClassName("mdl-switch__input");
+var switch_lables = socket_ul.getElementsByClassName("mdl-switch");
 $(".mdl-switch__input").on("click", function() {
   var sockets_st = "";
   for (var i = 0; i < checkboxs.length; i++) {
@@ -639,6 +649,17 @@ function GetPowerRecord() {
       chart_par.scrollTo(chart_par.scrollWidth, 0);
     }
     $("#uptime").html(power.up_time);
+
+    var status_arr = power.sockets.split(",");
+    for (var i = 0; i < status_arr.length; i++) {
+      //checkboxs[i].checked = status_arr[i] == "1";
+      if (status_arr[i] == "1") {
+        switch_lables[i].MaterialSwitch.on();
+      } else {
+        switch_lables[i].MaterialSwitch.off();
+      }
+    }
+
     window.setTimeout(GetPowerRecord, 3000);
   }, power_idx.toString());
 }
