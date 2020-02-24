@@ -11,11 +11,7 @@ try:
 except:
     io = __import__("StringIO").StringIO
 
-def gen(s, fn):
-    dat = io()
-    with gzip.GzipFile(fileobj=dat, mode="w") as f:
-        f.write(s)
-    dat = dat.getvalue()
+def gen(dat, fn):
     try:
         s = ','.join(["0x%02x" % c for c in dat])
     except:
@@ -26,15 +22,25 @@ def gen(s, fn):
     fn = re.sub(r"[^\w]", "_", fn)
     print("const unsigned char %s[0x%x] = {\n%s};" % (fn, len(dat), s))
 
+def gz_gen(s, fn):
+    dat = io()
+    with gzip.GzipFile(fileobj=dat, mode="w") as f:
+        f.write(s)
+    dat = dat.getvalue()
+    gen(dat, fn)
+
 def pack(path, name):
     s = b''
     for fn in glob.glob(path):
         s += ("/*%s*/\n" % fn).encode('utf-8')
         s += open(fn, 'rb').read()
-    gen(s, name)
+    gz_gen(s, name)
     
 pack('web/*.js', 'js_pack')
 pack('web/*.css', 'css_pack')
 
 for fn in glob.glob('web/*.html'):
+    gz_gen(open(fn, 'rb').read(), fn)
+
+for fn in glob.glob('web/*.woff2'):
     gen(open(fn, 'rb').read(), fn)
