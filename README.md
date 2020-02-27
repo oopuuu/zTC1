@@ -7,9 +7,11 @@
 
 # 固件web界面
 
-![web](./doc/web.png)
+<img src="doc/web-1.png" width="250px"><img src="doc/web-2.png" width="250px"><img src="doc/web-3.png" width="250px">
 
-固件启动后, 会开启一个热点 TC1-AP, 连接热点后, 直接用浏览器访问: http://192.168.0.1 即可看到如上web界面.
+固件启动后, 会开启一个热点 TC1-AP-XXXXXX, 连接热点后, 直接用浏览器访问: http://192.168.0.1 即可看到如上web界面.
+
+XXXXXX 是 MAC 地址后六位.
 
 
 
@@ -40,7 +42,7 @@ TC1排插硬件分 a1 a2 两个版本, 本固件仅支持**a1版本**. a1 a2两�
 - [x] Web实时显示功率和功耗
 - [x] 添加定时任务控制插口通断
 - [x] ota在线升级
-- [ ] 通过mqtt连入HomeAssistant
+- [x] 通过mqtt连入HomeAssistant
 
 
 
