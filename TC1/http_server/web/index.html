@@ -824,16 +824,21 @@ function AddTimedTask() {
   var tim = task_time.value;
   var idx = document.getElementById("task_skt_idx").value;
   var  on = document.getElementById("task_on").checked;
+  var wkd = $("input[name='task_weekday']")[0].value;
 
   datatime = dat + "T" + tim; // yyyy-MM-ddTHH:mm:ss
   var prs_time = Math.round(new Date(datatime) / 1000);
   //prs_time = prs_time + parseInt(sec);
   on = on ? "1" : "0";
-  var cmd = prs_time + " " + idx + " " + on;
-  if (cmd.length >= 16) {
+  var cmd = prs_time + " " + idx + " " + on + " " + wkd;
+  if (cmd.length != 16) {
     alert("CMD ERROR!");
   }
   HttpPost("/task", function (re) {
+    if (re != "OK") {
+      alert(re);
+      return;
+    }
     GetTimedTask();
   }, cmd);
 }

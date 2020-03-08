@@ -335,9 +335,9 @@ static int HttpAddTask(httpd_request_t *req)
     require_noerr(err, exit);
 
     pTimedTask task = (pTimedTask)malloc(sizeof(struct TimedTask));
-    int re = sscanf(buf, "%ld %d %d", &task->prs_time, &task->socket_idx, &task->on);
-    http_log("AddTask buf[%s] re[%d] (%ld %d %d)",
-        buf, re, task->prs_time, task->socket_idx, task->on);
+    int re = sscanf(buf, "%ld %d %d %d", &task->prs_time, &task->socket_idx, &task->on, &task->weekday);
+    http_log("AddTask buf[%s] re[%d] (%ld %d %d %d)",
+        buf, re, task->prs_time, task->socket_idx, task->on, task->weekday);
     if (task->prs_time < 1577428136 || task->prs_time > 9577428136
         || task->socket_idx < 0 || task->socket_idx > 5
         || (task->on != 0 && task->on != 1))
@@ -346,7 +346,7 @@ static int HttpAddTask(httpd_request_t *req)
         re = 0;
     }
 
-    char* mess = re == 3 && AddTask(task) ? "OK" : "NO";
+    char* mess = (re == 4 && AddTask(task)) ? "OK" : "NO";
 
     send_http(mess, strlen(mess), exit, &err);
 exit:
