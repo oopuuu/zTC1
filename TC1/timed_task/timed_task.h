@@ -18,4 +18,5 @@ extern int task_count;
 bool AddTask(pTimedTask task);
 bool DelTask(int time);
 bool DelFirstTask();
+void ProcessTask();
 char* GetTaskStr();

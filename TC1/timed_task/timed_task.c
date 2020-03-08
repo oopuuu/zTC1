@@ -3,7 +3,11 @@
 #include<string.h>
 #include<stdbool.h>
 #include<time.h>
+
+#include"main.h"
+#include"user_gpio.h"
 #include"timed_task/timed_task.h"
+#include"http_server/web_log.h"
 
 pTimedTask task_top = NULL;
 int task_count = 0;
@@ -46,7 +50,7 @@ bool AddTaskWeek(pTimedTask task)
 {
     int day_sec = 86400;
     time_t now = time(NULL);
-    int today_weekday = (now / day_sec + 3) % 7 + 1; //1970-01-01 ������
+    int today_weekday = (now / day_sec + 3) % 7 + 1; //1970-01-01 星期五
     int next_day = task->weekday - today_weekday;
     bool next_day_is_today = next_day == 0 && task->prs_time % day_sec > now % day_sec;
     next_day = next_day > 0 || next_day_is_today ? next_day : next_day + 7;
@@ -108,6 +112,26 @@ bool DelTask(int time)
         tmp_tsk = tmp_tsk->next;
     }
     return false;
+}
+
+void ProcessSingle()
+{
+    UserRelaySet(task_top->socket_idx, task_top->on);
+    DelFirstTask();
+}
+
+void ProcessWeek()
+{
+    //TODO 添加下一周的定时任务
+    ProcessSingle();
+}
+
+void ProcessTask()
+{
+    task_log("process task time[%ld] socket_idx[%d] on[%d]",
+        task_top->prs_time, task_top->socket_idx, task_top->on);
+    if (task_top->weekday == 0) ProcessSingle();
+    else ProcessWeek();
 }
 
 char* GetTaskStr()

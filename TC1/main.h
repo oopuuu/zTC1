@@ -9,6 +9,7 @@
 #define ota_log(M, ...) do { custom_log("OTA", M, ##__VA_ARGS__); web_log("OTA", M, ##__VA_ARGS__) } while(0)
 #define rtc_log(M, ...) do { custom_log("RTC", M, ##__VA_ARGS__); web_log("RTC", M, ##__VA_ARGS__) } while(0)
 #define tc1_log(M, ...) do { custom_log("TC1", M, ##__VA_ARGS__); web_log("TC1", M, ##__VA_ARGS__) } while(0)
+#define task_log(M, ...) do { custom_log("TASK", M, ##__VA_ARGS__); web_log("TASK", M, ##__VA_ARGS__) } while(0)
 #define http_log(M, ...) do { custom_log("HTTP", M, ##__VA_ARGS__); web_log("HTTP", M, ##__VA_ARGS__) } while(0)
 #define mqtt_log(M, ...) do { custom_log("MQTT", M, ##__VA_ARGS__); web_log("MQTT", M, ##__VA_ARGS__) } while(0)
 #define wifi_log(M, ...) do { custom_log("WIFI", M, ##__VA_ARGS__); web_log("WIFI", M, ##__VA_ARGS__) } while(0)
