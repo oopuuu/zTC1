@@ -48,7 +48,8 @@ bool AddTaskWeek(pTimedTask task)
     time_t now = time(NULL);
     int today_weekday = (now / day_sec + 3) % 7 + 1; //1970-01-01 ÐÇÆÚÎå
     int next_day = task->weekday - today_weekday;
-    next_day = next_day > 0 ? next_day : next_day + 7;
+    bool next_day_is_today = next_day == 0 && task->prs_time % day_sec > now % day_sec;
+    next_day = next_day > 0 || next_day_is_today ? next_day : next_day + 7;
     task->prs_time = (now - now % day_sec) + (next_day * day_sec) + task->prs_time % day_sec;
 
     return AddTaskSingle(task);
