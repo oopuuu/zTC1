@@ -132,7 +132,7 @@ void ProcessTask()
 
 char* GetTaskStr()
 {
-    char* str = (char*)malloc(sizeof(char)*(task_count*80+2));
+    char* str = (char*)malloc(sizeof(char)*(task_count*89+2));
     pTimedTask tmp_tsk = task_top;
     char* tmp_str = str;
     tmp_str[0] = '[';
@@ -144,10 +144,10 @@ char* GetTaskStr()
         struct tm* tm_info;
         time_t prs_time = tmp_tsk->prs_time + 28800;
         tm_info = localtime(&prs_time);
-        strftime(buffer, 26, "%m-%d %H:%M:%S", tm_info);
+        strftime(buffer, 26, "%m-%d %H:%M", tm_info);
 
-        sprintf(tmp_str, "{'timestamp':%ld,'prs_time':'%s','socket_idx':%d,'on':%d},",
-            tmp_tsk->prs_time, buffer, tmp_tsk->socket_idx, tmp_tsk->on);
+        sprintf(tmp_str, "{'timestamp':%ld,'prs_time':'%s','socket_idx':%d,'on':%d,'weekday':%d},",
+            tmp_tsk->prs_time, buffer, tmp_tsk->socket_idx, tmp_tsk->on, tmp_tsk->weekday);
         tmp_str += strlen(tmp_str);
         tmp_tsk = tmp_tsk->next;
     }

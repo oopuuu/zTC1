@@ -238,11 +238,13 @@
                 <th>Time</th>
                 <th>Socket</th>
                 <th>On</th>
+                <th>Loop</th>
                 <th>Option</th>
               </tr>
               <tr>
-                <td>02-15 07:11:08</td>
+                <td>02-15 07:11</td>
                 <td>1</td>
+                <td>0</td>
                 <td>0</td>
                 <td><a>Delete</a></td>
               </tr>
@@ -250,6 +252,7 @@
                 <td>2020-02-15<br>07:11:08</td>
                 <td>1</td>
                 <td>0</td>
+                <td>6</td>
                 <td><a>Delete</a></td>
               </tr>
             </table>
@@ -794,12 +797,13 @@ function GetTimedTask() {
       <th>Time</th>\
       <th>Socket</th>\
       <th>On</th>\
+      <th>Loop</th>\
       <th>Option</th>\
     </tr>";
     console.log(re);
     var tasks = JSON.parse(re);
     if (tasks.length == 0) {
-      tb_html += "<tr><td colspan='4'>No Timed Task</td></tr>";
+      tb_html += "<tr><td colspan='5'>No Timed Task</td></tr>";
     }
     for (var i = 0; i < tasks.length; i++) {
       tb_html += "\
@@ -807,6 +811,7 @@ function GetTimedTask() {
         <td>" + tasks[i].prs_time + "</td>\
         <td>" + tasks[i].socket_idx + "</td>\
         <td>" + tasks[i].on + "</td>\
+        <td>" + tasks[i].weekday + "</td>\
         <td><a href='javascript:DelTimedTask(" + tasks[i].timestamp + ");'>Delete</a></td>\
       </tr>";
     }
