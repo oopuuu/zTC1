@@ -8,7 +8,7 @@
 pTimedTask task_top = NULL;
 int task_count = 0;
 
-bool AddTask(pTimedTask task)
+bool AddTaskSingle(pTimedTask task)
 {
     task_count++;
     if (task_top == NULL)
@@ -40,6 +40,24 @@ bool AddTask(pTimedTask task)
     }
     task_count--;
     return false;
+}
+
+bool AddTaskWeek(pTimedTask task)
+{
+    int day_sec = 86400;
+    time_t now = time(NULL);
+    int today_weekday = (now / day_sec + 3) % 7 + 1; //1970-01-01 ÐÇÆÚÎå
+    int next_day = task->weekday - today_weekday;
+    next_day = next_day > 0 ? next_day : next_day + 7;
+    task->prs_time = (now - now % day_sec) + (next_day * day_sec) + task->prs_time % day_sec;
+
+    return AddTaskSingle(task);
+}
+
+bool AddTask(pTimedTask task)
+{
+    if (task->weekday == 0) return AddTaskSingle(task);
+    return AddTaskWeek(task);
 }
 
 bool DelFirstTask()
