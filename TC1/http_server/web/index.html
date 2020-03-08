@@ -261,11 +261,30 @@
             </div>
             <div class="over-unset mdl-card__supporting-text">
               <form action="#">
+                <div class="mdl-textfield mdl-js-textfield getmdl-select">
+                  <input type="text" value="" class="mdl-textfield__input" readonly>
+                  <input type="hidden" value=""  id="task_skt_idx" name="task_skt_idx">
+                  <i class="mdl-icon-toggle__label material-icons"><svg><use xlink:href="#icon-keyboard_arrow_down" /></svg></i>
+                  <label for="task_skt_idx" class="mdl-textfield__label">No Loop</label>
+                  <ul for="task_skt_idx" class="mdl-menu mdl-menu--bottom-left mdl-js-menu">
+                      <li class="mdl-menu__item" data-val="0">No Loop</li>
+                      <li class="mdl-menu__item" data-val="1">Monday</li>
+                      <li class="mdl-menu__item" data-val="2">Tuesday</li>
+                      <li class="mdl-menu__item" data-val="3">Wednesday</li>
+                      <li class="mdl-menu__item" data-val="4">Thursday</li>
+                      <li class="mdl-menu__item" data-val="5">Friday</li>
+                      <li class="mdl-menu__item" data-val="6">Saturday</li>
+                      <li class="mdl-menu__item" data-val="7">Sunday</li>
+                  </ul>
+                </div>
                 <div class="mdl-textfield mdl-js-textfield">
-                  <input class="mdl-textfield__input" type="datetime-local" id="task_time">
+                  <input class="mdl-textfield__input" type="date" id="task_date">
                   <label class="mdl-textfield__label" for="sample1"></label>
                 </div>
-                <!-- Simple Select with arrow -->
+                <div class="mdl-textfield mdl-js-textfield">
+                  <input class="mdl-textfield__input" type="time" id="task_time">
+                  <label class="mdl-textfield__label" for="sample1"></label>
+                </div>
                 <div class="mdl-textfield mdl-js-textfield getmdl-select">
                   <input type="text" value="" class="mdl-textfield__input" readonly>
                   <input type="hidden" value=""  id="task_skt_idx" name="task_skt_idx">

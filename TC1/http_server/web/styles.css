@@ -233,6 +233,9 @@ table {
 .mdl-data-table td, .mdl-data-table th {
   text-align: center;
 }
+.page3 .mdl-textfield {
+  max-width: 46%;
+}
 .sys-log {
   width: 100%;
   height: 400px;
