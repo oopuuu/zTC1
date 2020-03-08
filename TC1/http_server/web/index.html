@@ -291,7 +291,7 @@
                   <i class="mdl-icon-toggle__label material-icons"><svg><use xlink:href="#icon-keyboard_arrow_down" /></svg></i>
                   <label for="task_skt_idx" class="mdl-textfield__label">Socket</label>
                   <ul for="task_skt_idx" class="mdl-menu mdl-menu--bottom-left mdl-js-menu">
-                      <li class="mdl-menu__item" data-val="1">Socket-1</li>
+                      <li class="mdl-menu__item" data-val="1" data-selected='true'>Socket-1</li>
                       <li class="mdl-menu__item" data-val="2">Socket-2</li>
                       <li class="mdl-menu__item" data-val="3">Socket-3</li>
                       <li class="mdl-menu__item" data-val="4">Socket-4</li>
@@ -815,16 +815,18 @@ function GetTimedTask() {
 }
 GetTimedTask();
 
+var task_date = document.getElementById("task_date");
+var task_time = document.getElementById("task_time");
+task_date.value = "2020-12-31";
+task_time.value = "10:08:00";
 function AddTimedTask() {
-  var tim = document.getElementById("task_time").value;
+  var dat = task_date.value;
+  var tim = task_time.value;
   var idx = document.getElementById("task_skt_idx").value;
   var  on = document.getElementById("task_on").checked;
 
-  if (tim == null || tim == "" || tim.length < 10) {
-    alert("task time invalid!");
-    return;
-  }
-  var prs_time = Math.round(new Date(tim) / 1000);
+  datatime = dat + "T" + tim; // yyyy-MM-ddTHH:mm:ss
+  var prs_time = Math.round(new Date(datatime) / 1000);
   //prs_time = prs_time + parseInt(sec);
   on = on ? "1" : "0";
   var cmd = prs_time + " " + idx + " " + on;
