@@ -214,6 +214,9 @@ _:-ms-input-placeholder, :root .demo-graph {
           align-items: center;
 }
 /* zogodo */
+.success{color:#58dc5c;}
+.error{color:#ff2d2d;}
+.info{color:#e700ea;}
 .page {
   display:none;
 }
