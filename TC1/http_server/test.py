@@ -35,7 +35,7 @@ def pack(path, name):
         s += ("/*%s*/\n" % fn).encode('utf-8')
         s += open(fn, 'rb').read()
     gz_gen(s, name)
-    
+
 pack('web/*.js', 'js_pack')
 pack('web/*.css', 'css_pack')
 
