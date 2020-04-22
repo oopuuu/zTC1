@@ -60,8 +60,6 @@
     'ip':'%s',\
     'mask':'%s',\
     'gateway':'%s',\
-    'date':'%s',\
-    'time':'%s',\
     'up_time':%ld\
 }"
 

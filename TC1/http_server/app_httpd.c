@@ -157,15 +157,10 @@ exit:
 static int HttpGetTc1Status(httpd_request_t *req)
 {
     char* sockets = GetSocketStatus();
-    char* tc1_status = malloc(458);
-    char now_date[11] = { 0 };
-    char now_time[10] = { 0 };
-    strftime(now_date, 11, "%Y-%m-%d", localtime(&now));
-    strftime(now_time, 10, "%H:%M:%S", localtime(&now));
+    char* tc1_status = malloc(412);
     sprintf(tc1_status, TC1_STATUS_JSON, sockets, ip_status.mode,
         sys_config->micoSystemConfig.ssid, sys_config->micoSystemConfig.user_key,
-        user_config->ap_name, user_config->ap_key, MQTT_SERVER, MQTT_SERVER_PORT, VERSION,
-        ip_status.ip, ip_status.mask, ip_status.gateway, now_date, now_time, 0L);
+        user_config->ap_name, user_config->ap_key, MQTT_SERVER, MQTT_SERVER_PORT, VERSION, ip_status.ip, ip_status.mask, ip_status.gateway, 0L);
 
     OSStatus err = kNoErr;
     send_http(tc1_status, strlen(tc1_status), exit, &err);
