@@ -751,6 +751,8 @@ var ct_data = { series: [ [] ] };
 var ct_chart = new Chartist.Line('.ct-chart', ct_data, {showArea: true, axisY: {position: 'end'}});
 var power_idx = 0;
 var chart_wth = 0;
+var p = document.getElementById("p");
+var w = document.getElementById("w");
 function GetPowerRecord() {
   HttpPost("/power", function (re) {
     re = re.replace(/'/g, '"');
@@ -760,7 +762,9 @@ function GetPowerRecord() {
     var x = chart_par.scrollWidth - chart_par.offsetWidth - chart_par.scrollLeft;
 
     power.powers.forEach(element => {
-      var len = ct_data.series[0].push(element/10);
+      var curr_p = element/10;
+      p.innerHTML = curr_p.toFixed(2);
+      var len = ct_data.series[0].push(curr_p);
       if (len > 1000) { //最多1000条数据
         ct_data.series[0].shift();
       }
@@ -772,6 +776,9 @@ function GetPowerRecord() {
       chart_par.scrollTo(chart_par.scrollWidth, 0);
     }
     $("#uptime").html(power.up_time);
+
+    var w_v = (17.1 * power.p_count) / 1000 / 36000;
+    w.innerHTML = w_v.toFixed(2);
 
     var status_arr = power.sockets.split(",");
     for (var i = 0; i < status_arr.length; i++) {
