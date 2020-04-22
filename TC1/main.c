@@ -97,7 +97,7 @@ int application_start(void)
     tc1_log("mqtt_ip:%s",user_config->mqtt_ip);
     tc1_log("mqtt_port:%d",user_config->mqtt_port);
     tc1_log("mqtt_user:%s",user_config->mqtt_user);
-    tc1_log("mqtt_password:%s",user_config->mqtt_password);
+    //tc1_log("mqtt_password:%s",user_config->mqtt_password);
     tc1_log("version:%d",user_config->version);
 
     WifiInit();

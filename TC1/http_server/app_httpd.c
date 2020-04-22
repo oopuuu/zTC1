@@ -125,7 +125,7 @@ static int HttpGetAssets(httpd_request_t *req)
         http_log("HttpGetAssets url[%s] err", req->filename);
         return err;
     }
-    http_log("HttpGetAssets url[%s] file_name[%s]", req->filename, file_name);
+    //http_log("HttpGetAssets url[%s] file_name[%s]", req->filename, file_name);
 
     int total_sz = 0;
     const unsigned char* file_data = NULL;

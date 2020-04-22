@@ -78,8 +78,8 @@ void WifiScanCallback(ScanResult_adv* scan_ret, void* arg)
     {
         ApInfo* ap = (ApInfo*)&scan_ret->ApList[i];
         uint8_t* mac = (uint8_t*)ap->bssid;
-        wifi_log("wifi_scan_callback ssid[%16s] bssid[%02X-%02X-%02X-%02X-%02X-%02X] security[%d]",
-            ap->ssid, mac[0], mac[1], mac[2], mac[3], mac[4], mac[5], ap->security);
+        //wifi_log("wifi_scan_callback ssid[%16s] bssid[%02X-%02X-%02X-%02X-%02X-%02X] security[%d]",
+        //    ap->ssid, mac[0], mac[1], mac[2], mac[3], mac[4], mac[5], ap->security);
         char* ssid = scan_ret->ApList[i].ssid;
         //排除隐藏的wifi和SSID带'或"的我wifi
         if (ssid[0] == 0 || strstr(ssid, "'") || strstr(ssid, "\"")) continue;
@@ -132,7 +132,7 @@ static void WifiLedTimerCallback(void* arg)
 
 void WifiConnect(char* wifi_ssid, char* wifi_key)
 {
-    wifi_log("WifiConnect wifi_ssid[%s] wifi_key[%s]", wifi_ssid, wifi_key);
+    wifi_log("WifiConnect wifi_ssid[%s] wifi_key[******]", wifi_ssid);
     //wifi配置初始化
     network_InitTypeDef_st wNetConfig;
 
@@ -172,7 +172,7 @@ void ApConfig(char* name, char* key)
 {
     strncpy(user_config->ap_name, name, 32);
     strncpy(user_config->ap_key, key, 32);
-    wifi_log("ApConfig ap_name[%s] ap_key[%s]", user_config->ap_name, user_config->ap_key);
+    wifi_log("ApConfig ap_name[%s] ap_key[******]", user_config->ap_name);
     micoWlanSuspendStation();
     ApInit(false);
     mico_system_context_update(sys_config);
@@ -184,7 +184,7 @@ void ApInit(bool use_defaul)
     {
         sprintf(user_config->ap_name, ZZ_AP_NAME, str_mac + 6);
         sprintf(user_config->ap_key, "%s", ZZ_AP_KEY);
-        wifi_log("ApInit ap_name[%s] ap_ke[%s]", user_config->ap_name, user_config->ap_key);
+        wifi_log("ApInit use_defaul[true] key[12345678]");
     }
 
     network_InitTypeDef_st wNetConfig;
@@ -199,6 +199,6 @@ void ApInit(bool use_defaul)
     strcpy((char *)wNetConfig.dnsServer_ip_addr, ZZ_AP_DNS_SERVER);
     micoWlanStart(&wNetConfig);
 
-    wifi_log("ApInit ssid[%s] key[%s]", wNetConfig.wifi_ssid, wNetConfig.wifi_key);
+    wifi_log("ApInit ssid[%s] key[******]", wNetConfig.wifi_ssid);
 }
 
