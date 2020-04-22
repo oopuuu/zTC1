@@ -593,6 +593,14 @@ HttpGet("/status", function (re) {
   $("#info_mask").html(status.mask);
   $("#info_gateway").html(status.gateway);
   $("#uptime").html(status.up_time);
+
+  //var now = new Date()
+  //task_date.value = now.toLocaleDateString().replace(/\//g, '-');
+  //task_date.value = now.getFullYear() + '-' + now.getMonth() + '-' + now.getDate();
+  $("#task_date").value(status.date);
+  $("#task_time").value(status.time);
+  task_date.value = status.date;
+
 });
 
 //Menu-start
