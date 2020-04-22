@@ -273,3 +273,17 @@ svg {
   fill: #78909c;
   padding-bottom: 6px;
 }
+.mdl-data-table {
+  table-layout: fixed;
+}
+.mdl-data-table th,
+.mdl-data-table td,
+.mdl-data-table th:first-of-type,
+.mdl-data-table td:first-of-type,
+.mdl-data-table td:last-of-type,
+.mdl-data-table th:last-of-type {
+  padding: 0;
+}
+.mdl-data-table th:first-of-type {
+  width: 30%;
+}
