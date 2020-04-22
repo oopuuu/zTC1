@@ -275,6 +275,7 @@ svg {
 }
 .mdl-data-table {
   table-layout: fixed;
+  border: none;
 }
 .mdl-data-table th,
 .mdl-data-table td,
