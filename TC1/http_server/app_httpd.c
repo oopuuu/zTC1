@@ -407,7 +407,7 @@ const struct httpd_wsgi_call g_app_handlers[] = {
     { "/assets", HTTPD_HDR_ADD_SERVER|HTTPD_HDR_ADD_CONN_CLOSE, APP_HTTP_FLAGS_NO_EXACT_MATCH, HttpGetAssets, NULL, NULL, NULL },
     { "/socket", HTTPD_HDR_DEFORT, 0, NULL, HttpSetSocketStatus, NULL, NULL },
     { "/status", HTTPD_HDR_DEFORT, 0, HttpGetTc1Status, NULL, NULL, NULL },
-    { "/power", HTTPD_HDR_DEFORT, 0, NULL, HttpGetPowerInfo, NULL, NULL },
+    { "/power", HTTPD_HDR_DEFORT, 0, HttpGetPowerInfo, HttpGetPowerInfo, NULL, NULL },
     { "/wifi/config", HTTPD_HDR_DEFORT, 0, HttpGetWifiConfig, HttpSetWifiConfig, NULL, NULL },
     { "/wifi/scan", HTTPD_HDR_DEFORT, 0, HttpGetWifiScan, HttpSetWifiScan, NULL, NULL },
     { "/mqtt/config", HTTPD_HDR_DEFORT, 0, NULL, HttpSetMqttConfig, NULL, NULL },
