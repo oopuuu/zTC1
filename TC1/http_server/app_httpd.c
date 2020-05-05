@@ -338,6 +338,7 @@ static int HttpAddTask(httpd_request_t *req)
     int re = sscanf(buf, "%ld %d %d %d", &task->prs_time, &task->socket_idx, &task->on, &task->weekday);
     http_log("AddTask buf[%s] re[%d] (%ld %d %d %d)",
         buf, re, task->prs_time, task->socket_idx, task->on, task->weekday);
+    task->socket_idx--;
     if (task->prs_time < 1577428136 || task->prs_time > 9577428136
         || task->socket_idx < 0 || task->socket_idx > 5
         || (task->on != 0 && task->on != 1))

@@ -67,7 +67,7 @@ void SetSocketStatus(char* socket_status)
  */
 void UserRelaySet(unsigned char i, unsigned char on)
 {
-    if (i >= SOCKET_NUM) return;
+    if (i < 0 || i >= SOCKET_NUM) return;
 
     if (on == Relay_ON)
     {
