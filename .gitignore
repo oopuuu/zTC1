@@ -5,12 +5,4 @@ zTC1.*
 *.bin
 *.rar
 
-docs
-
 TC1/http_server/web/assets/*
-
-!TC1/http_server/web/assets/css_pack.css
-!TC1/http_server/web/assets/js_pack.js
-!TC1/http_server/web/assets/css_pack.css
-#!TC1/http_server/web/assets/*.woff2
-
