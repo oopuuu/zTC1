@@ -776,7 +776,7 @@ var chart_wth = 0;
 var p = document.getElementById("p");
 var w = document.getElementById("w");
 function GetPowerRecord() {
-  HttpGet("/power", function (re) {
+  HttpPost("/power", function (re) {
     re = re.replace(/'/g, '"');
     var power = JSON.parse(re);
     power_idx = power.idx + 1;

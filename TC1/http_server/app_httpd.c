@@ -51,7 +51,7 @@
 static bool is_http_init;
 static bool is_handlers_registered;
 const struct httpd_wsgi_call g_app_handlers[];
-char power_info_json[1548] = { 0 };
+char power_info_json[1552] = { 0 };
 char up_time[16] = "00:00:00";
 
 /*
