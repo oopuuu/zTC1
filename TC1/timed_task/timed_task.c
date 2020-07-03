@@ -61,7 +61,8 @@ bool AddTaskWeek(pTimedTask task)
 
 bool AddTask(pTimedTask task)
 {
-    if (task->weekday == 0) return AddTaskSingle(task);
+    if (task->weekday == 0 || task->weekday == 8)
+        return AddTaskSingle(task);
     return AddTaskWeek(task);
 }
 
@@ -75,6 +76,11 @@ bool DelFirstTask()
         if (tmp->weekday == 0)
         {
             free(tmp);
+        }
+        else if (tmp->weekday == 8) //8代表每日任务
+        {
+            tmp->prs_time += day_sec;
+            AddTask(tmp);
         }
         else
         {
