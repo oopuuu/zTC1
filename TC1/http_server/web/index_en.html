@@ -306,7 +306,7 @@
                   <label class="mdl-textfield__label" for="sample1"></label>
                 </div>
                 <div class="mdl-textfield mdl-js-textfield">
-                  <input class="mdl-textfield__input" type="time" id="task_time">
+                  <input class="mdl-textfield__input" type="time" step="1" id="task_time">
                   <label class="mdl-textfield__label" for="sample1"></label>
                 </div>
                 <div class="mdl-textfield mdl-js-textfield">
@@ -864,7 +864,7 @@ var task_time = document.getElementById("task_time");
 //task_date.value = "2020-12-31";
 //task_time.value = "10:08:00";
 task_date.value = (new Date()).Format("yyyy-MM-dd");
-task_time.value = (new Date()).Format("hh:mm:00");
+task_time.value = (new Date()).Format("hh:mm:ss");
 function AddTimedTask() {
   var dat = task_date.value;
   var tim = task_time.value;
