@@ -879,6 +879,7 @@ function AddTimedTask() {
   var cmd = prs_time + " " + idx + " " + on + " " + wkd;
   if (cmd.length != 16) {
     alert("CMD ERROR!");
+    return
   }
   HttpPost("/task", function (re) {
     if (re != "OK") {

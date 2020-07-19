@@ -203,7 +203,7 @@ static int HttpGetPowerInfo(httpd_request_t *req)
     mico_time_t past_ms = 0;
     mico_time_get_time(&past_ms);
     int past = past_ms / 1000;
-    int d = past / 3600 * 60;
+    int d = past / (3600 * 60);
     int h = past / 3600 % 24;
     int m = past / 60 % 60;
     int s = past % 60;

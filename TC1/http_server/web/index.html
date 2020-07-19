@@ -38,9 +38,9 @@
             <i class="material-icons"><svg><use xlink:href="#icon-more_vert" /></svg></i>
           </button>
           <ul class="mdl-menu mdl-js-menu mdl-js-ripple-effect mdl-menu--bottom-right" for="hdrbtn">
-            <li class="mdl-menu__item">About</li>
-            <li class="mdl-menu__item">Contact</li>
-            <li class="mdl-menu__item">Legal information</li>
+            <li class="mdl-menu__item" onclick="ChangeLanguage('lang-en')">English</li>
+            <li class="mdl-menu__item" onclick="ChangeLanguage('lang-cn')">中文</li>
+            <li class="mdl-menu__item" onclick="ChangeLanguage('lang-jp')">日本語</li>
           </ul>
         </div>
       </header>
@@ -65,19 +65,54 @@
         </header>
         <nav class="demo-navigation mdl-navigation mdl-color--blue-grey-800">
           <a class="mdl-navigation__link mdl-nav-active" href="javascript:ShowPage(1);">
-            <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation"><svg><use xlink:href="#icon-home" /></svg></i>主页</a>
+            <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">
+              <svg><use xlink:href="#icon-home" /></svg>
+            </i>
+            <span class="lang lang-en">Home</span>
+            <span class="lang lang-cn">主页</span>
+          </a>
           <a class="mdl-navigation__link" href="javascript:ShowPage(2);">
-            <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation"><svg><use xlink:href="#icon-settings" /></svg></i>设置</a>
+            <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">
+              <svg><use xlink:href="#icon-settings" /></svg>
+            </i>
+            <span class="lang lang-en">Config</span>
+            <span class="lang lang-cn">设置</span>
+          </a>
           <a class="mdl-navigation__link" href="javascript:ShowPage(3);">
-            <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation"><svg><use xlink:href="#icon-access_alarm" /></svg></i>定时任务</a>
+            <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">
+              <svg><use xlink:href="#icon-access_alarm" /></svg>
+            </i>
+            <span class="lang lang-en">Timed Task</span>
+            <span class="lang lang-cn">定时任务</span>
+          </a>
           <a class="mdl-navigation__link" href="javascript:ShowPage(4);">
-            <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation"><svg><use xlink:href="#icon-info" /></svg></i>系统状态</a>
+            <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">
+              <svg><use xlink:href="#icon-info" /></svg>
+            </i>
+            <span class="lang lang-en">System Status</span>
+            <span class="lang lang-cn">系统状态</span>
+          </a>
           <a class="mdl-navigation__link" href="javascript:ShowPage(5);">
-            <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation"><svg><use xlink:href="#icon-cloud_download" /></svg></i>在线升级</a>
+            <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">
+              <svg><use xlink:href="#icon-cloud_download" /></svg>
+            </i>
+            <span class="lang lang-en">OTA</span>
+            <span class="lang lang-cn">在线升级</span>
+          </a>
           <a class="mdl-navigation__link" href="javascript:ShowPage(6);">
-            <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation"><svg><use xlink:href="#icon-notes" /></svg></i>系统日志</a>
+            <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">
+              <svg><use xlink:href="#icon-notes" /></svg>
+            </i>
+            <span class="lang lang-en">System Log</span>
+            <span class="lang lang-cn">系统日志</span>
+          </a>
           <a class="mdl-navigation__link" href="javascript:ShowPage(7);">
-            <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation"><svg><use xlink:href="#icon-help" /></svg></i>关于</a>
+            <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">
+              <svg><use xlink:href="#icon-help" /></svg>
+            </i>
+            <span class="lang lang-en">About</span>
+            <span class="lang lang-cn">关于</span>
+          </a>
         </nav>
       </div>
       <main class="mdl-layout__content">
@@ -522,6 +557,16 @@ var icon_menu = "<svg><path d='M0 0h24v24H0z' fill='none'/><path d='M3 18h18v-2H
 </script>
 <script type="text/javascript" src="assets/js_pack.js"></script>
 <script>
+//语言
+$(".lang-cn").show();
+function ChangeLanguage(lang) {
+  if (lang == "lang-jp") {
+    ShowToast("申し訳ありませんが、日本語はありません。");
+    return
+  }
+  $(".lang").hide();
+  $("."+lang).show();
+}
 //弹框-start
 var snackbarContainer = document.querySelector('#demo-toast-example');
 function ShowToast(mess) {
@@ -879,6 +924,7 @@ function AddTimedTask() {
   var cmd = prs_time + " " + idx + " " + on + " " + wkd;
   if (cmd.length != 16) {
     alert("CMD ERROR!");
+    return
   }
   HttpPost("/task", function (re) {
     if (re != "OK") {
