@@ -68,43 +68,43 @@
             <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">
               <svg><use xlink:href="#icon-home" /></svg>
             </i>
-            <span class="lang" langKey="Home">Home</span>
+            <span class="lang" langKey="Home">主页</span>
           </a>
           <a class="mdl-navigation__link" href="javascript:ShowPage(2);">
             <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">
               <svg><use xlink:href="#icon-settings" /></svg>
             </i>
-            <span class="lang" langKey="Config">Config</span>
+            <span class="lang" langKey="Config">设置</span>
           </a>
           <a class="mdl-navigation__link" href="javascript:ShowPage(3);">
             <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">
               <svg><use xlink:href="#icon-access_alarm" /></svg>
             </i>
-            <span class="lang" langKey="TimedTask">Timed Task</span>
+            <span class="lang" langKey="TimedTask">定时任务</span>
           </a>
           <a class="mdl-navigation__link" href="javascript:ShowPage(4);">
             <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">
               <svg><use xlink:href="#icon-info" /></svg>
             </i>
-            <span class="lang" langKey="SystemStatus">System Status</span>
+            <span class="lang" langKey="SystemStatus">系统状态</span>
           </a>
           <a class="mdl-navigation__link" href="javascript:ShowPage(5);">
             <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">
               <svg><use xlink:href="#icon-cloud_download" /></svg>
             </i>
-            <span class="lang" langKey="OTA">OTA</span>
+            <span class="lang" langKey="OTA">在线升级</span>
           </a>
           <a class="mdl-navigation__link" href="javascript:ShowPage(6);">
             <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">
               <svg><use xlink:href="#icon-notes" /></svg>
             </i>
-            <span class="lang" langKey="SystemLog">System Log</span>
+            <span class="lang" langKey="SystemLog">系统日志</span>
           </a>
           <a class="mdl-navigation__link" href="javascript:ShowPage(7);">
             <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">
               <svg><use xlink:href="#icon-help" /></svg>
             </i>
-            <span class="lang" langKey="About">About</span>
+            <span class="lang" langKey="About">关于</span>
           </a>
         </nav>
       </div>
@@ -127,7 +127,7 @@
                 <ul id="socket_ul" class="demo-list-control mdl-list">
                   <li class="mdl-list__item">
                     <span class="mdl-list__item-primary-content">
-                      插座-1
+                      <span class="lang" langKey="Socket1">插座-1</span>
                     </span>
                     <span class="mdl-list__item-secondary-action">
                       <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="list-switch-1">
@@ -552,6 +552,7 @@ var icon_menu = "<svg><path d='M0 0h24v24H0z' fill='none'/><path d='M3 18h18v-2H
 <script>
 //语言
 var LangConfig = {
+  //菜单
   Home: {en: "Home", cn: "主页"},
   Config: {en: "Config", cn: "设置"},
   TimedTask: {en: "Timed Task", cn: "定时任务"},
@@ -559,6 +560,8 @@ var LangConfig = {
   OTA: {en: "OTA", cn: "在线升级"},
   SystemLog: {en: "System Log", cn: "系统日志"},
   About: {en: "About", cn: "关于"},
+  //主页
+  Socket1: {en: "Socket-1", cn: "插座-1"},
 }
 function ChangeLanguage(lang) {
   if (lang == "jp") {
