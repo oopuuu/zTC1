@@ -94,10 +94,10 @@ static int HttpGetIndexPage(httpd_request_t *req)
     OSStatus err = kNoErr;
 
     err = httpd_send_all_header(req, HTTP_RES_200, sizeof(web_index_html), HTTP_CONTENT_HTML_ZIP);
-    require_noerr_action(err, exit, http_log("ERROR: Unable to send http wifisetting headers."));
+    require_noerr_action(err, exit, http_log("ERROR: Unable to send http index headers."));
 
     err = httpd_send_body(req->sock, web_index_html, sizeof(web_index_html));
-    require_noerr_action(err, exit, http_log("ERROR: Unable to send http wifisetting body."));
+    require_noerr_action(err, exit, http_log("ERROR: Unable to send http index body."));
 
 exit:
     return err;
@@ -107,10 +107,10 @@ static int HttpGetDemoPage(httpd_request_t *req)
 {
     OSStatus err = kNoErr;
     err = httpd_send_all_header(req, HTTP_RES_200, sizeof(web_index_html), HTTP_CONTENT_HTML_ZIP);
-    require_noerr_action(err, exit, http_log("ERROR: Unable to send http wifisetting headers."));
+    require_noerr_action(err, exit, http_log("ERROR: Unable to send http demo headers."));
 
     err = httpd_send_body(req->sock, web_index_html, sizeof(web_index_html));
-    require_noerr_action(err, exit, http_log("ERROR: Unable to send http wifisetting body."));
+    require_noerr_action(err, exit, http_log("ERROR: Unable to send http demo body."));
 exit:
     return err;
 }
@@ -145,10 +145,10 @@ static int HttpGetAssets(httpd_request_t *req)
     if (total_sz == 0) return err;
 
     err = httpd_send_all_header(req, HTTP_RES_200, total_sz, content_type);
-    require_noerr_action(err, exit, http_log("ERROR: Unable to send http testpage headers."));
+    require_noerr_action(err, exit, http_log("ERROR: Unable to send http assets headers."));
 
     err = httpd_send_body(req->sock, file_data, total_sz);
-    require_noerr_action(err, exit, http_log("ERROR: Unable to send http wifisetting body."));
+    require_noerr_action(err, exit, http_log("ERROR: Unable to send http assets body."));
 
 exit:
     return err;

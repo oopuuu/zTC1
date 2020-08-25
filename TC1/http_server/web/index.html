@@ -382,9 +382,7 @@
               <div class="mdl-layout-spacer"></div>
               <i class="material-icons"><svg><use xlink:href="#icon-event" /></svg></i>
               <!-- <span>2020-02-22</span> -->
-              <a class="mdl-button">
-                2020-02-22
-              </a>
+              <a class="mdl-button" id="st-date">2020-02-22</a>
             </div>
           </div>
 
@@ -669,6 +667,7 @@ HttpGet("/status", function (re) {
   $("#info_gateway").html(status.gateway);
   $("#uptime").html(status.up_time);
 });
+$("#st-date").html((new Date()).Format("yyyy-MM-dd"));
 
 //Menu-start
 var chart_par = document.getElementById("ct-chart-par");
