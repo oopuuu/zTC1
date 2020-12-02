@@ -20,8 +20,9 @@ extern char time_buf[];
 
 void SetLogRecord(LogRecord* lr, char* log);
 char* GetLogRecord();
+void web_log(const char *N, const char *M, ...);
 
-#define web_log(N, M, ...)                           \
+#define web_log0(N, M, ...)                           \
     LOG_TMP = (char*)malloc(sizeof(char)*LOG_LEN);     \
     now = time(NULL); \
     now += 28800; \
