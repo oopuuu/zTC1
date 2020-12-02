@@ -46,7 +46,6 @@ void web_log(const char *N, const char *M, ...)
     va_start(ap, M);
     int ret = vsnprintf(log, sizeof(log), M, ap);
     va_end(ap);
-    puts(msg);
 
     LOG_TMP = (char*)malloc(sizeof(char)*LOG_LEN);
     now = time(NULL);
