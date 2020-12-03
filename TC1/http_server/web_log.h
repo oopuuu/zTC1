@@ -20,7 +20,7 @@ extern char time_buf[];
 
 void SetLogRecord(LogRecord* lr, char* log);
 char* GetLogRecord();
-void web_log(const char *N, const char *M, ...);
+void WebLog(const char *M, ...);
 
 #define web_log0(N, M, ...)                           \
     LOG_TMP = (char*)malloc(sizeof(char)*LOG_LEN);     \
@@ -29,5 +29,7 @@ void web_log(const char *N, const char *M, ...);
     strftime(time_buf, TIM_LEN, "%Y-%m-%d %H:%M:%S", localtime(&now)); \
     snprintf(LOG_TMP, LOG_LEN, "[%s][%s %s:%d] "M, time_buf, N, SHORT_FILE, __LINE__, ##__VA_ARGS__); \
     SetLogRecord(&log_record, LOG_TMP);                \
+
+#define web_log(N, M, ...) WebLog("["N" %s:%d] "M, SHORT_FILE, __LINE__, ##__VA_ARGS__)
 
 #endif // !WEB_LOG_H

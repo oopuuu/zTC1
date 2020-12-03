@@ -40,7 +40,7 @@ char* GetLogRecord()
     return log_record_str;
 }
 
-void web_log(const char *N, const char *M, ...)
+void WebLog(const char *M, ...)
 {
     va_list ap;
     va_start(ap, M);
@@ -48,10 +48,9 @@ void web_log(const char *N, const char *M, ...)
     va_end(ap);
 
     LOG_TMP = (char*)malloc(sizeof(char)*LOG_LEN);
-    now = time(NULL);
-    now += 28800;
+    now = time(NULL) + 28800; //¶«8Çø
     strftime(time_buf, TIM_LEN, "%Y-%m-%d %H:%M:%S", localtime(&now));
-    snprintf(LOG_TMP, LOG_LEN, "[%s][%s %s:%d] %s", time_buf, N, SHORT_FILE, __LINE__, log);
+    snprintf(LOG_TMP, LOG_LEN, "[%s]%s", time_buf, log);
     SetLogRecord(&log_record, LOG_TMP);
 }
 
