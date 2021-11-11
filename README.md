@@ -48,7 +48,6 @@ TC1 排插硬件分 A1 A2 两个版本, 本固件仅支持 **A1 版本**. A1 A2 
 
 # 联系
 
-如有其它问题, 可以联系本人 Telegram: [@zogodo](https://t.me/zogodo)
+如有其它问题, 可以加入 Telegram 群聊: [@zztc1](https://t.me/zztc1)
 
-或者发送邮件给我: zhogodo@gmail.com
 
