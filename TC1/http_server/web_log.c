@@ -6,10 +6,6 @@
 
 LogRecord log_record = { 1,{ 0 } };
 char log_record_str[LOG_NUM*LOG_LEN] = { 0 };
-char* LOG_TMP;
-char log[LOG_LEN];
-time_t now;
-char time_buf[TIM_LEN];
 
 void SetLogRecord(LogRecord* lr, char* log)
 {
@@ -42,15 +38,17 @@ char* GetLogRecord()
 
 void WebLog(const char *M, ...)
 {
+    char* buff = (char*)malloc(sizeof(char)*LOG_LEN);
+
+    time_t now = time(NULL) + 28800; //ä¸œ8åŒº
+    strftime(buff, TIME_LEN, "[%Y-%m-%d %H:%M:%S]", localtime(&now));
+    buff[TIME_LEN - 1] = ' ';
+
     va_list ap;
     va_start(ap, M);
-    int ret = vsnprintf(log, sizeof(log), M, ap);
+    int ret = vsnprintf(buff + TIME_LEN, sizeof(buff) - TIME_LEN, M, ap);
     va_end(ap);
 
-    LOG_TMP = (char*)malloc(sizeof(char)*LOG_LEN);
-    now = time(NULL) + 28800; //¶«8Çø
-    strftime(time_buf, TIM_LEN, "%Y-%m-%d %H:%M:%S", localtime(&now));
-    snprintf(LOG_TMP, LOG_LEN, "[%s]%s", time_buf, log);
-    SetLogRecord(&log_record, LOG_TMP);
+    SetLogRecord(&log_record, buff);
 }
 
