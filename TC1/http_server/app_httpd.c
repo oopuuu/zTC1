@@ -335,7 +335,14 @@ static int HttpAddTask(httpd_request_t *req)
     err = httpd_get_data(req, buf, 16);
     require_noerr(err, exit);
 
-    pTimedTask task = (pTimedTask)malloc(sizeof(struct TimedTask));
+    pTimedTask task = NewTask();
+    if (task == NULL)
+    {
+        http_log("NewTask() error, max task num = %d!", MAX_TASK_NUM);
+        char* mess = "NO SPACE";
+        send_http(mess, strlen(mess), exit, &err);
+        return err;
+    }
     int re = sscanf(buf, "%ld %d %d %d", &task->prs_time, &task->socket_idx, &task->on, &task->weekday);
     http_log("AddTask buf[%s] re[%d] (%ld %d %d %d)",
         buf, re, task->prs_time, task->socket_idx, task->on, task->weekday);

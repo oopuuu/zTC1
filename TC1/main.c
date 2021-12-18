@@ -31,12 +31,18 @@ void appRestoreDefault_callback(void * const user_config_data, uint32_t size)
     userConfigDefault->mqtt_port = 0;
     userConfigDefault->mqtt_user[0] = 0;
     userConfigDefault->mqtt_password[0] = 0;
+    userConfigDefault->task_top = NULL;
+    userConfigDefault->task_count = 0;
     userConfigDefault->version = USER_CONFIG_VERSION;
 
     int i;
     for (i = 0; i < SOCKET_NUM; i++)
     {
         userConfigDefault->socket_status[i] = 1;
+    }
+    for (i = 0; i < MAX_TASK_NUM; i++)
+    {
+        user_config->timed_tasks[i].on_use = false;
     }
     //mico_system_context_update(sys_config);
 }
@@ -126,7 +132,7 @@ int application_start(void)
         UserMqttHassPower();
 
         time_t now = time(NULL);
-        if (task_top && now >= task_top->prs_time)
+        if (user_config->task_top && now >= user_config->task_top->prs_time)
         {
             ProcessTask();
         }

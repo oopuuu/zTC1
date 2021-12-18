@@ -9,28 +9,40 @@
 #include"timed_task/timed_task.h"
 #include"http_server/web_log.h"
 
-pTimedTask task_top = NULL;
-int task_count = 0;
 int day_sec = 86400;
+
+pTimedTask NewTask()
+{
+    for (int i = 0; i < MAX_TASK_NUM; i++)
+    {
+        pTimedTask task = &user_config->timed_tasks[i];
+        if (!task->on_use)
+        {
+            task->on_use = true;
+            return task;
+        }
+    }
+    return NULL;
+}
 
 bool AddTaskSingle(pTimedTask task)
 {
-    task_count++;
-    if (task_top == NULL)
+    user_config->task_count++;
+    if (user_config->task_top == NULL)
     {
         task->next = NULL;
-        task_top = task;
+        user_config->task_top = task;
         return true;
     }
 
-    if (task->prs_time <= task_top->prs_time)
+    if (task->prs_time <= user_config->task_top->prs_time)
     {
-        task->next = task_top;
-        task_top = task;
+        task->next = user_config->task_top;
+        user_config->task_top = task;
         return true;
     }
 
-    pTimedTask tmp = task_top;
+    pTimedTask tmp = user_config->task_top;
     while (tmp)
     {
         if (tmp->next == NULL
@@ -43,7 +55,7 @@ bool AddTaskSingle(pTimedTask task)
         }
         tmp = tmp->next;
     }
-    task_count--;
+    user_config->task_count--;
     return false;
 }
 
@@ -68,14 +80,14 @@ bool AddTask(pTimedTask task)
 
 bool DelFirstTask()
 {
-    if (task_top)
+    if (user_config->task_top)
     {
-        pTimedTask tmp = task_top;
-        task_top = task_top->next;
-        task_count--;
+        pTimedTask tmp = user_config->task_top;
+        user_config->task_top = user_config->task_top->next;
+        user_config->task_count--;
         if (tmp->weekday == 0)
         {
-            free(tmp);
+            tmp->on_use = false;
         }
         else if (tmp->weekday == 8) //8代表每日任务
         {
@@ -94,33 +106,33 @@ bool DelFirstTask()
 
 bool DelTask(int time)
 {
-    if (task_top == NULL)
+    if (user_config->task_top == NULL)
     {
         return false;
     }
 
-    if (time == task_top->prs_time)
+    if (time == user_config->task_top->prs_time)
     {
-        pTimedTask tmp = task_top;
-        task_top = task_top->next;
-        free(tmp);
-        task_count--;
+        pTimedTask tmp = user_config->task_top;
+        user_config->task_top = user_config->task_top->next;
+        tmp->on_use = false;
+        user_config->task_count--;
         return true;
     }
-    else if (task_top->next == NULL)
+    else if (user_config->task_top->next == NULL)
     {
         return false;
     }
 
-    pTimedTask pre_tsk = task_top;
-    pTimedTask tmp_tsk = task_top->next;
+    pTimedTask pre_tsk = user_config->task_top;
+    pTimedTask tmp_tsk = user_config->task_top->next;
     while (tmp_tsk)
     {
         if (time == tmp_tsk->prs_time)
         {
             pre_tsk->next = tmp_tsk->next;
-            free(tmp_tsk);
-            task_count--;
+            tmp_tsk->on_use = false;
+            user_config->task_count--;
             return true;
         }
         tmp_tsk = tmp_tsk->next;
@@ -131,15 +143,15 @@ bool DelTask(int time)
 void ProcessTask()
 {
     task_log("process task time[%ld] socket_idx[%d] on[%d]",
-        task_top->prs_time, task_top->socket_idx, task_top->on);
-    UserRelaySet(task_top->socket_idx, task_top->on);
+        user_config->task_top->prs_time, user_config->task_top->socket_idx, user_config->task_top->on);
+    UserRelaySet(user_config->task_top->socket_idx, user_config->task_top->on);
     DelFirstTask();
 }
 
 char* GetTaskStr()
 {
-    char* str = (char*)malloc(sizeof(char)*(task_count*89+2));
-    pTimedTask tmp_tsk = task_top;
+    char* str = (char*)malloc(sizeof(char)*(user_config->task_count*89+2));
+    pTimedTask tmp_tsk = user_config->task_top;
     char* tmp_str = str;
     tmp_str[0] = '[';
     tmp_str[2] = 0;
@@ -157,7 +169,7 @@ char* GetTaskStr()
         tmp_str += strlen(tmp_str);
         tmp_tsk = tmp_tsk->next;
     }
-    if (task_count > 0) --tmp_str;
+    if (user_config->task_count > 0) --tmp_str;
     *tmp_str = ']';
     return str;
 }
