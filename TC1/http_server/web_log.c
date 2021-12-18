@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
 
 #include"http_server/web_log.h"
 
@@ -46,7 +47,7 @@ void WebLog(const char *M, ...)
 
     va_list ap;
     va_start(ap, M);
-    int ret = vsnprintf(buff + TIME_LEN, sizeof(buff) - TIME_LEN, M, ap);
+    vsnprintf(buff + TIME_LEN, LOG_LEN - TIME_LEN, M, ap);
     va_end(ap);
 
     SetLogRecord(&log_record, buff);

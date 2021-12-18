@@ -76,10 +76,12 @@ void WifiScanCallback(ScanResult_adv* scan_ret, void* arg)
     char* tmp2 = secs;
     for (; i < count; i++)
     {
+        /*
         ApInfo* ap = (ApInfo*)&scan_ret->ApList[i];
         uint8_t* mac = (uint8_t*)ap->bssid;
-        //wifi_log("wifi_scan_callback ssid[%16s] bssid[%02X-%02X-%02X-%02X-%02X-%02X] security[%d]",
-        //    ap->ssid, mac[0], mac[1], mac[2], mac[3], mac[4], mac[5], ap->security);
+        wifi_log("wifi_scan_callback ssid[%16s] bssid[%02X-%02X-%02X-%02X-%02X-%02X] security[%d]",
+            ap->ssid, mac[0], mac[1], mac[2], mac[3], mac[4], mac[5], ap->security);
+        */
         char* ssid = scan_ret->ApList[i].ssid;
         //排除隐藏的wifi和SSID带'或"的我wifi
         if (ssid[0] == 0 || strstr(ssid, "'") || strstr(ssid, "\"")) continue;
