@@ -237,6 +237,8 @@ void MqttClientThread(mico_thread_arg_t arg)
     connectData.clientID.cstring = str_mac;
     connectData.username.cstring = user_config->mqtt_user;
     connectData.password.cstring = user_config->mqtt_password;
+    connectData.username.cstring = "test";
+    connectData.password.cstring = "12345678";
     connectData.keepAliveInterval = MQTT_CLIENT_KEEPALIVE;
     connectData.cleansession = 1;
 
@@ -465,12 +467,13 @@ void UserMqttHassAuto(char socket_id)
         sprintf(topic_buf, "homeassistant/switch/%s/socket_%d/config", str_mac, socket_id);
         sprintf(send_buf, 
             "{\"name\":\"TC1_%s_Socket_%d\","
+            "\"uniq_id\":\"%s_s%d\","
             "\"stat_t\":\"homeassistant/switch/%s/socket_%d/state\","
             "\"cmd_t\":\"device/ztc1/set\","
             "\"pl_on\":\"set socket %s %d 1\","
             "\"pl_off\":\"set socket %s %d 0\"}",
-            str_mac+8, socket_id+1, str_mac, socket_id, str_mac, socket_id, str_mac, socket_id);
-        UserMqttSendTopic(topic_buf, send_buf, 0);
+            str_mac+8, socket_id+1, str_mac, socket_id, str_mac, socket_id, str_mac, socket_id, str_mac, socket_id);
+        UserMqttSendTopic(topic_buf, send_buf, 1);
     }
     if (send_buf)
         free(send_buf);
@@ -489,11 +492,12 @@ void UserMqttHassAutoPower(void)
         sprintf(topic_buf, "homeassistant/sensor/%s/power/config", str_mac);
         sprintf(send_buf, 
             "{\"name\":\"TC1_%s_Power\","
+            "\"uniq_id\":\"%s_p\","
             "\"state_topic\":\"homeassistant/sensor/%s/power/state\","
             "\"unit_of_measurement\":\"W\","
             "\"icon\":\"mdi:gauge\","
             "\"value_template\":\"{{ value_json.power }}\"}",
-            str_mac+8, str_mac);
+            str_mac+8, str_mac, str_mac);
         UserMqttSendTopic(topic_buf, send_buf, 1);
     }
     if (send_buf) free(send_buf);

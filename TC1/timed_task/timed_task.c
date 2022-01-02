@@ -165,7 +165,7 @@ char* GetTaskStr()
         strftime(buffer, 26, "%m-%d %H:%M", tm_info);
 
         sprintf(tmp_str, "{'timestamp':%ld,'prs_time':'%s','socket_idx':%d,'on':%d,'weekday':%d},",
-            tmp_tsk->prs_time, buffer, tmp_tsk->socket_idx, tmp_tsk->on, tmp_tsk->weekday);
+            tmp_tsk->prs_time, buffer, tmp_tsk->socket_idx+1, tmp_tsk->on, tmp_tsk->weekday);
         tmp_str += strlen(tmp_str);
         tmp_tsk = tmp_tsk->next;
     }
