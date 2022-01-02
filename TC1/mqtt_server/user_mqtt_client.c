@@ -237,8 +237,6 @@ void MqttClientThread(mico_thread_arg_t arg)
     connectData.clientID.cstring = str_mac;
     connectData.username.cstring = user_config->mqtt_user;
     connectData.password.cstring = user_config->mqtt_password;
-    connectData.username.cstring = "test";
-    connectData.password.cstring = "12345678";
     connectData.keepAliveInterval = MQTT_CLIENT_KEEPALIVE;
     connectData.cleansession = 1;
 

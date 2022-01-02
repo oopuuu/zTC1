@@ -16,7 +16,7 @@
 #define wifi_log(M, ...) do { custom_log("WIFI", M, ##__VA_ARGS__); web_log("WIFI", M, ##__VA_ARGS__); } while(0)
 #define power_log(M, ...) do { custom_log("POWER", M, ##__VA_ARGS__); web_log("POWER", M, ##__VA_ARGS__); } while(0)
 
-#define VERSION "v2.1.3"
+#define VERSION "v2.1.4"
 
 #define TYPE 1
 #define TYPE_NAME "zTC1"

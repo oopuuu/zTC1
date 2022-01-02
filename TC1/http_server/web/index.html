@@ -251,11 +251,19 @@
             <form action="#">
               <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
                 <input class="mdl-textfield__input" type="text" id="mqtt_addr">
-                <label class="mdl-textfield__label" for="mqtt_addr">MQTT 地址</label>
+                <label class="mdl-textfield__label" for="mqtt_addr">地址</label>
               </div>
               <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
                 <input class="mdl-textfield__input" type="text" id="mqtt_port">
-                <label class="mdl-textfield__label" for="mqtt_port">MQTT 端口</label>
+                <label class="mdl-textfield__label" for="mqtt_port">端口</label>
+              </div>
+              <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                <input class="mdl-textfield__input" type="text" id="mqtt_usr">
+                <label class="mdl-textfield__label" for="mqtt_usr">用户名</label>
+              </div>
+              <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                <input class="mdl-textfield__input" type="text" id="mqtt_pwd">
+                <label class="mdl-textfield__label" for="mqtt_pwd">密码</label>
               </div>
             </form>
             </div>
@@ -636,6 +644,8 @@ var info_station_name;
 var info_wifi_password;
 var mqtt_addr;
 var mqtt_port;
+var mqtt_usr;
+var mqtt_pwd;
 
 HttpGet("/status", function (re) {
   var status = JSON.parse(re);
@@ -661,6 +671,8 @@ HttpGet("/status", function (re) {
 
   mqtt_addr = status.mqtt_addr;
   mqtt_port = status.mqtt_port;
+  mqtt_usr = status.mqtt_usr;
+  mqtt_pwd = status.mqtt_pwd;
   $("#info_version").html(status.version);
   $("#info_ip").html(status.ip);
   $("#info_mask").html(status.mask);
@@ -692,6 +704,8 @@ function ShowPage(id) {
     $("#custom_password")[0].parentElement.MaterialTextfield.change(info_wifi_password);
     $("#mqtt_addr")[0].parentElement.MaterialTextfield.change(mqtt_addr);
     $("#mqtt_port")[0].parentElement.MaterialTextfield.change(mqtt_port);
+    $("#mqtt_usr")[0].parentElement.MaterialTextfield.change(mqtt_usr);
+    $("#mqtt_pwd")[0].parentElement.MaterialTextfield.change(mqtt_pwd);
   } else {
     window.clearTimeout(rescan_timer);
   }
@@ -780,7 +794,9 @@ function GetScanResult() {
 $("#mqtt_submit").on("click", function() {
   var mqtt_addr = $("#mqtt_addr").val();
   var mqtt_port = $("#mqtt_port").val();
-  var params = mqtt_addr + " " + mqtt_port;
+  var mqtt_usr = $("#mqtt_usr").val();
+  var mqtt_pwd = $("#mqtt_pwd").val();
+  var params = mqtt_addr + " " + mqtt_port + " " + mqtt_usr + " " + mqtt_pwd;
   HttpPost("/mqtt/config", function (re) {
     ShowToast(re);
   }, params);

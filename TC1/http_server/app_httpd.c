@@ -157,10 +157,11 @@ exit:
 static int HttpGetTc1Status(httpd_request_t *req)
 {
     char* sockets = GetSocketStatus();
-    char* tc1_status = malloc(412);
+    char* tc1_status = malloc(512);
     sprintf(tc1_status, TC1_STATUS_JSON, sockets, ip_status.mode,
         sys_config->micoSystemConfig.ssid, sys_config->micoSystemConfig.user_key,
-        user_config->ap_name, user_config->ap_key, MQTT_SERVER, MQTT_SERVER_PORT, VERSION, ip_status.ip, ip_status.mask, ip_status.gateway, 0L);
+        user_config->ap_name, user_config->ap_key, MQTT_SERVER, MQTT_SERVER_PORT, MQTT_SERVER_USR, MQTT_SERVER_PWD,
+        VERSION, ip_status.ip, ip_status.mask, ip_status.gateway, 0L);
 
     OSStatus err = kNoErr;
     send_http(tc1_status, strlen(tc1_status), exit, &err);
@@ -295,7 +296,7 @@ static int HttpSetMqttConfig(httpd_request_t *req)
     err = httpd_get_data(req, buf, buf_size);
     require_noerr(err, exit);
 
-    sscanf(buf, "%s %d", MQTT_SERVER, &MQTT_SERVER_PORT);
+    sscanf(buf, "%s %d %s %s", MQTT_SERVER, &MQTT_SERVER_PORT, MQTT_SERVER_USR, MQTT_SERVER_PWD);
     mico_system_context_update(sys_config);
 
     send_http("OK", 2, exit, &err);

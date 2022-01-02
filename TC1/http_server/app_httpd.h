@@ -56,6 +56,8 @@
     'ap_pwd':'%s',\
     'mqtt_addr':'%s',\
     'mqtt_port':%d,\
+    'mqtt_usr':'%s',\
+    'mqtt_pwd':'%s',\
     'version':'%s',\
     'ip':'%s',\
     'mask':'%s',\
