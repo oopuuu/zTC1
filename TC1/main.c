@@ -42,7 +42,7 @@ void appRestoreDefault_callback(void * const user_config_data, uint32_t size)
     }
     for (i = 0; i < MAX_TASK_NUM; i++)
     {
-        user_config->timed_tasks[i].on_use = false;
+        userConfigDefault->timed_tasks[i].on_use = false;
     }
     //mico_system_context_update(sys_config);
 }
