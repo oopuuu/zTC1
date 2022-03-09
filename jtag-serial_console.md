@@ -35,12 +35,12 @@ b SetLogRecord
 commands 1
 silent
 p log
-p \n
 c
 end
 set height 0
 c
 
+b application_start
 ```
 
 
