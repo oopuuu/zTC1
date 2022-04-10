@@ -5,16 +5,16 @@
 #include "micokit_ext.h"
 #include "timed_task/timed_task.h"
 
-#define app_log(M, ...) do { custom_log("APP", M, ##__VA_ARGS__); web_log("APP", M, ##__VA_ARGS__); } while(0)
-#define key_log(M, ...) do { custom_log("KEY", M, ##__VA_ARGS__); web_log("KEY", M, ##__VA_ARGS__); } while(0)
-#define ota_log(M, ...) do { custom_log("OTA", M, ##__VA_ARGS__); web_log("OTA", M, ##__VA_ARGS__); } while(0)
-#define rtc_log(M, ...) do { custom_log("RTC", M, ##__VA_ARGS__); web_log("RTC", M, ##__VA_ARGS__); } while(0)
-#define tc1_log(M, ...) do { custom_log("TC1", M, ##__VA_ARGS__); web_log("TC1", M, ##__VA_ARGS__); } while(0)
-#define task_log(M, ...) do { custom_log("TASK", M, ##__VA_ARGS__); web_log("TASK", M, ##__VA_ARGS__); } while(0)
-#define http_log(M, ...) do { custom_log("HTTP", M, ##__VA_ARGS__); web_log("HTTP", M, ##__VA_ARGS__); } while(0)
-#define mqtt_log(M, ...) do { custom_log("MQTT", M, ##__VA_ARGS__); web_log("MQTT", M, ##__VA_ARGS__); } while(0)
-#define wifi_log(M, ...) do { custom_log("WIFI", M, ##__VA_ARGS__); web_log("WIFI", M, ##__VA_ARGS__); } while(0)
-#define power_log(M, ...) do { custom_log("POWER", M, ##__VA_ARGS__); web_log("POWER", M, ##__VA_ARGS__); } while(0)
+#define app_log(M, ...) custom_log("APP", M, ##__VA_ARGS__); web_log("APP", M, ##__VA_ARGS__);
+#define key_log(M, ...) custom_log("KEY", M, ##__VA_ARGS__); web_log("KEY", M, ##__VA_ARGS__);
+#define ota_log(M, ...) custom_log("OTA", M, ##__VA_ARGS__); web_log("OTA", M, ##__VA_ARGS__);
+#define rtc_log(M, ...) custom_log("RTC", M, ##__VA_ARGS__); web_log("RTC", M, ##__VA_ARGS__);
+#define tc1_log(M, ...) custom_log("TC1", M, ##__VA_ARGS__); web_log("TC1", M, ##__VA_ARGS__);
+#define task_log(M, ...) custom_log("TASK", M, ##__VA_ARGS__); web_log("TASK", M, ##__VA_ARGS__);
+#define http_log(M, ...) custom_log("HTTP", M, ##__VA_ARGS__); web_log("HTTP", M, ##__VA_ARGS__);
+#define mqtt_log(M, ...) custom_log("MQTT", M, ##__VA_ARGS__); web_log("MQTT", M, ##__VA_ARGS__);
+#define wifi_log(M, ...) custom_log("WIFI", M, ##__VA_ARGS__); web_log("WIFI", M, ##__VA_ARGS__);
+#define power_log(M, ...) custom_log("POWER", M, ##__VA_ARGS__); web_log("POWER", M, ##__VA_ARGS__);
 
 #define VERSION "v2.1.6"
 

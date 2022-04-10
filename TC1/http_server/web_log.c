@@ -6,9 +6,7 @@
 #include"http_server/web_log.h"
 
 char* LOG_TMP;
-//char log[LOG_LEN];
-time_t now;
-char time_buf[TIM_LEN];
+time_t LOG_NOW;
 
 LogRecord log_record = { 1,{ 0 } };
 char log_record_str[LOG_NUM*LOG_LEN] = { 0 };
