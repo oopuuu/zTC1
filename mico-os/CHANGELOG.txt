@@ -1,0 +1,122 @@
+=====================================================================
+MiCO SDK - CHANGELOG
+=====================================================================
+Changes for MiCO v3.5.3
+* Libraries, Protocols, Drivers
+  * Syetem default settings does not be written into flash
+
+Changes for MiCO v3.5.2
+* Libraries, Protocols, Drivers
+  * Remove USE_MiCOKit_EXT from board.h, should be defined in application
+  * DHCP: Add support DHCP option 60, vendor class id
+  * BTE: Fix pin code, build by MiCO Cube
+  * MDNS: Fix package format error
+  * EasyLink: 
+    * Redesigned for monitor mode extension
+    * Remove EasyLink with softap mode
+    * Start or close without reboot
+    * Move airkiss, aws configuration out from MiCO
+  
+* Platforms
+  * Support NUCLEO_F412ZG board support
+  * EMW3031B: Support hardware float unit, add flash and ram size
+  * EMW3081: Add uart send mutex
+  * EMW3031: Kernel updated for read authorization code correctly
+  * EMW316x, EMW3239: Add uart flow control function
+  * EMW3080B/C: Initialize GPIO and check interface version in bootloader, check CRC in QC
+  * EMW3080B/C: Fix connection error using BSSID, Add lowpower mode with wifi connection
+  * EMW3080B/C: Fix station mode cannot stop when password is wrong
+  * EMW3080B/C: Fix unexpected enter bootload mode when uart RX is not pull up
+  * MOC100: Add GPIO definition
+  * EMW1088: Support receive wifi management frame
+
+Changes for MiCO v3.5.1
+* Platforms
+  * EMW3031, EMW5031: Support FM25Q16A spi flash, update boot2.bin for bootloader error
+  * EMW316x, EMW3239: Generate all.bin file for interal flash
+  * EMW3166: Fix application partition size error
+  * EMW3081: Fix Station mode close bug, fix TCP server listen error
+  * EMW3080B: Add SYS led, Fix flash may be unexpected protected bug, 
+  * MOC100: Add this new module
+
+Changes for MiCO v3.5.0
+* Applications and demos
+  * Moved to a different project https://code.aliyun.com/mico/mico-demos.git 
+  
+* Libraries, Protocols, Drivers
+  * Add wlan monitor mode apis
+  * Alink libraries moved another project
+  * Developers can create their customized board components under program's root
+
+* Toolchain
+  * Support MiCO Cube workflow scripts
+
+* Platforms
+  * QC test string format fixed "MAC:"
+  * EMW3080B/C: Fix serial bug in ATE firmware and kernel, airkiss optimized
+  * MOC100: Add this new module
+  * EMW3165: Move bootloader output to MICO_UART_2
+  * EMW3165: Move app uart, cli uart and stdio uart to MICO_UART_2, bootloader uart baurdrate 921600
+
+Changes for MiCO v3.2.3
+* Platforms
+  * EMW3080B/C: Remove kernel debug info 
+  * EMW3080B/C: Add pin remapping apis
+
+Changes for MiCO v3.2.2
+* Bootloader
+  * Flash image download may stalled when using bootloader is fixed
+
+* Platforms
+  * Public release for EMW3080B/C
+  * Bugs fixed under EMW3081 and EMW3081A
+  * EMW3162 and EMW3239 bootloader cannnot load mbed application is fixed
+
+Changes for MiCO v3.2.1
+* Applications and demos
+  * Alink test application Alibaba xiaozhi cloud service
+  
+* Libraries, Protocols, Drivers
+  * System does not reboot in EasyLink mode when EasyLink is triggered
+  * Add ALink AWS Wi-Fi configuration mode, use #define MICO_CONFIG_MODE CONFIG_MODE_AWS in mico_config.h
+  * Add APIs for custom IE configuration on wlan beacon, mico_wlan.h
+  * Add Alink v1.1 and Alink embed cloud protocol
+  * Add str2hex api in StringUtils
+
+* Platforms
+  * Added support for EMW3080A/B/C, first version
+  
+Changes for MiCO v3.2.0
+* Applications and demos
+  * iperf test application for for active measurements of the maximum achievable bandwidth on IP networks, at demos/test/iperf
+  * TLS server demo at demos/net/tls_server
+  * MQTT client demo at demos/net/mqtt_client
+  * websocket demo at demos/net/websocket
+
+* Libraries, Protocols, Drivers
+  * mico_Contex_t struct is redefined, status is not a member anymore, use mico_system_status_wlan to get wlan status
+  * Added support for FreeRTOS v9.0.0
+  * Provide a standlone wolfSSL library and update version to v3.9.8
+  * Added libwebsocket, currently this is supported on MK3031 platforms only
+  * Homekit enhancements
+  * Add MQTT protocol
+  * MFG test optimized and renamed to QC test
+  * Bluetooth embedded stack optimized for BLE auto-connection
+  * BT smart library optimized
+  	* Add bonding callback to application 
+  	* Use independent BLE worker thread rather than MICO_NETWORKING_WORKER_THREAD
+  	* White-list functuon for BLE scan 
+  * New WLAN firmware 5.90.230.15 for 43362
+  
+* Platforms
+  * Added support for EMW3081A and EMW3081B, only IAR projects are provided
+  * Added support for EMW3297, first version
+  * Fix firmware download crash on EMW3031 while has input data on serial port
+  
+* Toolchain
+  * Fix "Segment fault" error sometimes on OSX and Linux make
+  * Fix Linux64 host cannot be recognised
+  * Use python script instead of perl
+  
+
+Changes for previous MiCO SDK versions can be found at:  

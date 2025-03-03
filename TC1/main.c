@@ -33,6 +33,7 @@ void appRestoreDefault_callback(void * const user_config_data, uint32_t size)
     userConfigDefault->mqtt_password[0] = 0;
     userConfigDefault->task_top = NULL;
     userConfigDefault->task_count = 0;
+    userConfigDefault->mqtt_report_freq = 2;
     userConfigDefault->version = USER_CONFIG_VERSION;
 
     int i;
@@ -136,7 +137,13 @@ int application_start(void)
         {
             ProcessTask();
         }
-        mico_thread_msleep(1000);
+        int freq = user_config->mqtt_report_freq;
+        tc1_log("shangbao频率 %d",freq);
+        if(freq == 0){
+        	freq = 2;
+        }
+        tc1_log("shangbao频率22 %d",freq);
+        mico_thread_msleep(1000*freq);
     }
 
 exit:

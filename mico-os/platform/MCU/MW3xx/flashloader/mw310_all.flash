@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<flash_device>
+  <exe>$PROJ_DIR$\..\..\..\..\Platform\MCU\MW3xx\flashloader\mw310_flash_all.out</exe>
+  <page>256</page>
+  <block>512 0x1000</block>
+  <flash_base>0x1f000000</flash_base>
+</flash_device>

@@ -1,0 +1,24 @@
+execUserPreload()
+{
+ __message "User Preload....";
+	__hwResetRunToBp(4, 0x0124000, 10); // stratege 4 always load bootloader in ROM .
+ // __delay(10); 
+}
+execUserSetup()
+{
+	__message "User Setup....";
+	__writeMemory32(0x00c89346,   0x480C0100, "Memory");	__delay(10); // disable wdt
+	
+}
+
+execUserReset()
+{
+	__message "User Reset....";
+     
+}
+
+execUserExit()
+{
+	__message "User exit....";
+ __writeMemory32(0,   0x480C0100, "Memory");	__delay(10); // enable wdt
+}

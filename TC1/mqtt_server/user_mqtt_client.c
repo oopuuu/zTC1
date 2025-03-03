@@ -207,7 +207,7 @@ void MqttClientThread(mico_thread_arg_t arg)
     {
         isconnect = false;
         mico_rtos_thread_sleep(3);
-        if (MQTT_SERVER[0] < 0x20 || MQTT_SERVER[0] > 0x7f || MQTT_SERVER_PORT < 1) continue;  //未配置mqtt服务器时不连接
+        if (MQTT_SERVER[0] < 0x20 || MQTT_SERVER[0] > 0x7f || MQTT_SERVER_PORT < 1) continue;  //鏈厤缃甿qtt鏈嶅姟鍣ㄦ椂涓嶈繛鎺�
 
         micoWlanGetLinkStatus(&LinkStatus);
         if (LinkStatus.is_connected != 1)
@@ -249,7 +249,7 @@ void MqttClientThread(mico_thread_arg_t arg)
     rc = MQTTSubscribe(&c, topic_set, QOS0, MessageArrived);
     require_noerr_string(rc, MQTT_reconnect, "ERROR: MQTT client subscribe err.");
     mqtt_log("MQTT client subscribe success! recv_topic=[%s].", topic_set);
-    /*4.1 连接成功后先更新发送一次数据*/
+    /*4.1 杩炴帴鎴愬姛鍚庡厛鏇存柊鍙戦�佷竴娆℃暟鎹�*/
     isconnect = true;
 
     int i = 0;
@@ -434,7 +434,7 @@ OSStatus UserMqttSend(char *arg)
     return UserMqttSendTopic(topic_state, arg, 0);
 }
 
-//更新ha开关状态
+//鏇存柊ha寮�鍏崇姸鎬�
 OSStatus UserMqttSendSocketState(char socket_id)
 {
     char *send_buf = malloc(64);
@@ -452,7 +452,7 @@ OSStatus UserMqttSendSocketState(char socket_id)
     return oss_status;
 }
 
-//hass mqtt自动发现数据开关发送
+//hass mqtt鑷姩鍙戠幇鏁版嵁寮�鍏冲彂閫�
 void UserMqttHassAuto(char socket_id)
 {
     socket_id--;
@@ -478,7 +478,7 @@ void UserMqttHassAuto(char socket_id)
     if (topic_buf)
         free(topic_buf);
 }
-//hass mqtt自动发现数据功率发送
+//hass mqtt鑷姩鍙戠幇鏁版嵁鍔熺巼鍙戦��
 void UserMqttHassAutoPower(void)
 {
     char *send_buf = NULL;
@@ -497,6 +497,16 @@ void UserMqttHassAutoPower(void)
             "\"value_template\":\"{{ value_json.power }}\"}",
             str_mac+8, str_mac, str_mac);
         UserMqttSendTopic(topic_buf, send_buf, 1);
+        sprintf(topic_buf, "homeassistant/sensor/%s/powerConsumption/config", str_mac);
+        sprintf(send_buf,
+                    "{\"name\":\"TC1_%s_PowerConsumption\","
+                    "\"uniq_id\":\"%s_pc\","
+                    "\"state_topic\":\"homeassistant/sensor/%s/powerConsumption/state\","
+                    "\"unit_of_measurement\":\"kWh\","
+                    "\"icon\":\"mdi:fence-electric\","
+                    "\"value_template\":\"{{ value_json.powerConsumption }}\"}",
+                    str_mac+8, str_mac, str_mac);
+        UserMqttSendTopic(topic_buf, send_buf, 1);
     }
     if (send_buf) free(send_buf);
     if (topic_buf) free(topic_buf);
@@ -508,6 +518,10 @@ void UserMqttHassPower(void)
 {
     sprintf(topic_buf, "homeassistant/sensor/%s/power/state", str_mac);
     sprintf(send_buf, "{\"power\":\"%.3f\"}", real_time_power/10);
+    UserMqttSendTopic(topic_buf, send_buf, 0);
+
+    sprintf(topic_buf, "homeassistant/sensor/%s/powerConsumption/state", str_mac);
+    sprintf(send_buf, "{\"powerConsumption\":\"%.3f\"}", (17.1 * p_count) / 1000 / 36000);
     UserMqttSendTopic(topic_buf, send_buf, 0);
 }
 

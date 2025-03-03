@@ -18,6 +18,7 @@
 #define MQTT_SERVER_PORT user_config->mqtt_port
 #define MQTT_SERVER_USR  user_config->mqtt_user
 #define MQTT_SERVER_PWD  user_config->mqtt_password
+#define MQTT_REPORT_FREQ  user_config->mqtt_report_freq
 
 extern OSStatus UserMqttInit(void);
 extern OSStatus UserMqttSend(char *arg);

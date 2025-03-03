@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<flash_board>
+  <pass>
+    <loader>$PROJ_DIR$\..\..\..\..\Platform\MCU\MW3xx\flashloader\mw310_all.flash</loader>
+  </pass>
+</flash_board>
+
+

@@ -161,7 +161,7 @@ static int HttpGetTc1Status(httpd_request_t *req)
     sprintf(tc1_status, TC1_STATUS_JSON, sockets, ip_status.mode,
         sys_config->micoSystemConfig.ssid, sys_config->micoSystemConfig.user_key,
         user_config->ap_name, user_config->ap_key, MQTT_SERVER, MQTT_SERVER_PORT, MQTT_SERVER_USR, MQTT_SERVER_PWD,
-        VERSION, ip_status.ip, ip_status.mask, ip_status.gateway, 0L);
+        VERSION, ip_status.ip, ip_status.mask, ip_status.gateway,user_config->mqtt_report_freq, 0L);
 
     OSStatus err = kNoErr;
     send_http(tc1_status, strlen(tc1_status), exit, &err);
@@ -306,6 +306,39 @@ exit:
     return err;
 }
 
+static int HttpSetMqttReportFreq(httpd_request_t *req)
+{
+    OSStatus err = kNoErr;
+
+    int buf_size = 97;
+    char *buf = malloc(buf_size);
+
+    err = httpd_get_data(req, buf, buf_size);
+    require_noerr(err, exit);
+
+    sscanf(buf, "%d", &MQTT_REPORT_FREQ);
+    mico_system_context_update(sys_config);
+
+    send_http("OK", 2, exit, &err);
+
+exit:
+    if (buf) free(buf);
+    return err;
+}
+
+static int HttpGetMqttReportFreq(httpd_request_t *req)
+{
+    OSStatus err = kNoErr;
+    int buf_size = 97;
+    char *freq = malloc(buf_size);
+    sprintf(freq, "%d", &MQTT_REPORT_FREQ);
+
+    send_http(freq, strlen(freq), exit, &err);
+
+exit:
+    return err;
+}
+
 static int HttpGetLog(httpd_request_t *req)
 {
     OSStatus err = kNoErr;
@@ -420,6 +453,7 @@ const struct httpd_wsgi_call g_app_handlers[] = {
     { "/wifi/config", HTTPD_HDR_DEFORT, 0, HttpGetWifiConfig, HttpSetWifiConfig, NULL, NULL },
     { "/wifi/scan", HTTPD_HDR_DEFORT, 0, HttpGetWifiScan, HttpSetWifiScan, NULL, NULL },
     { "/mqtt/config", HTTPD_HDR_DEFORT, 0, NULL, HttpSetMqttConfig, NULL, NULL },
+	{ "/mqtt/report/freq", HTTPD_HDR_DEFORT, 0, HttpGetMqttReportFreq, HttpSetMqttReportFreq, NULL, NULL },
     { "/log", HTTPD_HDR_DEFORT, 0, HttpGetLog, NULL, NULL, NULL },
     { "/task", HTTPD_HDR_DEFORT, APP_HTTP_FLAGS_NO_EXACT_MATCH, HttpGetTasks, HttpAddTask, NULL, HttpDelTask },
     { "/ota", HTTPD_HDR_DEFORT, 0, Otastatus, OtaStart, NULL, NULL },

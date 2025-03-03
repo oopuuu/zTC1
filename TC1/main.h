@@ -52,6 +52,7 @@ typedef struct
     char version;
     char mqtt_ip[SETTING_MQTT_STRING_LENGTH_MAX];
     int mqtt_port;
+    int mqtt_report_freq;
     char mqtt_user[SETTING_MQTT_STRING_LENGTH_MAX];
     char mqtt_password[SETTING_MQTT_STRING_LENGTH_MAX];
     char socket_status[SOCKET_NUM]; //记录当前开关

@@ -1,0 +1,780 @@
+/*
+ * Copyright 2008-2015, Marvell International Ltd.
+ * All Rights Reserved.
+ */
+#include <lowlevel_drivers.h>
+#include <core_cm4.h>
+#include <wm_os.h>
+#include <wmstdio.h>
+#include <mdev_pm.h>
+#include <boot_flags.h>
+#include <critical_error.h>
+
+#ifdef CONFIG_ENABLE_ROM_LIBS
+#include <cyassl/ctaocrypt/visibility.h>
+#include <cyassl/ctaocrypt/memory.h>
+#endif
+
+#define FREQ_32M 32000000
+CLK_Src_Type sfll_ref_clk = CLK_XTAL_REF;
+
+#ifdef CONFIG_ENABLE_CPP_SUPPORT
+typedef void (*funcp_t)(void);
+typedef funcp_t *funcpp_t;
+
+/**
+ * @brief   Constructors table start.
+ * @pre     The symbol must be aligned to a 32 bits boundary.
+ */
+extern funcp_t __init_array_start;
+
+/**
+ * @brief   Constructors table end.
+ * @pre     The symbol must be aligned to a 32 bits boundary.
+ */
+extern funcp_t __init_array_end;
+
+/**
+ * @brief   Destructors table start.
+ * @pre     The symbol must be aligned to a 32 bits boundary.
+ */
+extern funcp_t __fini_array_start;
+
+/**
+ * @brief   Destructors table end.
+ * @pre     The symbol must be aligned to a 32 bits boundary.
+ */
+extern funcp_t __fini_array_end;
+#endif
+
+extern uint32_t pm4_sig __attribute__((section(".nvram_uninit")));
+
+typedef struct stframe {
+	uint32_t r0;
+	uint32_t r1;
+	uint32_t r2;
+	uint32_t r3;
+	uint32_t r12;
+	uint32_t lr;
+	uint32_t pc;
+	uint32_t psr;
+} stframe_t;
+
+#ifdef CONFIG_LL_DEBUG
+static int stptr;
+#endif
+
+/* Default Fault Handlers. */
+void Default_IRQHandler(void) __attribute__ ((naked));
+void Reset_IRQHandler(void) __attribute__ ((naked));
+void HardFault_IRQHandler(void) __attribute__ ((naked));
+
+void WEAK NMI_IRQHandler(void);
+void WEAK MemManage_IRQHandler(void);
+void WEAK BusFault_IRQHandler(void);
+void WEAK UsageFault_IRQHandler(void);
+void WEAK SVC_IRQHandler(void);
+void WEAK DebugMonitor_IRQHandler(void);
+void WEAK PendSV_IRQHandler(void);
+void WEAK SysTick_IRQHandler(void);
+void WEAK ExtPin0_IRQHandler(void);
+void WEAK ExtPin1_IRQHandler(void);
+void WEAK RTC_IRQHandler(void);
+void WEAK CRC_IRQHandler(void);
+void WEAK AES_IRQHandler(void);
+void WEAK I2C0_IRQHandler(void);
+void WEAK I2C1_IRQHandler(void);
+void WEAK DMA_IRQHandler(void);
+void WEAK GPIO_IRQHandler(void);
+void WEAK SSP0_IRQHandler(void);
+void WEAK SSP1_IRQHandler(void);
+void WEAK SSP2_IRQHandler(void);
+void WEAK QSPI_IRQHandler(void);
+void WEAK GPT0_IRQHandler(void);
+void WEAK GPT1_IRQHandler(void);
+void WEAK GPT2_IRQHandler(void);
+void WEAK GPT3_IRQHandler(void);
+void WEAK UART0_IRQHandler(void);
+void WEAK UART1_IRQHandler(void);
+void WEAK UART2_IRQHandler(void);
+void WEAK WDT_IRQHandler(void);
+void WEAK ADC0_IRQHandler(void);
+void WEAK DAC_IRQHandler(void);
+void WEAK ACOMPWKUP_IRQHandler(void);
+void WEAK ACOMP_IRQHandler(void);
+void WEAK SDIO_IRQHandler(void);
+void WEAK USB_IRQHandler(void);
+void WEAK PLL_IRQHandler(void);
+void WEAK RC32M_IRQHandler(void);
+void WEAK ExtPin3_IRQHandler(void);
+void WEAK ExtPin4_IRQHandler(void);
+void WEAK ExtPin5_IRQHandler(void);
+void WEAK ExtPin6_IRQHandler(void);
+void WEAK ExtPin7_IRQHandler(void);
+void WEAK ExtPin8_IRQHandler(void);
+void WEAK ExtPin9_IRQHandler(void);
+void WEAK ExtPin10_IRQHandler(void);
+void WEAK ExtPin11_IRQHandler(void);
+void WEAK ExtPin12_IRQHandler(void);
+void WEAK ExtPin13_IRQHandler(void);
+void WEAK ExtPin14_IRQHandler(void);
+void WEAK ExtPin15_IRQHandler(void);
+void WEAK ExtPin16_IRQHandler(void);
+void WEAK ExtPin17_IRQHandler(void);
+void WEAK ExtPin18_IRQHandler(void);
+void WEAK ExtPin19_IRQHandler(void);
+void WEAK ExtPin20_IRQHandler(void);
+void WEAK ExtPin21_IRQHandler(void);
+void WEAK ExtPin22_IRQHandler(void);
+void WEAK ExtPin23_IRQHandler(void);
+void WEAK ExtPin24_IRQHandler(void);
+void WEAK ExtPin25_IRQHandler(void);
+void WEAK ExtPin26_IRQHandler(void);
+void WEAK ExtPin27_IRQHandler(void);
+void WEAK ULPCOMP_IRQHandler(void);
+void WEAK BRNDET_IRQHandler(void);
+void WEAK WIFIWKUP_IRQHandler(void);
+
+/* System main stack pointer address */
+extern unsigned long _estack;
+
+/*
+ * The minimal vector table for a Cortex-M3.  Note that the proper constructs
+ * must be placed on this to ensure that it ends up at physical address
+ * 0x0000.0000.
+ */
+__attribute__ ((used, section(".isr_vector")))
+void (*const __vector_table[]) (void) = {
+	/* Cortex-M3 common exception */
+	(void (*)(void))(&_estack),
+	Reset_IRQHandler,
+	NMI_IRQHandler,
+	HardFault_IRQHandler,
+	MemManage_IRQHandler,
+	BusFault_IRQHandler,
+	UsageFault_IRQHandler,
+	0,
+	0,
+	0,
+	0,
+	SVC_IRQHandler,
+	DebugMonitor_IRQHandler,
+	0,
+	PendSV_IRQHandler,
+	SysTick_IRQHandler,
+	/* Marvell specific interrupts */
+	ExtPin0_IRQHandler,
+	ExtPin1_IRQHandler,
+	RTC_IRQHandler,
+	CRC_IRQHandler,
+	AES_IRQHandler,
+	I2C0_IRQHandler,
+	I2C1_IRQHandler,
+	Default_IRQHandler,
+	DMA_IRQHandler,
+	GPIO_IRQHandler,
+	SSP0_IRQHandler,
+	SSP1_IRQHandler,
+	SSP2_IRQHandler,
+	QSPI_IRQHandler,
+	GPT0_IRQHandler,
+	GPT1_IRQHandler,
+	GPT2_IRQHandler,
+	GPT3_IRQHandler,
+	UART0_IRQHandler,
+	UART1_IRQHandler,
+	UART2_IRQHandler,
+	Default_IRQHandler,
+	WDT_IRQHandler,
+	Default_IRQHandler,
+	ADC0_IRQHandler,
+	DAC_IRQHandler,
+	ACOMPWKUP_IRQHandler,
+	ACOMP_IRQHandler,
+	SDIO_IRQHandler,
+	USB_IRQHandler,
+	Default_IRQHandler,
+	PLL_IRQHandler,
+	Default_IRQHandler,
+	RC32M_IRQHandler,
+	ExtPin3_IRQHandler,
+	ExtPin4_IRQHandler,
+	ExtPin5_IRQHandler,
+	ExtPin6_IRQHandler,
+	ExtPin7_IRQHandler,
+	ExtPin8_IRQHandler,
+	ExtPin9_IRQHandler,
+	ExtPin10_IRQHandler,
+	ExtPin11_IRQHandler,
+	ExtPin12_IRQHandler,
+	ExtPin13_IRQHandler,
+	ExtPin14_IRQHandler,
+	ExtPin15_IRQHandler,
+	ExtPin16_IRQHandler,
+	ExtPin17_IRQHandler,
+	ExtPin18_IRQHandler,
+	ExtPin19_IRQHandler,
+	ExtPin20_IRQHandler,
+	ExtPin21_IRQHandler,
+	ExtPin22_IRQHandler,
+	ExtPin23_IRQHandler,
+	ExtPin24_IRQHandler,
+	ExtPin25_IRQHandler,
+	ExtPin26_IRQHandler,
+	ExtPin27_IRQHandler,
+	Default_IRQHandler,
+	ULPCOMP_IRQHandler,
+	BRNDET_IRQHandler,
+	WIFIWKUP_IRQHandler,};
+
+
+/*
+ * The following are constructs created by the linker, indicating where the
+ * ".bss" and ".nvram" segments reside in memory.
+ */
+
+#ifdef CONFIG_ENABLE_MCU_PM3
+extern unsigned long _pm3_bss1;
+extern unsigned long _epm3_bss1;
+extern unsigned long _pm3_bss;
+extern unsigned long _epm3_bss;
+#endif /*  CONFIG_ENABLE_MCU_PM3 */
+
+extern unsigned long _bss;
+extern unsigned long _ebss;
+extern unsigned long _nvram_begin;
+extern unsigned long _nvram_end;
+
+#ifdef CONFIG_ENABLE_ROM_LIBS
+extern unsigned long _rom_data_start;
+extern unsigned long _rom_data;
+static void rom_init()
+{
+	memset(&_rom_data_start, 0, (unsigned) &_rom_data);
+	CyaSSL_SetAllocators((CyaSSL_Malloc_cb)((uint32_t)pvPortMalloc | 0x01),
+		(CyaSSL_Free_cb)((uint32_t)vPortFree | 0x01),
+		(CyaSSL_Realloc_cb)((uint32_t)pvPortReAlloc | 0x01));
+}
+#endif
+
+/*
+ * This is the code that gets called when the processor first starts execution
+ * following a reset event. Only the absolutely necessary set is performed,
+ * after which the os_init() routine is called, to start kernel. os_init()
+ * after starting scheduler, hands over control to application specific entry
+ * point, main() or user_app_init() as defined.
+ */
+void Reset_IRQHandler(void)
+{
+	__asm volatile ("mov sp, %0" : : "r" (&_estack));
+	__asm volatile ("b Reset_IRQHandler_C");
+}
+
+/*
+ * PLL Configuration Routine
+ *
+ * Fout=Fvco/P=Refclk/M*2*N /P
+ * where Fout is the output frequency of CLKOUT, Fvco is the frequency of the
+ * VCO, M is reference divider ratio, N is feedback divider ratio, P is post
+ * divider ratio.
+ * Given the CLKOUT should be programmed to Fout, it should follow these
+ * steps in sequence:
+ * A) Select proper M to get Refclk/M = 400K (+/-20%)
+ * B) Find proper P to make P*Fout in the range of 150MHz ~ 300MHz
+ * C) Find out the N by Round(P*Fout/(Refclk/M*2))
+ */
+static void CLK_Config_Pll(int ref_clk, CLK_Src_Type type)
+{
+	int i, refDiv;
+	int fout = CHIP_SFLL_FREQ();
+	CLK_SfllConfig_Type sfllConfigSet;
+
+	while (CLK_GetClkStatus(CLK_SFLL) == SET)
+		;
+	sfllConfigSet.refClockSrc = type;
+
+	refDiv = (int) (ref_clk / 400000);
+
+	/* Check for (P*fout) within 150MHz to 300MHz range */
+	for (i = 1; i <= 8; i <<= 1)
+		if (((fout * i) >= 150000000) &&
+				((fout * i) <= 300000000))
+			break;
+
+	/* Configure the SFLL */
+	sfllConfigSet.refDiv = refDiv;
+	sfllConfigSet.fbDiv = (int)((double) (i * fout) /
+				 (((double) ref_clk / (double) refDiv) * 2));
+
+	sfllConfigSet.kvco = 1;
+
+	/* Post divider ratio, 2-bit
+	 * 2'b00, Fout = Fvco/1
+	 * 2'b01, Fout = Fvco/2
+	 * 2'b10, Fout = Fvco/4
+	 * 2'b11, Fout = Fvco/8
+	 */
+	sfllConfigSet.postDiv = ffs(i) - 1;
+	CLK_SfllEnable(&sfllConfigSet);
+	while (CLK_GetClkStatus(CLK_SFLL) == RESET)
+		;
+}
+
+static void Setup_RC32M()
+{
+	PMU_PowerOnWLAN();
+	CLK_RefClkEnable(CLK_XTAL_REF);
+	while (CLK_GetClkStatus(CLK_XTAL_REF) == RESET)
+		;
+	/* Configure the SFLL */
+	CLK_SfllConfig_Type sfllCfgSet;
+
+	/* 38.4M Main Crystal -> 192M Fvco */
+	sfllCfgSet.refClockSrc = CLK_XTAL_REF;
+	sfllCfgSet.refDiv = 0x60;
+	sfllCfgSet.fbDiv = 0xF0;
+	sfllCfgSet.kvco = 1;
+
+	CLK_SfllEnable(&sfllCfgSet);
+
+	while (CLK_GetClkStatus(CLK_SFLL) == RESET)
+		;
+
+	 /* Set clock divider for IPs */
+	CLK_ModuleClkDivider(CLK_APB0, 2);
+	CLK_ModuleClkDivider(CLK_APB1, 2);
+	CLK_ModuleClkDivider(CLK_PMU, 4);
+
+	/* Switch system clock source to SFLL
+	* before RC32M calibration */
+	CLK_SystemClkSrc(CLK_SFLL);
+
+	/* Enable RC32M_GATE functional clock
+	* for calibration use
+	*/
+	PMU->PERI3_CTRL.BF.RC32M_GATE = 0;
+
+	CLK_RC32MCalibration(CLK_AUTO_CAL, 0);
+
+	while ((RC32M->STATUS.BF.CAL_DONE == 0) ||
+		(RC32M->STATUS.BF.CLK_RDY == 0))
+		;
+
+	/* Disable RC32M_GATE functional clock
+	* on calibrating RC32M
+	*/
+	PMU->PERI3_CTRL.BF.RC32M_GATE = 1;
+
+	/* Reset the PMU clock divider to 1 */
+	CLK_ModuleClkDivider(CLK_PMU, 1);
+}
+
+void CLK_RC32M_SfllRefClk()
+{
+	int freq = FREQ_32M;
+	CLK_Src_Type type = CLK_RC32M;
+
+	sfll_ref_clk = CLK_RC32M;
+
+	/* Set system clock to RC32M as PLL needs to be disabled for
+	 * reconfiguring it.*/
+	CLK_SystemClkSrc(CLK_RC32M);
+
+	/* Disable XTAL reference clock and SFLL before reconfiguring it. */
+	CLK_RefClkDisable(CLK_XTAL_REF);
+	CLK_SfllDisable();
+
+	/* Set reference clock to RC32M */
+	CLK_RefClkEnable(CLK_RC32M);
+	while (CLK_GetClkStatus(CLK_RC32M) == RESET)
+		;
+
+	if (board_cpu_freq() > freq) {
+		CLK_Config_Pll(freq, type);
+		freq = board_cpu_freq();
+		type = CLK_SFLL;
+	}
+
+	if (freq > 50000000) {
+		/* Max APB0 freq 50MHz */
+		CLK_ModuleClkDivider(CLK_APB0, 2);
+		/* Max APB1 freq 50MHz */
+		CLK_ModuleClkDivider(CLK_APB1, 2);
+	}
+
+	/* Select clock source */
+	CLK_SystemClkSrc(type);
+
+}
+
+void CLK_Init()
+{
+	int freq;
+	CLK_Src_Type type;
+	if (board_cpu_freq() == FREQ_32M) {
+		Setup_RC32M();
+		CLK_SystemClkSrc(CLK_RC32M);
+		/* SFLL will not be used as system clock
+		 * when board_cpu_frequency = 32M
+		 * Hence, disable it
+		 */
+		CLK_SfllDisable();
+		type = CLK_RC32M;
+	} else {
+		if (sfll_ref_clk == CLK_RC32M) {
+			/* SFLL(driven by RC32M) will be used as
+			 * the system clock source */
+			CLK_RefClkEnable(CLK_RC32M);
+			while (CLK_GetClkStatus(CLK_RC32M) == RESET)
+				;
+			type = CLK_RC32M;
+			freq = FREQ_32M;
+		} else {
+			/* XTAL/SFLL(driven by XTAL) will be used as
+			 * the system clock source */
+			/* 38.4 MHx XTAL is routed through WLAN */
+			PMU_PowerOnWLAN();
+			CLK_RefClkEnable(CLK_XTAL_REF);
+			while (CLK_GetClkStatus(CLK_XTAL_REF) == RESET)
+				;
+			type = CLK_XTAL_REF;
+			freq = CLK_MAINXTAL_FREQUENCY;
+		}
+		Setup_RC32M();
+
+		/* On RC32M setup, SystemClkSrc = SFLL
+		 * Change the clock to reference clock before configuring PLL */
+		CLK_SystemClkSrc(type);
+
+		 /* If board_cpu_frequency > board_main_xtal, SFLL would be
+		  * used as system clock source.
+		  * SFLL should be disabled otherwise.
+		  * Also, SFLL should be disabled before reconfiguring
+		  * SFLL to a new frequency value */
+		CLK_SfllDisable();
+
+		/*
+		* Check if expected cpu frequency is greater than the
+		* source clock frequency. In that case we need to enable
+		* the PLL.
+		*/
+
+		if (board_cpu_freq() > freq) {
+			CLK_Config_Pll(freq, type);
+			freq = board_cpu_freq();
+			type = CLK_SFLL;
+		}
+
+		if (freq > 50000000) {
+			/* Max APB0 freq 50MHz */
+			CLK_ModuleClkDivider(CLK_APB0, 2);
+			/* Max APB1 freq 50MHz */
+			CLK_ModuleClkDivider(CLK_APB1, 2);
+		}
+
+	}
+	/* Select clock source */
+	CLK_SystemClkSrc(type);
+
+	/* Power down WLAN in order to save power */
+	if (sfll_ref_clk == CLK_RC32M)
+		PMU_PowerDownWLAN();
+}
+
+__attribute__((used))
+void Reset_IRQHandler_C(void)
+{
+	/* Zero fill the bss segment. */
+	memset(&_bss, 0x00, ((unsigned) &_ebss - (unsigned) &_bss));
+#ifdef CONFIG_ENABLE_MCU_PM3
+	memset(&_pm3_bss1, 0x00,
+		 ((unsigned) &_epm3_bss1 - (unsigned) &_pm3_bss1));
+
+	memset(&_pm3_bss, 0x00,
+		 ((unsigned) &_epm3_bss - (unsigned) &_pm3_bss));
+#endif /* CONFIG_ENABLE_MCU_PM3 */
+	/*
+	 * Vector table relocation:
+	 *
+	 * 1. Bit 29 decides whether CODE = 0 or SRAM = 1 area.
+	 * 2. Bit 0-6 are reserved, hence address should be aligned to
+	 *    32 word boundary -- minimal.
+	 *
+	 * See programming VTOR in cortex-m3 trm for more details.
+	 */
+	if ((unsigned) __vector_table >= 0x20000000)
+		SCB->VTOR = ((uint32_t) __vector_table) & 0x3FFFFF80;
+	else
+		SCB->VTOR = ((uint32_t) __vector_table) & 0x1FFFFF80;
+
+	/* 4 pre-emption, 4 subpriority bits */
+	NVIC_SetPriorityGrouping(4);
+
+	/* Turn ON different power domains. */
+	PMU_PowerOnVDDIO(PMU_VDDIO_AON);
+	PMU_PowerOnVDDIO(PMU_VDDIO_0);
+	PMU_PowerOnVDDIO(PMU_VDDIO_1);
+	PMU_PowerOnVDDIO(PMU_VDDIO_2);
+	PMU_PowerOnVDDIO(PMU_VDDIO_3);
+
+	/* Enable Brown-out on VBAT */
+#ifdef CONFIG_ENABLE_MXCHIP	
+	PMU_VbatBrndetConfig_Type cfg;
+	cfg.brnTrigVolt = PMU_VBAT_BRNDET_TRIGVOLT_4;
+	cfg.brnHyst = PMU_VBAT_BRNDET_HYST_2;
+	cfg.brnFilter = PMU_VBAT_BRNDET_FILT_0;
+	PMU_ConfigVbatBrndet(&cfg);
+#endif
+	PMU_VbatBrndetCmd(ENABLE);
+	PMU_VbatBrndetRstCmd(ENABLE);
+	PMU_VbatBrndetIntCmd(DISABLE);
+	
+	/* Zero fill part of nvram if this is a reboot */
+	if (pm4_sig != PM4_SIGN) {
+		memset(&_nvram_begin, 0, ((unsigned) &_nvram_end -
+				(unsigned) &_nvram_begin));
+	}
+	pm4_sig = 0;
+
+	/* Do board specific Power On GPIO settings */
+	board_gpio_power_on();
+
+	/* Set PMU clock to 32Mhz */
+	RC32M->CLK.BF.REF_SEL = 1;
+	CLK_ModuleClkDivider(CLK_PMU, 1);
+
+	/* Initialize System Clock */
+	CLK_Init();
+
+	/* Initialize boot flags as set up by Boot2 */
+	boot_init();
+
+#ifdef CONFIG_ENABLE_ROM_LIBS
+	/* Initialize ROM */
+	rom_init();
+#endif
+
+#ifdef CONFIG_ENABLE_CPP_SUPPORT
+	/*
+	 * These constructors and destructors are needed for C++. Can be
+	 * removed if using custom linker script without these linker
+	 * variables. Default SDK linker script has these variables even
+	 * for pure C apps.
+	 */
+	/* Constructors invocation.*/
+	funcpp_t fpp = &__init_array_start;
+	while (fpp < &__init_array_end) {
+		(*fpp)();
+		fpp++;
+	}
+#endif
+
+	/* Initialize Operating System */
+	os_init();
+
+#ifdef CONFIG_ENABLE_CPP_SUPPORT
+	/* Destructors invocation.*/
+	fpp = &__fini_array_start;
+	while (fpp < &__fini_array_end) {
+		(*fpp)();
+		fpp++;
+	}
+#endif
+}
+
+#pragma weak NMI_IRQHandler = Default_IRQHandler
+#pragma weak MemManage_IRQHandler = Default_IRQHandler
+#pragma weak BusFault_IRQHandler = Default_IRQHandler
+#pragma weak UsageFault_IRQHandler = Default_IRQHandler
+#pragma weak SVC_IRQHandler = Default_IRQHandler
+#pragma weak DebugMonitor_IRQHandler = Default_IRQHandler
+#pragma weak PendSV_IRQHandler = Default_IRQHandler
+#pragma weak SysTick_IRQHandler = Default_IRQHandler
+#pragma weak ExtPin0_IRQHandler = Default_IRQHandler
+#pragma weak ExtPin1_IRQHandler = Default_IRQHandler
+#pragma weak RTC_IRQHandler = Default_IRQHandler
+#pragma weak CRC_IRQHandler = Default_IRQHandler
+#pragma weak AES_IRQHandler = Default_IRQHandler
+#pragma weak I2C0_IRQHandler = Default_IRQHandler
+#pragma weak I2C1_IRQHandler = Default_IRQHandler
+#pragma weak DMA_IRQHandler = Default_IRQHandler
+#pragma weak GPIO_IRQHandler = Default_IRQHandler
+#pragma weak SSP0_IRQHandler = Default_IRQHandler
+#pragma weak SSP1_IRQHandler = Default_IRQHandler
+#pragma weak SSP2_IRQHandler = Default_IRQHandler
+#pragma weak QSPI_IRQHandler = Default_IRQHandler
+#pragma weak GPT0_IRQHandler = Default_IRQHandler
+#pragma weak GPT1_IRQHandler = Default_IRQHandler
+#pragma weak GPT2_IRQHandler = Default_IRQHandler
+#pragma weak GPT3_IRQHandler = Default_IRQHandler
+#pragma weak UART0_IRQHandler = Default_IRQHandler
+#pragma weak UART1_IRQHandler = Default_IRQHandler
+#pragma weak UART2_IRQHandler = Default_IRQHandler
+#pragma weak WDT_IRQHandler = Default_IRQHandler
+#pragma weak ADC0_IRQHandler = Default_IRQHandler
+#pragma weak DAC_IRQHandler = Default_IRQHandler
+#pragma weak ACOMPWKUP_IRQHandler = Default_IRQHandler
+#pragma weak ACOMP_IRQHandler = Default_IRQHandler
+#pragma weak SDIO_IRQHandler = Default_IRQHandler
+#pragma weak USB_IRQHandler = Default_IRQHandler
+#pragma weak PLL_IRQHandler = Default_IRQHandler
+#pragma weak RC32M_IRQHandler = Default_IRQHandler
+#pragma weak ExtPin3_IRQHandler = Default_IRQHandler
+#pragma weak ExtPin4_IRQHandler = Default_IRQHandler
+#pragma weak ExtPin5_IRQHandler = Default_IRQHandler
+#pragma weak ExtPin6_IRQHandler = Default_IRQHandler
+#pragma weak ExtPin7_IRQHandler = Default_IRQHandler
+#pragma weak ExtPin8_IRQHandler = Default_IRQHandler
+#pragma weak ExtPin9_IRQHandler = Default_IRQHandler
+#pragma weak ExtPin10_IRQHandler = Default_IRQHandler
+#pragma weak ExtPin11_IRQHandler = Default_IRQHandler
+#pragma weak ExtPin12_IRQHandler = Default_IRQHandler
+#pragma weak ExtPin13_IRQHandler = Default_IRQHandler
+#pragma weak ExtPin14_IRQHandler = Default_IRQHandler
+#pragma weak ExtPin15_IRQHandler = Default_IRQHandler
+#pragma weak ExtPin16_IRQHandler = Default_IRQHandler
+#pragma weak ExtPin17_IRQHandler = Default_IRQHandler
+#pragma weak ExtPin18_IRQHandler = Default_IRQHandler
+#pragma weak ExtPin19_IRQHandler = Default_IRQHandler
+#pragma weak ExtPin20_IRQHandler = Default_IRQHandler
+#pragma weak ExtPin21_IRQHandler = Default_IRQHandler
+#pragma weak ExtPin22_IRQHandler = Default_IRQHandler
+#pragma weak ExtPin23_IRQHandler = Default_IRQHandler
+#pragma weak ExtPin24_IRQHandler = Default_IRQHandler
+#pragma weak ExtPin25_IRQHandler = Default_IRQHandler
+#pragma weak ExtPin26_IRQHandler = Default_IRQHandler
+#pragma weak ExtPin27_IRQHandler = Default_IRQHandler
+#pragma weak ULPCOMP_IRQHandler = Default_IRQHandler
+#pragma weak BRNDET_IRQHandler = Default_IRQHandler
+#pragma weak WIFIWKUP_IRQHandler = Default_IRQHandler
+
+void Default_IRQHandler(void)
+{
+	/*
+	 * Check bit 2 in LR to find which stack pointer we should refer to,
+	 * if bit = 0 then main stack pointer (msp) else process stack
+	 * pointer (psp).
+	 */
+	__asm volatile ("tst lr, #4");
+	__asm volatile ("ite eq");
+	__asm volatile ("mrseq r0, msp");
+	__asm volatile ("mrsne r0, psp");
+	__asm volatile ("b Default_IRQHandler_C");
+}
+
+__attribute__((used))
+void Default_IRQHandler_C(unsigned long *addr)
+{
+#ifdef CONFIG_LL_DEBUG
+	stframe_t *stf;
+	ll_printf("NVIC->ISPR[0] : %x\r\n", NVIC->ISPR[0]);
+	ll_printf("NVIC->ISPR[1] : %x\r\n", NVIC->ISPR[1]);
+
+	ll_printf("NVIC->ISER[0] : %x\r\n", NVIC->ISER[0]);
+	ll_printf("NVIC->ISER[1] : %x\r\n", NVIC->ISER[1]);
+
+	ll_printf("NVIC->ISPR[0] &  NVIC->ISER[0] : %x\r\n",
+		  NVIC->ISER[0] & NVIC->ISPR[0]);
+	ll_printf("NVIC->ISPR[1] &  NVIC->ISER[1] : %x\r\n",
+		  NVIC->ISER[1] & NVIC->ISPR[1]);
+
+
+	stf = (stframe_t *) addr;
+	ll_printf("Default IRQHandler: using stack pointer @ 0x%08x",
+		  (unsigned int)addr);
+
+	ll_printf("\r\nr0 = 0x%08x\r\nr1 = 0x%08x\r\nr2 = 0x%08x\r\n"
+		  "r3 = 0x%08x\r\nr12 = 0x%08x\r\nlr = 0x%08x\r\npc = 0x%08x"
+		  "\r\npsr = 0x%08x\r\n", stf->r0, stf->r1, stf->r2, stf->r3,
+		  stf->r12, stf->lr, stf->pc, stf->psr);
+
+	ll_printf("Task name %s\r\n", get_current_taskname());
+
+#endif
+	while (1)
+		;
+}
+
+/* Trap MSP or PSP register value and then call real fault handler */
+void HardFault_IRQHandler(void)
+{
+	__asm volatile ("mrs r0, msp");
+	__asm volatile ("mrs r1, psp");
+	__asm volatile ("b HardFault_IRQHandler_C");
+}
+
+__attribute__((used))
+WEAK void HardFault_IRQHandler_C(unsigned long *msp, unsigned long *psp)
+{
+#ifdef CONFIG_LL_DEBUG
+	int regval;
+	stframe_t *stf;
+
+	stf = (stframe_t *) msp;
+	ll_printf("HardFault IRQHandler: using msp @ 0x%08x",
+		  (unsigned int)msp);
+
+	ll_printf("\r\nr0 = 0x%08x\r\nr1 = 0x%08x\r\nr2 = 0x%08x\r\n"
+		  "r3 = 0x%08x\r\nr12 = 0x%08x\r\nlr = 0x%08x\r\npc = 0x%08x"
+		  "\r\npsr = 0x%08x\r\n", stf->r0, stf->r1, stf->r2, stf->r3,
+		  stf->r12, stf->lr, stf->pc, stf->psr);
+
+	stf = (stframe_t *) psp;
+	ll_printf("HardFault IRQHandler: using psp @ 0x%08x",
+		  (unsigned int)psp);
+
+	ll_printf("\r\nr0 = 0x%08x\r\nr1 = 0x%08x\r\nr2 = 0x%08x\r\n"
+		  "r3 = 0x%08x\r\nr12 = 0x%08x\r\nlr = 0x%08x\r\npc = 0x%08x"
+		  "\r\npsr = 0x%08x\r\n", stf->r0, stf->r1, stf->r2, stf->r3,
+		  stf->r12, stf->lr, stf->pc, stf->psr);
+
+	ll_printf("Task name %s\r\n", get_current_taskname());
+
+	/* read HFSR  Hard Fault Status Register */
+	stptr = SCB->HFSR;
+	ll_printf("HFSR : 0x%08x\r\n", stptr);
+
+	if (stptr & SCB_HFSR_FORCED_Msk) {
+
+		/* read CFSR Configurable Fault Status Register */
+		stptr = SCB->CFSR;
+
+		ll_printf("Configurable Fault Status Register"
+			  "  (CFSR): 0x%08x\r\n", stptr);
+		ll_printf("  MemManage Fault Status Register"
+			  " (MMSR)  : 0x%02x\r\n", (stptr & 0xff));
+
+		/*
+		 * If MMARVALID bit is set, read the address
+		 * that caused the fault
+		 */
+		if (stptr & SCB_CFSR_MEMFAULTSR_Msk) {
+			/* MemManage Fault Address Reg (MMAR) */
+			regval = SCB->MMFAR;
+
+			ll_printf("    MMAR : 0x%08x\r\n", regval);
+		}
+
+		ll_printf("  Bus Fault Status Register"
+			  " (BFSR)        : 0x%02x\r\n", ((stptr >> 8) & 0xff));
+
+		/*
+		 * If BFARVALID bit is set, read the address
+		 * that caused the fault
+		 */
+		if (stptr & SCB_CFSR_BUSFAULTSR_Msk) {
+			/* Bus Fault Address Reg (BFAR) */
+			regval = SCB->BFAR;
+
+			ll_printf("      BFAR      : 0x%08x\r\n", regval);
+		}
+
+		ll_printf("  Usage Fault Status Register (UFSR)"
+			  "      : 0x%04x\r\n", (stptr >> 16));
+	}
+#endif
+	critical_error(-CRIT_ERR_HARD_FAULT, NULL);
+
+	while (1)
+		;
+}

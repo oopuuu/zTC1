@@ -1,0 +1,264 @@
+/*###ICF### Section handled by ICF editor, don't touch! ****/
+/*-Editor annotation file-*/
+/* IcfEditorFile="$TOOLKIT_DIR$\config\ide\IcfEditor\cortex_v1_0.xml" */
+/*-Specials-*/
+
+/*
+code回收 Heap 定义：
+1、启动阶段(0x1000)：mico_ping.o MICOMfgTest.o MICOForceOTA.o		0xebc
+2、阿里配网(0x4000)：Alink.o AlinkSoftAP.o dhcp-server-main.o dhcp-server.o zconfig.o zconfig.a 0x3d44
+3、mxchip配网(0x3000)：EasyLink.o smart_config.o 0x2de0
+4、thread ota(0x1000): thread_ota.o 0xeb4
+
+工作模式定义： 
+所有工作模式，首先回收启动阶段code 
+1、配网模式: 回收thread ota
+	mxchip配网模式：回收alink配网code 
+	alink配网模式：回收mxchip配网code
+2、工作模式
+	回收所有的配网模式code。
+*/
+
+//define symbol __ICFEDIT_intvec_start__ = 0x00000000;
+
+/*-Memory Regions-*/
+define symbol __ICFEDIT_region_ROM_start__   		= 0x00000000;
+define symbol __ICFEDIT_region_ROM_end__    		= 0x000FFFFF;
+define symbol __ICFEDIT_region_TCM_start__   		= 0x1FFF0000;
+define symbol __ICFEDIT_region_TCM_end__     		= 0x1FFFFFFF;
+define symbol __ICFEDIT_region_ROM_USED_RAM_start__ = 0x10000000;
+define symbol __ICFEDIT_region_ROM_USED_RAM_end__   = 0x10005FFF;
+define symbol __ICFEDIT_region_FWLOADER_start__ = 0x10006000;
+define symbol __ICFEDIT_region_FWLOADER_end__   = 0x1000DFFF;
+//define symbol __ICFEDIT_region_RECY_RAM_start__   	= 0x10002090;
+//define symbol __ICFEDIT_region_RECY_RAM_end__     	= 0x100037FF;
+define symbol __ICFEDIT_region_BD_RAM_start__   	= 0x1000E000;
+define symbol __ICFEDIT_region_BD_RAM_end__     	= 0x1006FFFF;
+
+/*-Sizes-*/
+/*define symbol __ICFEDIT_size_cstack__   = 0x400;*/
+/*define symbol __ICFEDIT_size_heap__     = 0x800;*/
+/**** End of ICF editor section. ###ICF###*/
+
+
+define memory mem with size = 4G;
+define region ROM_region   			= mem:[from __ICFEDIT_region_ROM_start__   			to __ICFEDIT_region_ROM_end__];
+define region TCM_region   			= mem:[from __ICFEDIT_region_TCM_start__   			to __ICFEDIT_region_TCM_end__];
+define region ROM_USED_RAM_region   = mem:[from __ICFEDIT_region_ROM_USED_RAM_start__   to __ICFEDIT_region_ROM_USED_RAM_end__];
+//define region RECY_RAM_region   	= mem:[from __ICFEDIT_region_RECY_RAM_start__   	to __ICFEDIT_region_RECY_RAM_end__];
+define region FWLOADER_region   = mem:[from __ICFEDIT_region_FWLOADER_start__   to __ICFEDIT_region_FWLOADER_end__];
+define region BD_RAM_region   		= mem:[from __ICFEDIT_region_BD_RAM_start__   		to __ICFEDIT_region_BD_RAM_end__];
+//define region HEAP_region   		= mem:[from __ICFEDIT_region_HEAP_RAM_start__   		to __ICFEDIT_region_HEAP_RAM_end__];
+
+/*define block CSTACK    with alignment = 8, size = __ICFEDIT_size_cstack__   { };*/
+/*define block HEAP      with alignment = 8, size = __ICFEDIT_size_heap__     { };*/
+
+//initialize by copy { readwrite };
+//initialize by copy with packing = none { section __DLIB_PERTHREAD }; // Required in a multi-threaded application
+
+//do not initialize  { section * };
+
+//place at address mem:__ICFEDIT_intvec_start__ { readonly section .vectors_table };
+
+
+/*place in RAM_region   { readwrite, block CSTACK, block HEAP };*/
+place in TCM_region   { readwrite };
+
+/****************************************
+ * ROM Section config                   *
+ ****************************************/
+keep { section .rom };
+place at start of ROM_region   { readonly, section .rom };
+
+/****************************************
+ * BD RAM Section config                *
+ ****************************************/
+keep { section .ram_dedecated_vector_table* };
+define block .vector_table with fixed order{section .ram_dedecated_vector_table*};
+
+keep { section .ram_user_define_irq_table* };
+define block .user_vector_table with fixed order{section .ram_user_define_irq_table*};
+
+keep { section .ram_user_define_data_table* };
+define block .user_data_table with fixed order{section .ram_user_define_data_table*};
+
+define block .rom.bss with fixed order{         section .hal.ram.bss* object hal_misc.o, 
+                                                section .hal.ram.bss* object hal_pinmux.o,
+                                                section .hal.ram.bss* object diag.o,
+                                                section .hal.ram.bss* object rtl8195a_ssi_rom.o,
+                                                section .hal.ram.bss* object rtl8195a_gpio.o,
+                                                section .hal.ram.bss*,
+                                                section .timer2_7_vector_table.data*, 
+                                                section .infra.ram.bss*,
+                                                section .mon.ram.bss*,
+                                                section .wlan_ram_map* object rom_wlan_ram_map.o,
+                                                section .wlan_ram_map*,
+                                                section .libc.ram.bss*,
+                                      };
+
+keep { section .start.ram.data* };
+define block .ram.start.table with fixed order{ section .start.ram.data* };
+
+keep { section .image1.validate.rodata* };
+keep { section .infra.ram.data* };
+keep { section .timer.ram.data* };
+keep { section .hal.ram.data* };
+define block .ram_image1.data with fixed order{ section .image1.validate.rodata*,
+                                                section .infra.ram.data*,
+                                                section .timer.ram.data*,
+                                                section .cutb.ram.data*,
+                                                section .hal.ram.data* object rom.o,	// for standard libaray __impure_data_ptr
+                                                section .cutc.ram.data*,
+                                                section .hal.ram.data*
+                                              };
+define block .ram_image1.bss with fixed order{ 	//section .hal.flash.data*,
+                                                section .hal.sdrc.data*
+                                                };
+
+define block .ram_image1.text with fixed order{ section .hal.ram.text*,
+                                                section .hal.sdrc.text*,
+                                                //section .text* object startup.o,
+                                                section .infra.ram.text*,
+                                                };
+
+define block IMAGE1 with fixed order { section LOADER };
+define block IMAGE1_DBG with fixed order { block .ram.start.table, block .ram_image1.data, block .ram_image1.bss, block .ram_image1.text };
+
+place at start of ROM_USED_RAM_region   { readwrite, 
+                                    	  block .vector_table, 
+                                    	  block .user_vector_table,
+                                    	  block .user_data_table, 
+                                    	  block .rom.bss, 
+                                    	  block IMAGE1
+                                    	};
+                                    	
+keep { section .fwloader.start_ram.data* };
+define block .fwloader.start.table1 with fixed order{ section .fwloader.start_ram.data* };
+
+keep { section .fwloader.validate.rodata* };
+define block .fwloader.start.table2 with fixed order{ section .fwloader.validate.rodata* };
+
+//keep { section .fwloader.ram.data* };
+//define block .fwloader_ram.data with fixed order{ section .fwloader.ram.data*,
+//                                                  section .data* object fw_loader_main.o,
+//                                                  section .bss* object fw_loader_main.o,                                                  
+//                                                  section .rodata* object fw_loader_main.o                                                                                                                                                    
+//                                                 };
+
+//keep { section .fwloader.ram.start* };
+//define block .fwloader_ram.text with fixed order{ 
+//																									section .text* object fw_loader_main.o
+//																									};     
+																									
+                                                                                     
+                                            
+define block FWLOADER with fixed order { block .fwloader.start.table1, 
+																		 block .fwloader.start.table2, 
+//																		 block .fwloader_ram.text,
+//																		 block .fwloader_ram.data
+																	 };
+																	 
+place at start of FWLOADER_region  { readwrite, block FWLOADER };  																	                                     	
+
+// yhb defined
+define block .elink_reuse with fixed order{ 
+												  object EasyLink.o,
+												  object smart_config.o,                                                                                                                                                  
+                                                 };
+define block .softap_reuse with fixed order{ 
+												  object Alink.o,
+												  object AlinkSoftAP.o,
+												  object dhcp-server-main.o,
+												  object dhcp-server.o,
+												  object rtw_ap.o,
+												  object zconfig.o,
+												  object zconfig_ieee80211.o, 
+												  object zconfig_protocol.o,
+												  object zconfig_utils.o, 
+												  object zconfig_vendor_mico.o,                                                                                                                                                  
+                                                 };
+define block .bootup_reuse with fixed order{ 
+												  object MICOMfgTest.o,
+												  object MICOForceOTA.o,
+												  object mico_ping.o,
+                                                 };
+define block .tota_reuse with fixed order{ 
+												  object thread_ota.o,                                                                                                                                                  
+                                                 };
+keep { section .image2.ram.data* };
+define block .image2.start.table1 with fixed order{ section .image2.ram.data* };
+
+keep { section .image2.validate.rodata*, section .custom.validate.rodata* };
+define block .image2.start.table2 with fixed order{ section .image2.validate.rodata*, section .custom.validate.rodata* };
+
+define block SHT$$PREINIT_ARRAY { preinit_array };
+define block SHT$$INIT_ARRAY { init_array };
+define block CPP_INIT with fixed order {        block SHT$$PREINIT_ARRAY,
+                                                block SHT$$INIT_ARRAY };
+
+define block .ram_image2.text with fixed order{ section .infra.ram.start*,
+                                                section .rodata*,
+                                                block CPP_INIT,
+                                                section .mon.ram.text*, 
+                                                section .hal.flash.text*,
+                                                section .hal.gpio.text*,
+                                                section .text*,
+                                                section CODE,
+                                                section .otg.rom.text,
+                                                section Veneer object startup.o,
+                                                section __DLIB_PERTHREAD,
+                                                //section .mdns.text
+                                              };
+
+define block .ram.data with fixed order{ section .data*, 
+                                         section DATA, 
+                                         section .ram.otg.data.a, 
+                                         section .iar.init_table,
+                                         //section .mdns.data
+                                       };
+
+define block IMAGE2 with fixed order { block .image2.start.table1, block .image2.start.table2, block .ram_image2.text, block .ram.data };
+
+define block .ram.bss with fixed order{ section .bss*,
+                                        section .ssl_ram_map,
+                                        section .hal.flash.data*,
+                                        section .hal.gpio.data*,
+                                        section COMMON,
+                                        section .bdsram.data*,
+										section .bss* object heap_5.o
+                                      };
+define block .bf_data with fixed order{ section .bfsram.data* };
+define block .heap with fixed order{ section .heap* };
+define block .stack_dummy with fixed order { section .stack };
+place at start of BD_RAM_region   { readwrite, 
+                                    block IMAGE2,
+                                    block .elink_reuse,
+                                    block .tota_reuse,
+                                    block .softap_reuse,
+                                    block .bootup_reuse,
+                                  };
+
+//place at address mem:0x10052b00  { readwrite,
+place at end of BD_RAM_region   { readwrite, 
+								  block .ram.bss,
+								  block .bf_data,
+                                  };
+								  
+
+/* TCM placement */
+define overlay TCM_overlay { section .tcm.heap,
+                                    section .tcm.bss,
+                                    block .heap,
+                                    block .stack_dummy
+							};
+/* dummy code placement */
+define overlay TCM_overlay { block IMAGE1_DBG };
+place at start of TCM_region { 	readwrite,
+                                    overlay TCM_overlay
+                                    }; 
+
+define exported symbol __rom_bss_start__ = 0x10000300; 	// use in rom
+define exported symbol __rom_bss_end__ = 0x10000bc8;	// use in rom
+define exported symbol __ram_start_table_start__= 0x10000bc8;	// use in rom
+define exported symbol __image1_validate_code__= 0x10000bdc;	// needed by ram code
+define exported symbol _rtl_impure_ptr = 0x10001c60;		// for standard library

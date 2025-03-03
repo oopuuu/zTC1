@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="description" content="A front-end template that helps you build fast, modern mobile web apps.">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
-    <title>zTC1</title>
+    <title>TC1智能插座</title>
     <meta name="mobile-web-app-capable" content="yes">
     <link rel="icon" sizes="192x192" href="http://yuntong.icu/tc1/images/android-desktop.png">
     <!-- Add to homescreen for Safari on iOS -->
@@ -23,19 +23,10 @@
     <div class="demo-layout mdl-layout mdl-js-layout mdl-layout--fixed-drawer mdl-layout--fixed-header">
       <header class="demo-header mdl-layout__header">
         <div class="mdl-layout__header-row">
-          <span class="mdl-layout-title">TC1</span>
+          <span class="mdl-layout-title">TC1智能插座</span>
           <div class="mdl-layout-spacer"></div>
-          <div class="mdl-textfield mdl-js-textfield mdl-textfield--expandable">
-            <label class="mdl-button mdl-js-button mdl-button--icon" for="search">
-              <i class="material-icons"><svg><use xlink:href="#icon-search" /></svg></i>
-            </label>
-            <div class="mdl-textfield__expandable-holder">
-              <input class="mdl-textfield__input" type="text" id="search">
-              <label class="mdl-textfield__label" for="search">Enter your query...</label>
-            </div>
-          </div>
           <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" id="hdrbtn">
-            <i class="material-icons"><svg><use xlink:href="#icon-more_vert" /></svg></i>
+            <i class="material-icons"><svg><use xlink:href="#icon-translate" /></svg></i>
           </button>
           <ul class="mdl-menu mdl-js-menu mdl-js-ripple-effect mdl-menu--bottom-right" for="hdrbtn">
             <li class="mdl-menu__item" onclick="ChangeLanguage('en')">English</li>
@@ -45,24 +36,6 @@
         </div>
       </header>
       <div class="demo-drawer mdl-layout__drawer mdl-color--blue-grey-900 mdl-color-text--blue-grey-50">
-        <header class="demo-drawer-header">
-          <!-- <img src="http://yuntong.icu/tc1/images/user.jpg" class="demo-avatar"> -->
-          <!-- <img width="112px" src="assets/user2.svg" class="demo-avatar"/> -->
-          <svg width="112pt" height="112pt" viewBox="0 0 112 112" class="demo-avatar"><use xlink:href="#img-user"/></svg>
-          <div class="demo-avatar-dropdown">
-            <span>hello@example.com</span>
-            <div class="mdl-layout-spacer"></div>
-            <button id="accbtn" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
-              <i class="material-icons" role="presentation"><svg><use xlink:href="#icon-arrow_drop_down" /></svg></i>
-              <span class="visuallyhidden">Accounts</span>
-            </button>
-            <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="accbtn">
-              <li class="mdl-menu__item">hello@example.com</li>
-              <li class="mdl-menu__item">info@example.com</li>
-              <li class="mdl-menu__item"><i class="material-icons"><svg><use xlink:href="#icon-add" /></svg></i>Add another account...</li>
-            </ul>
-          </div>
-        </header>
         <nav class="demo-navigation mdl-navigation mdl-color--blue-grey-800">
           <a class="mdl-navigation__link mdl-nav-active" href="javascript:ShowPage(1);">
             <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">
@@ -99,12 +72,6 @@
               <svg><use xlink:href="#icon-notes" /></svg>
             </i>
             <span class="lang" langKey="SystemLog">系统日志</span>
-          </a>
-          <a class="mdl-navigation__link" href="javascript:ShowPage(7);">
-            <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">
-              <svg><use xlink:href="#icon-help" /></svg>
-            </i>
-            <span class="lang" langKey="About">关于</span>
           </a>
         </nav>
       </div>
@@ -274,6 +241,25 @@
             </div>
           </div>
 
+<div class="page page2 mdl-cell mdl-cell--5-col demo-card-square mdl-card mdl-shadow--2dp" style="z-index: unset;">
+            <div class="mdl-card__title mdl-card--expand">
+              <h2 class="mdl-card__title-text">MQTT 功率上报设置</h2>
+            </div>
+            <div class="mdl-card__supporting-text">
+            <form action="#">
+              <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                <input class="mdl-textfield__input" type="text" id="mqtt_freq">
+                <label class="mdl-textfield__label" for="mqtt_freq">上报频率（秒）</label>
+              </div>
+            </form>
+            </div>
+            <div class="mdl-card__actions mdl-card--border">
+              <a id="mqtt_freq_submit" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+                提交
+              </a>
+            </div>
+          </div>
+
           <div class="page page3 mdl-cell mdl-cell--5-col demo-card-event mdl-card mdl-shadow--2dp">
             <table id="timed_task_tb" class="mdl-data-table mdl-js-data-table">
               <tr>
@@ -401,7 +387,7 @@
             <div class="mdl-card__supporting-text">
             <form action="#">
               <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                <input class="mdl-textfield__input" type="text" id="ota_url" value="http://yuntong.icu/ztc1/tc1-v2.1.5-ota.bin">
+                <input class="mdl-textfield__input" type="text" id="ota_url" value="">
                 <label class="mdl-textfield__label" for="ota_url">OTA 地址</label>
               </div>
             </form>
@@ -428,40 +414,6 @@
             </div>
           </div>
 
-          <div class="page page7 mdl-cell mdl-cell--12-col demo-card-square mdl-card mdl-shadow--2dp">
-            <div class="mdl-card__title mdl-card--expand">
-              <h2 class="mdl-card__title-text">关于</h2>
-            </div>
-            <div class="sys-log mdl-card__supporting-text">
-              <p>
-                <a href="https://github.com/zogodo/zTC1" target="_blank">github/zogodo/zTC1</a>
-              </p>
-              <p><a href="https://github.com/a2633063/zTC1" target="_blank">github/a2633063/zTC1</a>
-                <br>受该项目启发而写, 但基本未保留原项目代码.</p>
-              <p>
-                <a href="https://github.com/MXCHIP/mico-os" target="_blank">mico-os</a>
-              </p>
-              <p>
-                <a href="https://getmdl.io/index.html" target="_blank">Material Design Lite</a>
-              </p>
-              <p>
-                <a href="https://jquery.com/" target="_blank">jQuery</a>
-              </p>
-              <p>
-                <a href="https://gionkunz.github.io/chartist-js/index.html" target="_blank">Chartist</a>
-              </p>
-              <p>
-                <a href="https://creativeit.github.io/getmdl-select/" target="_blank">getmdl-select</a>
-              </p>
-              <p>
-                <a href="https://material.io/resources/icons/" target="_blank">Material Icons</a>
-              </p>
-              <p>
-                <a href="https://fonts.google.com/specimen/Roboto" target="_blank">Roboto</a>
-              </p>
-            </div>
-          </div>
-
         </div>
       </main>
     </div>
@@ -481,6 +433,10 @@
     <g id="icon-add">
       <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
       <path d="M0 0h24v24H0z" fill="none"/>
+    </g>
+    <g id="icon-translate">
+     <path d="M0 0h24v24H0z" fill="none"/>
+     <path d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/>
     </g>
     <g id="icon-arrow_drop_down">
       <path d="M7 10l5 5 5-5z"/>
@@ -646,6 +602,7 @@ var mqtt_addr;
 var mqtt_port;
 var mqtt_usr;
 var mqtt_pwd;
+var mqtt_freq;
 
 HttpGet("/status", function (re) {
   var status = JSON.parse(re);
@@ -673,6 +630,7 @@ HttpGet("/status", function (re) {
   mqtt_port = status.mqtt_port;
   mqtt_usr = status.mqtt_usr;
   mqtt_pwd = status.mqtt_pwd;
+  mqtt_freq = status.reportFreq;
   $("#info_version").html(status.version);
   $("#info_ip").html(status.ip);
   $("#info_mask").html(status.mask);
@@ -706,6 +664,7 @@ function ShowPage(id) {
     $("#mqtt_port")[0].parentElement.MaterialTextfield.change(mqtt_port);
     $("#mqtt_usr")[0].parentElement.MaterialTextfield.change(mqtt_usr);
     $("#mqtt_pwd")[0].parentElement.MaterialTextfield.change(mqtt_pwd);
+    $("#mqtt_freq")[0].parentElement.MaterialTextfield.change(mqtt_freq);
   } else {
     window.clearTimeout(rescan_timer);
   }
@@ -801,6 +760,12 @@ $("#mqtt_submit").on("click", function() {
     ShowToast(re);
   }, params);
 });
+
+$("#mqtt_freq_submit").on("click", function() {
+  var seconds = $("#mqtt_freq").val();
+  setReportFreq(seconds)
+});
+
 
 //Quotation Marks
 function ContainQM(str) {
@@ -1000,6 +965,24 @@ function GetSysLog() {
 GetSysLog();
 //日志-end
 
+//上報頻率
+function GetReportFreq() {
+  HttpGet("/mqtt/report/freq", function (re) {
+  var mqtt_freq = document.getElementById("mqtt_freq");
+   mqtt_freq.innerHTML = re;
+  });
+}
+GetReportFreq();
+
+function setReportFreq(seconds) {
+if(!seconds||seconds==0){
+  seconds=1;
+}
+  HttpPost("/mqtt/report/freq", function (re) {
+    ShowToast("已设置上报频率，重启后生效!");
+    
+  }, seconds);
+}
 </script>
   </body>
 </html>

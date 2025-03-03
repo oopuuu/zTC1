@@ -62,6 +62,7 @@
     'ip':'%s',\
     'mask':'%s',\
     'gateway':'%s',\
+	'reportFreq':'%d',\
     'up_time':%ld\
 }"
 

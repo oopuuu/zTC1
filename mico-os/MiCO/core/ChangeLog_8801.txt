@@ -1,0 +1,137 @@
+版本号：10880002.048
+日期：2015-11-23
+1. 新增API void ssl_version_set(int version)同时设置SSL Client和SSL Server工作的版本号。
+2. 新增API void wlan_notify_irq( void )，代替API void wiced_platform_notify_irq( void )
+
+版本号：10880002.047
+日期：2015-11-05
+1. 修正了active scan之后不能做广播扫描的问题。
+2. 接收到EasylinkV2数据就立即停留在该通道接收数据，之前是需要至少接收到2帧v2数据，这样能增加easylink配网成功率。
+
+版本号：10880002.047
+日期：2015-11-05
+1. 修正了active scan之后不能做广播扫描的问题。
+
+版本号：10880002.046
+日期：2015-11-04
+1. 增加了DHCP等待分配IP地址的时间，解决了某些分配IP非常慢的AP可能会连接不上的问题。带来的后果就是连接某些AP的速度可能会比之前的库慢一点点。
+2. 修正了TCP Server接收到错误的TCP包时发出的RESET包的Seq number不正确的问题。
+
+版本号：10880002.045
+日期：2015-10-26
+1. 产测程序使用独立的栈空间，不使用主线程空间，以免由于主线程栈太小的应用出现产测异常的问题。
+2. zconfig增加API：void zconfig_recv_mcast(int enable)接收组播报，enable=1接收，0=不接收，默认不接收
+
+版本号：10880002.044
+日期：2015-10-19
+1. 修正了Zlib没有获取Action帧的问题。
+
+版本号：10880002.043
+日期：2015-10-12
+1. 修正了Easylink无法支持Small MTU的问题。
+
+版本号：10880002.042
+日期：2015-09-21
+1. 修正了zconfig配置时打印的channel不正确的问题。
+2. 优化了TCP协议栈，修正了容易断线的问题。
+
+版本号：10880002.041
+日期：2015-09-11
+1. 增加对zconfig的支持。
+
+版本号：10880002.040
+日期：2015-08-07
+1. 修正了EasyLink配置超时以后，执行wifi power off会HardFault的问题。
+2. EasyLink过程中会挂起tcpip thread，完成以后还原。
+
+
+版本号：10880002.039
+日期：2015-08-05
+1. Easylink配置超时的回调函数会在配网线程结束以后延后10ms再产生。避免了用户重复启动EasyLink导致线程控制异常的问题。
+
+版本号：10880002.038
+日期：2015-07-24
+1. Smart config的回调函数RptConfigmodeRslt会返回是什么方式配置成功的。使用network_InitTypeDef_st结构体的wifi_retry_interval返回。
+	 返回配置类型定义如下：
+typedef enum{
+  CONFIG_BY_NONE,
+  CONFIG_BY_EASYLINK_V2,         
+  CONFIG_BY_EASYLINK_PLUS,        
+  CONFIG_BY_EASYLINK_MINUS,          
+  CONFIG_BY_AIRKISS,             
+  CONFIG_BY_SOFT_AP,  
+  CONFIG_BY_WAC,   
+  CONFIG_BY_ALINK,
+} mico_config_source_t;	
+
+2. 修正mico_rtos_suspend_thread工作不正确的问题，增加API: void mico_rtos_resume_thread(mico_thread_t* thread)
+
+
+版本号：10880002.037
+日期：2015-07-22
+1. 增加主动扫描API：int mxchip_active_scan(char*ssid, int is_adv)
+		 ssid: 需要主动扫描的SSID
+		 is_adv: =1：高级扫描，扫描结果通过ApListAdvCallback返回。=0：普通扫描，扫描结果通过ApListCallback返回。
+
+版本号：10880002.036
+日期：2015-07-13
+1. 修正了在低功耗模式下healthmonitor可能无法工作的问题。系统无法从错误的状态下恢复。
+2. 优化了DNS客户端，在首选DNS服务器不通的情况下之前会重试超过1分钟才使用备选DNS服务器，现在的做法是间隔1秒的周期性的使用首选DNS服务器和备选DNS服务器。
+
+
+版本号：10880002.035
+日期：2015-07-03
+1. 修正了EasyLink可能配置错误的问题。
+2. 按照新的Minus协议做了修改。
+
+版本号：10880002.034
+日期：2015-06-30
+1. 在没有正式测试之前，还原EasyLink，Airkiss等的配网方式。
+2. 修正了在wifi低功耗模式下可能断网的问题。
+3. 统一调整了产测输出，由库直接调用标注产测函数接口mxchip_mfg_test，判断逻辑始终是通过API：MicoShouldEnterMFGMode。
+
+版本号：10880002.033
+日期：2015-06-26
+1. 合并了Airkiss，EasyLink V2，EasyLink Plus，EasyLink Minus，Alink的多重一键配网方式。现在调用任意其中一个配网方式的API都会自适应的选择APP发送出来的配网方式。产生回调函数。
+	 如果确实需要固定某一种配网方式，请使用如下API：
+void autoconfig_start(int seconds, int mode)	
+	 其中mode选择配网模式，采用bitmask方式：
+enum {
+    MODE_EASYLINK = 1,
+    MODE_ALINK = 2,
+    MODE_AIRKISS = 4,
+    MODE_PROBEREQ = 8,
+    MODE_EASYLINKV2 = 0x10,
+    
+    MODE_AUTO = 0xFF,
+};
+
+void alink_config_stop(void) 
+
+版本号：10880002.032
+日期：2015-06-11
+1. Updated 8801's driver as WMSDK-3.1.16
+2. Updated 8801's firmware to P70 from WMSDK-3.1.16
+3. Support PMK fast connection.
+
+版本号：10880002.031
+日期：2015-05-14
+1. 修正了扫描AP返回的SSID的内容没有memset，导致可能出现名称有错误的情况。
+2. 修正了mico_rtos_set_semphore判断是否在中断context中的错误。
+
+版本号：31620002.026
+日期：2015-03-17
+1. Fix Select max FD size can't support OS event FD. 之前最大的FD size是17，而OS event的fd从是16到23.
+2. Changed: TCP write return immediately and set errno to ENOMEM when memory low. 之前在内存不足的时候write会卡住，直到TCP_MAXRTX重试超时才能退出，需要较长时间。
+3. Change TCP_MAXRTX from 12 to 5. 加快当TCP无法发送数据而返回错误的速度。
+		
+版本号：31620002.025
+日期：2015-03-11
+1. 支持阿里Beacon IE的配置模式：
+	该功能集成在OpenAlink API里面，当启动alink配置之后，就会检查Beacon IE，probe response中的特殊IE，也会按照阿里一键配网协议去抓包。
+	int alink_get_tpsk(uint8_t *ie,  char *tpsk) // 回调函数，当接收到这种beacon/Probe response数据包就调用这个函数，。
+		参数：ie指向该阿里特殊IE；tpsk用于返回密码。
+
+版本号：32880002.023
+日期：2015-03-13
+1. 修正了SoftAP无法分配IP地址的问题。
