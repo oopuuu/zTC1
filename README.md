@@ -9,7 +9,7 @@
 
 <img src="doc/web-1.png" width="250px"><img src="doc/web-2.png" width="250px"><img src="doc/web-3.png" width="250px">
 
-固件启动后, 会开启一个热点 TC1-AP-XXXXXX, 连接热点后, 直接用浏览器访问: http://192.168.0.1 即可看到如上web界面.
+固件启动后, 会开启一个热点 TC1-AP-XXXXXX, 密码12345678，连接热点后, 直接用浏览器访问: http://192.168.0.1 即可看到如上web界面.
 
 XXXXXX 是 MAC 地址后六位.
 
@@ -44,10 +44,13 @@ TC1 排插硬件分 A1 A2 两个版本, 本固件仅支持 **A1 版本**. A1 A2 
 - [x] ota在线升级
 - [x] 通过mqtt连入HomeAssistant
 
+基于原作者 zogodo，我又新增了如下功能:
+
+- [x] HomeAssistant中增加总耗电量传感器，数据来自于插座历史统计
+- [x] 可以设置mqtt数据上报频率，默认2秒
 
 
-# 联系
 
-如有其它问题, 可以加入 Telegram 群聊: [@zztc1](https://t.me/zztc1)
+
 
 
