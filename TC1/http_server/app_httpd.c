@@ -331,7 +331,7 @@ static int HttpGetMqttReportFreq(httpd_request_t *req)
     OSStatus err = kNoErr;
     int buf_size = 97;
     char *freq = malloc(buf_size);
-    sprintf(freq, "%d", &MQTT_REPORT_FREQ);
+    sprintf(freq, "%d", MQTT_REPORT_FREQ);
 
     send_http(freq, strlen(freq), exit, &err);
 

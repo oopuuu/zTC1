@@ -979,7 +979,7 @@ if(!seconds||seconds==0){
   seconds=1;
 }
   HttpPost("/mqtt/report/freq", function (re) {
-    ShowToast("已设置上报频率，重启后生效!");
+    ShowToast("已设置上报频率");
     
   }, seconds);
 }

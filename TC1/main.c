@@ -87,12 +87,12 @@ int application_start(void)
     }
     MicoSysLed(0);
 
-    if (user_config->version != USER_CONFIG_VERSION)
-    {
-        tc1_log("WARNGIN: user params restored!");
-        err = mico_system_context_restore(sys_config);
-        require_noerr(err, exit);
-    }
+//    if (user_config->version != USER_CONFIG_VERSION)
+//    {
+//        tc1_log("WARNGIN: user params restored!");
+//        err = mico_system_context_restore(sys_config);
+//        require_noerr(err, exit);
+//    }
 
     if (sys_config->micoSystemConfig.name[0] == 1)
     {
@@ -138,11 +138,11 @@ int application_start(void)
             ProcessTask();
         }
         int freq = user_config->mqtt_report_freq;
-        tc1_log("shangbao频率 %d",freq);
+
         if(freq == 0){
         	freq = 2;
         }
-        tc1_log("shangbao频率22 %d",freq);
+
         mico_thread_msleep(1000*freq);
     }
 
