@@ -61,6 +61,8 @@ typedef struct
     char ap_name[32];
     char ap_key[32];
     int task_count;
+    uint32_t p_count_2_days_ago;
+    uint32_t p_count_1_day_ago;
     pTimedTask task_top;
     struct TimedTask timed_tasks[MAX_TASK_NUM];
 } user_config_t;

@@ -1,4 +1,8 @@
 #include "main.h"
+#include "stdio.h"
+#include "stdlib.h"
+#include "time.h"
+#include "unistd.h"
 
 #include "user_gpio.h"
 #include "user_wifi.h"
@@ -34,6 +38,8 @@ void appRestoreDefault_callback(void * const user_config_data, uint32_t size)
     userConfigDefault->task_top = NULL;
     userConfigDefault->task_count = 0;
     userConfigDefault->mqtt_report_freq = 2;
+    userConfigDefault->p_count_2_days_ago = 0;
+    userConfigDefault->p_count_1_day_ago = 0;
     userConfigDefault->version = USER_CONFIG_VERSION;
 
     int i;
@@ -46,6 +52,59 @@ void appRestoreDefault_callback(void * const user_config_data, uint32_t size)
         userConfigDefault->timed_tasks[i].on_use = false;
     }
     //mico_system_context_update(sys_config);
+}
+
+void recordDailyPcount(){
+	if(user_config->p_count_1_day_ago != 0){
+		user_config->p_count_2_days_ago = user_config->p_count_1_day_ago;
+	}
+	user_config->p_count_1_day_ago = p_count;
+	mico_system_context_update(sys_config);
+	tc1_log("WARNGIN: p_count record!");
+}
+
+void schedule_p_count_task(mico_thread_arg_t arg){
+	mico_rtos_thread_sleep(20);
+	tc1_log("WARNGIN: p_count timer thread created!");
+    while (1) {
+        // 获取当前时间
+        time_t now;
+        struct tm next_run;
+        time(&now);
+        struct tm *current_time = localtime(&now);
+        // 计算下次执行时间，目标是 0 点 0 分
+        next_run = *current_time;
+        next_run.tm_hour = 0;
+        next_run.tm_min = 0;
+        next_run.tm_sec = 0;
+        // 如果当前时间已经过了 0 点 0 分，则设置为第二天
+        if (current_time->tm_hour >= 0 && current_time->tm_min > 0) {
+            next_run.tm_mday += 1; // 第二天
+        }
+        // 计算时间间隔（秒数）
+        time_t next_time = mktime(&next_run);
+        double seconds_until_next_run = difftime(next_time, now);
+        if (seconds_until_next_run > 0) {
+            // 休眠直到目标时间
+        	 mico_rtos_thread_sleep(seconds_until_next_run);
+        }
+        // 执行任务
+        recordDailyPcount();
+    }
+}
+
+void reportMqttPowerInfoThread(){
+	 while (1)
+	    {
+	        UserMqttHassPower();
+	        int freq = user_config->mqtt_report_freq;
+
+	        if(freq == 0){
+	        	freq = 2;
+	        }
+
+	        mico_thread_msleep(1000*freq);
+	    }
 }
 
 int application_start(void)
@@ -128,22 +187,26 @@ int application_start(void)
     PowerInit();
     AppHttpdStart(); // start http server thread
 
+    err = mico_rtos_create_thread(NULL, MICO_APPLICATION_PRIORITY, "p_count",
+                                   (mico_thread_function_t) schedule_p_count_task,
+								   0x2000, 0);
+    require_noerr_string(err, exit, "ERROR: Unable to start the p_count thread.");
+
+    err = mico_rtos_create_thread(NULL, MICO_APPLICATION_PRIORITY, "mqtt_power_report",
+                                       (mico_thread_function_t) reportMqttPowerInfoThread,
+    								   0x2000, 0);
+    require_noerr_string(err, exit, "ERROR: Unable to start the mqtt_power_report thread.");
+
+
     while (1)
     {
-        UserMqttHassPower();
-
         time_t now = time(NULL);
         if (user_config->task_top && now >= user_config->task_top->prs_time)
         {
             ProcessTask();
         }
-        int freq = user_config->mqtt_report_freq;
 
-        if(freq == 0){
-        	freq = 2;
-        }
-
-        mico_thread_msleep(1000*freq);
+        mico_thread_msleep(1000);
     }
 
 exit:

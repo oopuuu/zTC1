@@ -507,13 +507,35 @@ void UserMqttHassAutoPower(void)
                     "\"value_template\":\"{{ value_json.powerConsumption }}\"}",
                     str_mac+8, str_mac, str_mac);
         UserMqttSendTopic(topic_buf, send_buf, 1);
+
+        sprintf(topic_buf, "homeassistant/sensor/%s/powerConsumptionToday/config", str_mac);
+                sprintf(send_buf,
+                            "{\"name\":\"TC1_%s_powerConsumptionToday\","
+                            "\"uniq_id\":\"%s_pc_today\","
+                            "\"state_topic\":\"homeassistant/sensor/%s/powerConsumptionToday/state\","
+                            "\"unit_of_measurement\":\"kWh\","
+                            "\"icon\":\"mdi:fence-electric\","
+                            "\"value_template\":\"{{ value_json.powerConsumptionToday }}\"}",
+                            str_mac+8, str_mac, str_mac);
+        UserMqttSendTopic(topic_buf, send_buf, 1);
+
+        sprintf(topic_buf, "homeassistant/sensor/%s/powerConsumptionYesterday/config", str_mac);
+                        sprintf(send_buf,
+                                    "{\"name\":\"TC1_%s_powerConsumptionYesterday\","
+                                    "\"uniq_id\":\"%s_pc_yesterday\","
+                                    "\"state_topic\":\"homeassistant/sensor/%s/powerConsumptionYesterday/state\","
+                                    "\"unit_of_measurement\":\"kWh\","
+                                    "\"icon\":\"mdi:fence-electric\","
+                                    "\"value_template\":\"{{ value_json.powerConsumptionYesterday }}\"}",
+                                    str_mac+8, str_mac, str_mac);
+        UserMqttSendTopic(topic_buf, send_buf, 1);
     }
     if (send_buf) free(send_buf);
     if (topic_buf) free(topic_buf);
 }
 
-char topic_buf[64] = { 0 };
-char send_buf[32] = { 0 };
+char topic_buf[128] = { 0 };
+char send_buf[128] = { 0 };
 void UserMqttHassPower(void)
 {
     sprintf(topic_buf, "homeassistant/sensor/%s/power/state", str_mac);
@@ -522,6 +544,14 @@ void UserMqttHassPower(void)
 
     sprintf(topic_buf, "homeassistant/sensor/%s/powerConsumption/state", str_mac);
     sprintf(send_buf, "{\"powerConsumption\":\"%.3f\"}", (17.1 * p_count) / 1000 / 36000);
+    UserMqttSendTopic(topic_buf, send_buf, 0);
+
+    sprintf(topic_buf, "homeassistant/sensor/%s/powerConsumptionToday/state", str_mac);
+    sprintf(send_buf, "{\"powerConsumptionToday\":\"%.3f\"}", (17.1 * ((p_count-user_config->p_count_1_day_ago)<0?0:(p_count-user_config->p_count_1_day_ago))) / 1000 / 36000);
+    UserMqttSendTopic(topic_buf, send_buf, 0);
+
+    sprintf(topic_buf, "homeassistant/sensor/%s/powerConsumptionYesterday/state", str_mac);
+    sprintf(send_buf, "{\"powerConsumptionYesterday\":\"%.3f\"}", (17.1 * ((user_config->p_count_1_day_ago-user_config->p_count_2_days_ago)<0?0:(user_config->p_count_1_day_ago-user_config->p_count_2_days_ago))) / 1000 / 36000);
     UserMqttSendTopic(topic_buf, send_buf, 0);
 }
 
