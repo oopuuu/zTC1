@@ -186,7 +186,7 @@ void ApInit(bool use_defaul)
     {
         sprintf(user_config->ap_name, ZZ_AP_NAME, str_mac + 6);
         sprintf(user_config->ap_key, "%s", ZZ_AP_KEY);
-        wifi_log("ApInit use_defaul[true] key[12345678]");
+        wifi_log("ApInit use_defaul[true] key[]");
     }
 
     network_InitTypeDef_st wNetConfig;

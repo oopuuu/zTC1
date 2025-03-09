@@ -14,7 +14,7 @@ enum
 };
 
 #define ZZ_AP_NAME       "TC1-AP-%s"
-#define ZZ_AP_KEY        "12345678"
+#define ZZ_AP_KEY        ""
 #define ZZ_AP_LOCAL_IP   "192.168.0.1"
 #define ZZ_AP_DNS_SERVER "192.168.0.1"
 #define ZZ_AP_NET_MASK   "255.255.255.0"

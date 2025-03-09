@@ -547,6 +547,7 @@ void UserMqttHassPower(void)
     sprintf(send_buf, "{\"powerConsumption\":\"%.3f\"}", (17.1 * p_count) / 1000 / 36000);
     UserMqttSendTopic(topic_buf, send_buf, 0);
 
+//    tc1_log("p_count %ld, p_count_1_day_ago %ld ,p_count_2_days_ago %ld, result %ld",p_count,user_config->p_count_1_day_ago,user_config->p_count_2_days_ago,((p_count-user_config->p_count_1_day_ago)<0?0:(p_count-user_config->p_count_1_day_ago)));
     sprintf(topic_buf, "homeassistant/sensor/%s/powerConsumptionToday/state", str_mac);
     sprintf(send_buf, "{\"powerConsumptionToday\":\"%.3f\"}", (17.1 * ((p_count-user_config->p_count_1_day_ago)<0?0:(p_count-user_config->p_count_1_day_ago))) / 1000 / 36000);
     UserMqttSendTopic(topic_buf, send_buf, 0);

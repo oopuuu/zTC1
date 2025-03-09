@@ -151,12 +151,12 @@ int application_start(void)
     }
     MicoSysLed(0);
 
-//    if (user_config->version != USER_CONFIG_VERSION)
-//    {
-//        tc1_log("WARNGIN: user params restored!");
-//        err = mico_system_context_restore(sys_config);
-//        require_noerr(err, exit);
-//    }
+    if (user_config->version != USER_CONFIG_VERSION)
+    {
+        tc1_log("WARNGIN: user params restored!");
+        err = mico_system_context_restore(sys_config);
+        require_noerr(err, exit);
+    }
 
     if (sys_config->micoSystemConfig.name[0] == 1)
     {
