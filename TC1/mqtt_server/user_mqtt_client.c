@@ -390,6 +390,7 @@ void ProcessHaCmd(char* cmd)
         mqtt_log("set socket[%d] on[%d]", i, on);
         UserRelaySet(i, on);
         UserMqttSendSocketState(i);
+        mico_system_context_update(sys_config);
     }
 }
 

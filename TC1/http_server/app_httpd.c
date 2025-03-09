@@ -34,6 +34,7 @@
 #include <httpd.h>
 #include <http_parse.h>
 #include <http-strings.h>
+#include "stdlib.h"
 
 #include "mico.h"
 #include "httpd_priv.h"
@@ -286,6 +287,19 @@ exit:
     return err;
 }
 
+static int HttpSetRebootSystem(httpd_request_t *req)
+{
+    OSStatus err = kNoErr;
+
+    send_http("OK", 2, exit, &err);
+
+    char c[1] = { 0 };
+    sprintf(c, "reboot now !%s", "reboot");
+
+exit:
+    return err;
+}
+
 static int HttpSetMqttConfig(httpd_request_t *req)
 {
     OSStatus err = kNoErr;
@@ -305,6 +319,7 @@ exit:
     if (buf) free(buf);
     return err;
 }
+
 
 static int HttpSetMqttReportFreq(httpd_request_t *req)
 {
@@ -453,6 +468,7 @@ const struct httpd_wsgi_call g_app_handlers[] = {
     { "/wifi/config", HTTPD_HDR_DEFORT, 0, HttpGetWifiConfig, HttpSetWifiConfig, NULL, NULL },
     { "/wifi/scan", HTTPD_HDR_DEFORT, 0, HttpGetWifiScan, HttpSetWifiScan, NULL, NULL },
     { "/mqtt/config", HTTPD_HDR_DEFORT, 0, NULL, HttpSetMqttConfig, NULL, NULL },
+	{ "/reboot", HTTPD_HDR_DEFORT, 0, NULL, HttpSetRebootSystem, NULL, NULL },
 	{ "/mqtt/report/freq", HTTPD_HDR_DEFORT, 0, HttpGetMqttReportFreq, HttpSetMqttReportFreq, NULL, NULL },
     { "/log", HTTPD_HDR_DEFORT, 0, HttpGetLog, NULL, NULL, NULL },
     { "/task", HTTPD_HDR_DEFORT, APP_HTTP_FLAGS_NO_EXACT_MATCH, HttpGetTasks, HttpAddTask, NULL, HttpDelTask },

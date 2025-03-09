@@ -72,18 +72,21 @@ void schedule_p_count_task(mico_thread_arg_t arg){
         struct tm next_run;
         time(&now);
         struct tm *current_time = localtime(&now);
+        tc1_log("local time %s", asctime(current_time));
         // 计算下次执行时间，目标是 0 点 0 分
         next_run = *current_time;
         next_run.tm_hour = 0;
         next_run.tm_min = 0;
         next_run.tm_sec = 0;
         next_run.tm_mday += 1; // 第二天
-
+        tc1_log("next time %s", asctime(&next_run));
         // 计算时间间隔（秒数）
         time_t next_time = mktime(&next_run);
+        now = mktime(current_time);
         double seconds_until_next_run = difftime(next_time, now);
         if (seconds_until_next_run > 0) {
             // 休眠直到目标时间
+        	tc1_log("record p_count after %f seconds", seconds_until_next_run);
         	 mico_rtos_thread_sleep(seconds_until_next_run);
         }else{
         	mico_rtos_thread_sleep(1);

@@ -33,6 +33,11 @@
             <li class="mdl-menu__item" onclick="ChangeLanguage('cn')">中文</li>
             <li class="mdl-menu__item" onclick="ChangeLanguage('jp')">日本語</li>
           </ul>
+          <div>
+              <a href="javascript:reboot();" class="mdl-button mdl-js-button mdl-js-ripple-effect">
+                重启
+              </a>
+            </div>
         </div>
       </header>
       <div class="demo-drawer mdl-layout__drawer mdl-color--blue-grey-900 mdl-color-text--blue-grey-50">
@@ -973,6 +978,20 @@ function GetReportFreq() {
   });
 }
 GetReportFreq();
+
+function reboot(){
+var r=confirm("确定要重启吗？");
+if (r==true)
+{
+    setRebootSystem();
+}
+}
+
+function setRebootSystem() {
+  HttpPost("/reboot", function (re) {
+    ShowToast("已重启");
+  }, "000");
+}
 
 function setReportFreq(seconds) {
 if(!seconds||seconds==0){
