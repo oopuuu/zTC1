@@ -77,19 +77,21 @@ void schedule_p_count_task(mico_thread_arg_t arg){
         next_run.tm_hour = 0;
         next_run.tm_min = 0;
         next_run.tm_sec = 0;
-        // 如果当前时间已经过了 0 点 0 分，则设置为第二天
-        if (current_time->tm_hour >= 0 && current_time->tm_min > 0) {
-            next_run.tm_mday += 1; // 第二天
-        }
+        next_run.tm_mday += 1; // 第二天
+
         // 计算时间间隔（秒数）
         time_t next_time = mktime(&next_run);
         double seconds_until_next_run = difftime(next_time, now);
         if (seconds_until_next_run > 0) {
             // 休眠直到目标时间
         	 mico_rtos_thread_sleep(seconds_until_next_run);
+        }else{
+        	mico_rtos_thread_sleep(1);
+        	continue;
         }
         // 执行任务
         recordDailyPcount();
+        mico_rtos_thread_sleep(1);
     }
 }
 
