@@ -1,8 +1,11 @@
+cd ./TC1/http_server
+
+python ./test.py > web_data.c
+
+cd ../..
 
 mico make clean
 
-mico make TC1@MK3031@moc
+mico make TC1@MK3031@moc total
 
-mico make TC1@MK3031@moc download run
-
-mico make TC1@MK3031@moc total download run
+cp ./build/TC1\@MK3031\@moc/binary/TC1\@MK3031\@moc.ota.bin  ./build/TC1\@MK3031\@moc/binary/ota.bin
