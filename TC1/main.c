@@ -64,7 +64,7 @@ void recordDailyPcount(){
 }
 
 void schedule_p_count_task(mico_thread_arg_t arg){
-	mico_rtos_thread_sleep(20);
+	mico_thread_msleep(20000);
 	tc1_log("WARNGIN: p_count timer thread created!");
     while (1) {
         // 获取当前时间
@@ -87,14 +87,14 @@ void schedule_p_count_task(mico_thread_arg_t arg){
         if (seconds_until_next_run > 0) {
             // 休眠直到目标时间
         	tc1_log("record p_count after %f seconds", seconds_until_next_run);
-        	 mico_rtos_thread_sleep(seconds_until_next_run);
+        	 mico_thread_msleep(seconds_until_next_run * 1000);
         }else{
-        	mico_rtos_thread_sleep(1);
+        	mico_thread_msleep(1000);
         	continue;
         }
         // 执行任务
         recordDailyPcount();
-        mico_rtos_thread_sleep(1);
+        mico_thread_msleep(1000);
     }
 }
 
