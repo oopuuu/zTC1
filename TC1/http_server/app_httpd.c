@@ -293,8 +293,7 @@ static int HttpSetRebootSystem(httpd_request_t *req)
 
     send_http("OK", 2, exit, &err);
 
-    char c[1] = { 0 };
-    sprintf(c, "reboot now !%s", "reboot");
+    MicoSystemReboot();
 
 exit:
     return err;
