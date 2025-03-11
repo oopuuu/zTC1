@@ -105,6 +105,8 @@ int application_start(void) {
     err = mico_system_init(sys_config);
     require_noerr(err, exit);
 
+    p_count = user_config->p_count_1_day_ago;
+
     uint8_t mac[8];
     mico_wlan_get_mac_address(mac);
     sprintf(str_mac, "%02X%02X%02X%02X%02X%02X",
