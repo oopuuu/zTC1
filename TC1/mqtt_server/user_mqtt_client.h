@@ -19,12 +19,20 @@
 #define MQTT_SERVER_USR  user_config->mqtt_user
 #define MQTT_SERVER_PWD  user_config->mqtt_password
 #define MQTT_REPORT_FREQ  user_config->mqtt_report_freq
+#define MQTT_LED_ENABLED  user_config->power_led_enabled
 
 extern OSStatus UserMqttInit(void);
+
 extern OSStatus UserMqttSend(char *arg);
+
 extern bool UserMqttIsConnect(void);
+
 extern OSStatus UserMqttSendSocketState(char socket_id);
+
 extern void UserMqttHassAuto(char socket_id);
+
 extern void UserMqttHassPower(void);
+
 extern void UserMqttHassAutoPower(void);
+
 #endif

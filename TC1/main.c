@@ -3,6 +3,7 @@
 #include "stdlib.h"
 #include "time.h"
 #include "unistd.h"
+#include "TimeUtils.h"
 
 #include "user_gpio.h"
 #include "user_wifi.h"
@@ -39,6 +40,7 @@ void appRestoreDefault_callback(void *const user_config_data, uint32_t size) {
     userConfigDefault->mqtt_report_freq = 2;
     userConfigDefault->p_count_2_days_ago = 0;
     userConfigDefault->p_count_1_day_ago = 0;
+    userConfigDefault->power_led_enabled = 1;
     userConfigDefault->version = USER_CONFIG_VERSION;
 
     int i;
@@ -48,7 +50,7 @@ void appRestoreDefault_callback(void *const user_config_data, uint32_t size) {
     for (i = 0; i < MAX_TASK_NUM; i++) {
         userConfigDefault->timed_tasks[i].on_use = false;
     }
-    //mico_system_context_update(sys_config);
+    mico_system_context_update(sys_config);
 }
 
 void recordDailyPCount() {
@@ -63,39 +65,16 @@ void recordDailyPCount() {
         user_config->p_count_2_days_ago = user_config->p_count_1_day_ago;
     }
     user_config->p_count_1_day_ago = p_count;
-    mico_system_context_update(sys_config);tc1_log("WARNGIN: p_count record!");
+    mico_system_context_update(sys_config);tc1_log(
+            "WARNGIN: p_count record! p_count_1_day_ago:%d p_count_2_days_ago:%d",
+            p_count_1_day_ago, p_count_2_days_ago);
 }
 
 void schedule_p_count_task(mico_thread_arg_t arg) {
-    mico_thread_msleep(20000);tc1_log("WARNGIN: p_count timer thread created!");
+    mico_thread_sleep(20);tc1_log("WARNGIN: p_count timer thread created!");
     while (1) {
-        // 获取当前时间
-        time_t now;
-        struct tm next_run;
-        time(&now);
-        struct tm *current_time = localtime(&now);tc1_log("local time %s", asctime(current_time));
-        // 计算下次执行时间，目标是 0 点 0 分
-        next_run = *current_time;
-        next_run.tm_hour = 0;
-        next_run.tm_min = 0;
-        next_run.tm_sec = 0;
-        next_run.tm_mday += 1; // 第二天
-        tc1_log("next time %s", asctime(&next_run));
-        // 计算时间间隔（秒数）
-        time_t next_time = mktime(&next_run);
-        now = mktime(current_time);
-        double seconds_until_next_run = difftime(next_time, now);
-        if (seconds_until_next_run > 0) {
-            // 休眠直到目标时间
-            tc1_log("record p_count after %f seconds", seconds_until_next_run);
-            mico_thread_msleep(seconds_until_next_run * 1000);
-        } else {
-            mico_thread_msleep(1000);
-            continue;
-        }
-        // 执行任务
         recordDailyPCount();
-        mico_thread_msleep(1000);
+        mico_thread_sleep(60);
     }
 }
 
@@ -179,6 +158,8 @@ int application_start(void) {
     require_noerr(err, exit);
     PowerInit();
     AppHttpdStart(); // start http server thread
+
+    UserLedSet(user_config->power_led_enabled)
 
     err = mico_rtos_create_thread(NULL, MICO_APPLICATION_PRIORITY, "p_count",
                                   (mico_thread_function_t) schedule_p_count_task,

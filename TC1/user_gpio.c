@@ -80,7 +80,7 @@ void UserRelaySet(unsigned char i, unsigned char on)
 
     user_config->socket_status[i] = on;
 
-    if (RelayOut())
+    if (RelayOut()&&user_config->power_led_enabled)
     {
         UserLedSet(1);
     }
