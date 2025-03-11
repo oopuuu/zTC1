@@ -161,7 +161,7 @@ int application_start(void) {
     PowerInit();
     AppHttpdStart(); // start http server thread
 
-    UserLedSet(user_config->power_led_enabled)
+    UserLedSet(user_config->power_led_enabled);
 
     err = mico_rtos_create_thread(NULL, MICO_APPLICATION_PRIORITY, "p_count",
                                   (mico_thread_function_t) schedule_p_count_task,
