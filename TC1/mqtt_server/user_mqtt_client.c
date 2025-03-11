@@ -245,6 +245,8 @@ void MqttClientThread(mico_thread_arg_t arg)
 
     mqtt_log("MQTT client connect success!");
 
+    UserLedSet(user_config->power_led_enabled);
+
     /* 4. mqtt client subscribe */
     rc = MQTTSubscribe(&c, topic_set, QOS0, MessageArrived);
     require_noerr_string(rc, MQTT_reconnect, "ERROR: MQTT client subscribe err.");

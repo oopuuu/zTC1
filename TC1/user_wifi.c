@@ -124,7 +124,7 @@ static void WifiLedTimerCallback(void* arg)
         case WIFI_STATE_CONNECTED:
             UserLedSet(0);
             mico_rtos_stop_timer(&wifi_led_timer);
-            if (RelayOut())
+            if (RelayOut()&&user_config->power_led_enabled)
                 UserLedSet(1);
             else
                 UserLedSet(0);

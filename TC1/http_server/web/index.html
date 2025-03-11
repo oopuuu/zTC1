@@ -795,7 +795,7 @@
       HttpPost("/socket", function (re) {
       }, sockets_st);
         HttpPost("/led", function (re) {
-      }, checkboxs[0].checked ? 1 : 0);
+      }, checkboxs[0].checked ? "1" : "0");
     });
     //Socket-end
 
