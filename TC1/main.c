@@ -67,7 +67,7 @@ void recordDailyPCount() {
     user_config->p_count_1_day_ago = p_count;
     mico_system_context_update(sys_config);tc1_log(
             "WARNGIN: p_count record! p_count_1_day_ago:%d p_count_2_days_ago:%d",
-            p_count_1_day_ago, p_count_2_days_ago);
+            user_config->p_count_1_day_ago, user_config->p_count_2_days_ago);
 }
 
 void schedule_p_count_task(mico_thread_arg_t arg) {
