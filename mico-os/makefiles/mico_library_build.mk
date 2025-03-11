@@ -83,11 +83,13 @@ $(SOURCE_ROOT)build/$(NAME)/%.o: %.cpp $(MAKEFILES_PATH)/mico_library_makefile.m
 $(SOURCE_ROOT)build/$(NAME)/%.o: %.S $(MAKEFILES_PATH)/mico_library_makefile.mk
 	$(QUIET)$(call MKDIR, $(dir $@))
 	$(QUIET)$(ECHO) Assembling $<
-	$(QUIET)$(CC) $(CFLAGS) -o $@ $<
+	$(QUIET)$(AS) $(ASMFLAGS) -o $@ $<
 
+# Standard library defines
+CFLAGS += -c -MD -ggdb $(CPU_CFLAGS) $(ENDIAN_CFLAGS_LITTLE) -Wall -fsigned-char -ffunction-sections -Werror -fdata-sections -fno-common -std=gnu11 
 
 # MICO pre-built library defines
-CFLAGS += -DMiCO_PREBUILT_LIBS -DMiCO_SDK_VERSION_MAJOR=3
+CFLAGS += -DMiCO_PREBUILT_LIBS
 
 ifdef DEBUG
 CFLAGS += -DDEBUG

@@ -42,8 +42,6 @@
 extern "C" {
 #endif
 
-#define LWIP_NO_STDINT_H 1
-
 typedef uint8_t          u8_t;
 typedef int8_t           s8_t;
 typedef uint16_t         u16_t;
@@ -83,8 +81,6 @@ typedef int              sys_prot_t;
 
 /* Select how LwIP debug will print */
 #define LWIP_PLATFORM_DIAG(x)    {printf x;}
-
-#define LWIP_DONT_PROVIDE_BYTEORDER_FUNCTIONS
 
 #ifdef MICO_LWIP_DEBUG
 #define LWIP_PLATFORM_ASSERT(x) MICO_ASSERTION_FAIL_ACTION()

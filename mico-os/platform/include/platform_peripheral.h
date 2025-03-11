@@ -167,15 +167,6 @@ typedef enum
 } platform_i2c_speed_mode_t;
 
 /**
- * GTimer mode
- */
-typedef enum
-{
-    ONE_SHOT,
-    PERIOIC,
-} platform_gtimer_mode_t;
-
-/**
  * SPI slave transfer direction
  */
 typedef enum
@@ -212,11 +203,6 @@ typedef enum
  * GPIO interrupt callback handler
  */
 typedef void (*platform_gpio_irq_callback_t)( void* arg );
-
-/**
- * Gtimer interrupt callback handler
- */
-typedef void (*platform_gtimer_irq_callback_t)( void* arg );
 
 /******************************************************
  *                    Structures
@@ -284,16 +270,6 @@ typedef struct
     void*       rx_buffer;
     uint32_t    length;
 } platform_spi_message_segment_t;
-
-/**
- * IIS message segment
- */
-typedef struct
-{
-    const void* tx_buffer;
-    void*       rx_buffer;
-    uint32_t    length;
-} platform_iis_message_segment_t;
 
 /**
  * I2C configuration

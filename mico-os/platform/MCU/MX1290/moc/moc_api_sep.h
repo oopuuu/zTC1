@@ -113,7 +113,6 @@ typedef struct {
 	void* (*ssl_nonblock_connect)(int fd, int calen, char*ca, int *errno, int timeout);
 	void (*ssl_set_client_cert)(const char *_cert_pem, const char *private_key_pem);
 	void* (*ssl_connect_sni)(int fd, int calen, char*ca, char *sni_servername, int *errno);
-    void (*ssl_set_ecc)(int enable);
 } ssl_crypto_api_v1_t;
 
 typedef struct {
@@ -153,9 +152,6 @@ typedef struct {
 	int (*wifi_set_country)(int country_code);
 	int (*wlan_rx_mgnt_set)(int enable, mgnt_handler_t cb);
 	void (*autoconfig_start)(int seconds, int mode);
-    void (*wlan_set_softap_tdma)(int value);
-    int (*wifi_off_fastly)(void);
-    int (*OpenEasylink_softap)(int timeout, char *ssid, char*key, int channel);
 } wifi_api_v1_t;
 
 typedef struct {
@@ -207,7 +203,6 @@ typedef struct {
 	OSStatus (*MicoUartRecv)( mico_uart_t uart, void* data, uint32_t size, uint32_t timeout );
 	uint32_t (*MicoUartGetLengthInBuffer)( mico_uart_t uart ); 
 	void     (*MicoUartPinRedirect)(mico_uart_t uart);
-    int (*disable_log_uart)(void);
 } uart_api_t;
 
 typedef struct {
@@ -219,7 +214,7 @@ typedef struct {
 typedef struct {
 	/* Power management*/
 	int (*pm_mcu_state)(power_state_t state, uint32_t time_dur);
-	int (*pm_wakeup_source)(uint8_t wake_source);
+	int (*pm_wakeup_source)();
 	void (*wifi_off_mcu_standby)(uint32_t seconds);
 	void (*MicoMcuPowerSaveConfig)( int enable );
 } power_save_api_t;
@@ -238,7 +233,7 @@ typedef struct
 	wifi_api_t *wifi_apis;
 	cli_api_t *cli_apis;
 
-    flash_api_t *flash_apis;
+        flash_api_t *flash_apis;
 	gpio_api_t *gpio_apis;
 	uart_api_t *uart_apis;
 	i2c_api_t *i2c_apis;
@@ -248,7 +243,6 @@ typedef struct
 	wdg_api_t *wdg_apis;
 	adc_api_t *adc_apis;
 	power_save_api_t *ps_apis;
-	gtimer_api_t *gtimer_apis;
 } kernel_api_v1_t;
 
 typedef kernel_api_v1_t kernel_api_t;

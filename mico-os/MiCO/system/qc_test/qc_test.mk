@@ -12,7 +12,6 @@ NAME = Lib_MiCO_System_QC
 
 $(NAME)_SOURCES := qc_test.c \
                    internal/qc_test_tcpip.c \
-                   internal/qc_test_wlan.c \
                    internal/qc_test_ble.c \
                    internal/qc_test_cli.c
                    

@@ -98,9 +98,7 @@
 #define configUSE_TIMERS                            ( 1 )
 #define configTIMER_TASK_PRIORITY                   ( 2 )
 #define configTIMER_QUEUE_LENGTH                    ( 5 )
-#ifndef configTIMER_TASK_STACK_DEPTH
 #define configTIMER_TASK_STACK_DEPTH                ( ( unsigned short ) (1024 / sizeof( portSTACK_TYPE )) )
-#endif
 
 /* Task */
 #define configMAX_PRIORITIES		( 10 )
@@ -110,12 +108,6 @@
 #define configIDLE_SHOULD_YIELD		1
 #define configUSE_CO_ROUTINES 		0
 #define configMAX_CO_ROUTINE_PRIORITIES ( 2 )
-#ifndef configUSE_TICKLESS_IDLE
-#define configUSE_TICKLESS_IDLE       (1)
-#endif
-
-extern void rtos_suppress_and_sleep( unsigned long sleep_ms );
-#define portSUPPRESS_TICKS_AND_SLEEP( xExpectedIdleTime )    rtos_suppress_and_sleep( xExpectedIdleTime )
 
 /* Hooks */
 #define configUSE_IDLE_HOOK			0
@@ -123,9 +115,7 @@ extern void rtos_suppress_and_sleep( unsigned long sleep_ms );
 #define configUSE_MALLOC_FAILED_HOOK                ( 1 )
 
 /* Memory */
-#ifndef configTOTAL_HEAP_SIZE
 #define configTOTAL_HEAP_SIZE		( ( size_t ) ( 18 * 1024 ) )
-#endif
 
 /* Queue & Semaphore & Mutex */
 #define configQUEUE_REGISTRY_SIZE		0

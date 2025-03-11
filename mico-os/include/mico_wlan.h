@@ -189,10 +189,10 @@ typedef  struct  _ScanResult_adv
   char ApNum;       /**< The number of access points found in scanning.*/
   struct { 
     char ssid[32];  /**< The SSID of an access point.*/
+    char ApPower;   /**< Signal strength, min:0, max:100*/
     char bssid[6];  /**< The BSSID of an access point.*/
     char channel;   /**< The RF frequency, 1-13*/
     wlan_sec_type_t security;   /**< Security type, @ref wlan_sec_type_t*/
-    int16_t rssi;   /**< Signal strength*/
   } * ApList;
 } ScanResult_adv; 
 
@@ -204,7 +204,7 @@ typedef  struct  _ScanResult
   char ApNum;       /**< The number of access points found in scanning. */
   struct {  
     char ssid[32];  /**< The SSID of an access point. */
-    int16_t rssi;   /**< Signal strength*/
+    char ApPower;   /**< Signal strength, min:0, max:100. */
   } * ApList; 
 } ScanResult;  
 
@@ -225,25 +225,6 @@ typedef struct _network_InitTypeDef_st
   int  wifi_retry_interval;     /**< Retry interval if an error is occured when connecting an access point, 
                                      time unit is millisecond. */
 } network_InitTypeDef_st; 
-
-typedef struct _network_Enterprise_st 
-{ 
-  char wifi_ssid[32];           /**< SSID of the wlan needs to be connected.*/
-
-  char identity[32];
-  unsigned char *ca_cert;
-  unsigned int ca_cert_size;
-  unsigned char *client_cert;
-  unsigned int client_cert_size;
-  unsigned char *client_key;
-  unsigned int client_key_size;
-  
-  char local_ip_addr[16];       /**< Static IP configuration, Local IP address. */
-  char net_mask[16];            /**< Static IP configuration, Netmask. */
-  char gateway_ip_addr[16];     /**< Static IP configuration, Router IP address. */
-  char dnsServer_ip_addr[16];   /**< Static IP configuration, DNS server IP address. */
-  char dhcpMode;                /**< DHCP mode, @ref DHCP_Disable, @ref DHCP_Client and @ref DHCP_Server. */
-} network_Enterprise_st; 
 
 /** 
  *  @brief  Advanced precise wlan parameters, used in @ref network_InitTypeDef_adv_st.  
@@ -281,7 +262,7 @@ typedef struct _network_InitTypeDef_adv_st
  */
 typedef struct _linkStatus_t{
   int is_connected;       /**< The link to wlan is established or not, 0: disconnected, 1: connected. */
-  int rssi;               /**< Signal strength of the current connected AP */
+  int wifi_strength;      /**< Signal strength of the current connected AP */
   uint8_t  ssid[32];      /**< SSID of the current connected wlan */
   uint8_t  bssid[6];      /**< BSSID of the current connected wlan */
   int      channel;       /**< Channel of the current connected wlan */

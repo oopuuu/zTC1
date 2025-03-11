@@ -16,7 +16,6 @@ $(NAME)_SOURCES := mico_system_init.c \
                    mico_system_para_storage.c \
                    mico_system_time.c \
                    mico_system_power_daemon.c \
-                   mico_filesystem.c \
                    system_misc.c 
                    
 $(NAME)_SOURCES  += command_console/mico_cli.c
@@ -42,6 +41,7 @@ $(NAME)_SOURCES += mdns/mico_mdns.c \
 $(NAME)_SOURCES += tftp_ota/tftp_ota.c \
                    tftp_ota/tftpc.c
                    
+$(NAME)_LINK_FILES := mico_system_power_daemon.o
 
 $(NAME)_COMPONENTS := system/qc_test system/easylink/MFi_WAC
 

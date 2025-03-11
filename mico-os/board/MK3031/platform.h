@@ -72,8 +72,8 @@ PIN	FUN1	FUN2	FUN3	FUN4
 21/24	UART1_TXD	GPIO_44		ADC0_2
 22/25	UART1_RXD	GPIO_45		ADC0_3
 23	GPIO_6			
-26A2	I2C1_SDA	GPIO_9		
-27A1	I2C1_SCL	GPIO_10		
+26A1	I2C1_SDA	GPIO_9		
+27A2	I2C1_SCL	GPIO_10		
 28A3	GPIO_26			32K_OUT
 29A4	GND			
 30B1	GPIO_43			ADC0_1
@@ -141,14 +141,6 @@ typedef enum
 
 typedef enum
 {
-    MICO_IIS_1,
-	MICO_IIS_2,
-    MICO_IIS_MAX, /* Denotes the total number of IIS port aliases. Not a valid IIS alias */
-    MICO_IIS_NONE,
-} mico_iis_t;
-
-typedef enum
-{
     MICO_PWM_1,
     MICO_PWM_2,
     MICO_PWM_3,
@@ -195,6 +187,7 @@ typedef enum
     MICO_PARTITION_USER_MAX = 0,
     MICO_PARTITION_USER = 7,
 } mico_user_partition_t;
+
 
 #define STDIO_UART          MICO_UART_1
 #define STDIO_UART_BAUDRATE (115200) 

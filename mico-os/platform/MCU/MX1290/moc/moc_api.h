@@ -4,17 +4,10 @@
 #include "lwip_api_define.h"
 #include "mico.h"
 
-#define INTERFACE_VERSION 3
+#define INTERFACE_VERSION 2
 
 typedef void (*ssl_Logging_cb)( const int logLevel,
                                 const char * const logMessage );
-
-#ifndef BIT
-#define BIT(__n)       (1<<(__n))
-#endif
-
-#define DSLEEP_WAKEUP_BY_TIMER		BIT(0)
-#define DSLEEP_WAKEUP_BY_GPIO		BIT(2)    // GPIO Port(PA_18, PA_5, PA_22, PA_23)
 
 typedef enum
 {
@@ -182,12 +175,6 @@ typedef struct
                               uint16_t number_of_segments );
     OSStatus (*spi_finalize)( const mico_spi_device_t* spi );
 } spi_api_t;
-
-typedef struct {
-	OSStatus (*MicoGtimerInitialize)(mico_gtimer_t gtimer);
-	OSStatus (*MicoGtimerStart)(mico_gtimer_t timer, mico_gtimer_mode_t mode, uint32_t time, mico_gtimer_irq_callback_t function, void *arg);
-	OSStatus (*MicoGtimerStop)(mico_gtimer_t timer);
-} gtimer_api_t;
 
 /* API type define */
 typedef struct mico_api_struct
@@ -388,7 +375,7 @@ typedef struct mico_api_struct
 
     /* Power management*/
     int (*pm_mcu_state)( power_state_t state, uint32_t time_dur );
-    int (*pm_wakeup_source)( uint8_t wake_source );
+    int (*pm_wakeup_source)( );
     void (*wifi_off_mcu_standby)( int seconds );
     void (*MicoMcuPowerSaveConfig)( int enable );
 
@@ -430,7 +417,6 @@ typedef struct mico_api_struct
     adc_api_t *adc_apis;
     i2c_api_t *i2c_apis;
     spi_api_t *spi_apis;
-    gtimer_api_t *gtimer_apis;
 
     int (*ssl_set_loggingcb)( ssl_Logging_cb f );
     int (*wlan_inject_frame)( const uint8_t *buff, size_t len );
@@ -493,7 +479,6 @@ typedef struct user_api_struct
     void (*mico_rtos_stack_overflow)( char *taskname );
     const platform_peripherals_pinmap_t *pinmaps;
     const mico_gpio_init_t *gpio_init;
-    const uint8_t stdio_break_in;
 } user_api_t;
 
 typedef enum {

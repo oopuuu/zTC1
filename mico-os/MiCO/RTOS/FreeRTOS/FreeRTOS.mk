@@ -15,11 +15,7 @@ VERSION := 8.2.0
 $(NAME)_SOURCES := ver$(VERSION)/Source/portable/MemMang/heap_4.c
 else
 VERSION := 9.0.0
-ifneq ($(filter $(HOST_MCU_FAMILY),MOC108),)
-$(NAME)_SOURCES := ver$(VERSION)/Source/portable/MemMang/heap_4.c
-else
 $(NAME)_SOURCES := ver$(VERSION)/Source/portable/MemMang/heap_3.c
-endif
 endif
 
 VERSION_MAJOR 	= $(word 1, $(subst ., ,$(VERSION)))
@@ -74,9 +70,6 @@ else
 Cortex-M4F_SOURCES  := ver$(VERSION)/Source/portable/GCC/ARM_CM4F/port.c 
 Cortex-M4F_INCLUDES := ver$(VERSION)/Source/portable/GCC/ARM_CM4F
 endif
-
-ARM968E-S_SOURCES	:= ver$(VERSION)/Source/portable/GCC/ARM968E_S/port.c 
-ARM968E-S_INCLUDES 	:= ver$(VERSION)/Source/portable/GCC/ARM968E_S
 
 $(NAME)_SOURCES += $($(HOST_ARCH)_SOURCES)
 GLOBAL_INCLUDES += $($(HOST_ARCH)_INCLUDES)
