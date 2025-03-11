@@ -61,8 +61,10 @@ TC1 排插硬件分 A1 A2 两个版本, 本固件仅支持 **A1 版本**. A1 A2 
 - 安装完成后添加micoder路径 mico config --global MICODER (micoder所在路径)/MiCoder
 - 最后切换到此项目根目录执行build.sh即可编译固件
 
+# 注意事项
+- 使用pip安装mico-cube失败，请使用下列命令安装（执行命令时注意路径位置）
 
-
+-  `python -m pip install mico-cube-1.0.0.tar.gz`
 
 
 
