@@ -69,9 +69,12 @@ void UserMqttTimerFunc(void *arg)
     }
     if (mico_rtos_is_queue_empty(&mqtt_msg_send_queue))
     {
-        timer_status++;
+
         switch (timer_status)
         {
+        case 0:
+        	UserMqttHassAutoLed();
+        	break;
         case 1:
         case 2:
         case 3:
@@ -87,6 +90,7 @@ void UserMqttTimerFunc(void *arg)
             mico_stop_timer(&timer_handle);
             break;
         }
+        timer_status++;
     }
 }
 
@@ -245,7 +249,7 @@ void MqttClientThread(mico_thread_arg_t arg)
 
     mqtt_log("MQTT client connect success!");
 
-    UserLedSet(user_config->power_led_enabled);
+    UserLedSet(RelayOut() && user_config->power_led_enabled);
 
     /* 4. mqtt client subscribe */
     rc = MQTTSubscribe(&c, topic_set, QOS0, MessageArrived);
@@ -259,6 +263,8 @@ void MqttClientThread(mico_thread_arg_t arg)
     {
         UserMqttSendSocketState(i);
     }
+
+    UserMqttSendLedState();
 
     mico_init_timer(&timer_handle, 150, UserMqttTimerFunc, &arg);
     mico_start_timer(&timer_handle);
@@ -393,6 +399,19 @@ void ProcessHaCmd(char* cmd)
         UserRelaySet(i, on);
         UserMqttSendSocketState(i);
         mico_system_context_update(sys_config);
+    }else if(strcmp(cmd, "set led") == ' '){
+    	int on;
+    	        sscanf(cmd, "set led %s %d", mac, &on);
+    	        if (strcmp(mac, str_mac)) return;
+    	        mqtt_log("set led on[%d]", on);
+    	        user_config->power_led_enabled = on;
+    	            if (RelayOut() && user_config->power_led_enabled) {
+    	                UserLedSet(1);
+    	            } else {
+    	                UserLedSet(0);
+    	            }
+    	        UserMqttSendLedState();
+    	        mico_system_context_update(sys_config);
     }
 }
 
@@ -455,6 +474,23 @@ OSStatus UserMqttSendSocketState(char socket_id)
     return oss_status;
 }
 
+OSStatus UserMqttSendLedState(void)
+{
+    char *send_buf = malloc(64);
+    char *topic_buf = malloc(64);
+    OSStatus oss_status = kUnknownErr;
+    if (send_buf != NULL && topic_buf != NULL)
+    {
+        sprintf(topic_buf, "homeassistant/switch/%s/led/state", str_mac);
+        sprintf(send_buf, "set led %s %d", str_mac, (int)user_config->power_led_enabled);
+        oss_status = UserMqttSendTopic(topic_buf, send_buf, 1);
+    }
+    if (send_buf) free(send_buf);
+    if (topic_buf) free(topic_buf);
+
+    return oss_status;
+}
+
 //hass mqtt鑷姩鍙戠幇鏁版嵁寮�鍏冲彂閫�
 void UserMqttHassAuto(char socket_id)
 {
@@ -474,6 +510,33 @@ void UserMqttHassAuto(char socket_id)
             "\"pl_on\":\"set socket %s %d 1\","
             "\"pl_off\":\"set socket %s %d 0\"}",
             str_mac+8, socket_id+1, str_mac, socket_id, str_mac, socket_id, str_mac, socket_id, str_mac, socket_id);
+        UserMqttSendTopic(topic_buf, send_buf, 1);
+    }
+    if (send_buf)
+        free(send_buf);
+    if (topic_buf)
+        free(topic_buf);
+}
+
+void UserMqttHassAutoLed(void)
+{
+    char *send_buf = NULL;
+    char *topic_buf = NULL;
+    send_buf = (char *) malloc(300);
+    topic_buf = (char *) malloc(64);
+    if (send_buf != NULL && topic_buf != NULL)
+    {
+    	 sprintf(topic_buf, "homeassistant/switch/%s/led/config", str_mac);
+    	        sprintf(send_buf, "set led %s %d", str_mac, (int)user_config->power_led_enabled);
+
+        sprintf(send_buf,
+            "{\"name\":\"TC1_%s_Led\","
+            "\"uniq_id\":\"%s_led\","
+            "\"stat_t\":\"homeassistant/switch/%s/led/state\","
+            "\"cmd_t\":\"device/ztc1/set\","
+            "\"pl_on\":\"set led %s 1\","
+            "\"pl_off\":\"set led %s 0\"}",
+            str_mac+8, str_mac, str_mac, str_mac,str_mac);
         UserMqttSendTopic(topic_buf, send_buf, 1);
     }
     if (send_buf)
