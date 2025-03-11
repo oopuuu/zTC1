@@ -127,7 +127,9 @@ OSStatus ConfigIncommingJsonMessageUAP( int fd, const uint8_t *input, size_t siz
 
     easylink_success = true;
     if( easylink_sem ) mico_rtos_set_semaphore( &easylink_sem );
-
+#ifdef MICO_EASYLINK_AND_SOFTAP_ENABLED
+    easylink_uap_success(easylinkIndentifier);
+#endif
 exit:
     if ( input_str ) free( input_str );
 

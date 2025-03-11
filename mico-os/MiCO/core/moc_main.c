@@ -132,6 +132,7 @@ USED const user_api_t user_handler = {
 #ifdef CONFIG_CPU_MX1290
     .pinmaps = &peripherals_pinmap,
     .gpio_init = gpio_init,
+    .stdio_break_in = 1, // 1=enable: bootloader use user uart to enter boot mode.
 #endif
 };
 

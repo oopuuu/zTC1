@@ -753,9 +753,7 @@ Queue_t * const pxQueue = ( Queue_t * ) xQueue;
 			{
 				traceQUEUE_SEND( pxQueue );
 				xYieldRequired = prvCopyDataToQueue( pxQueue, pvItemToQueue, xCopyPosition );
-#ifdef MXCHIP
-                event_rx_cb(pxQueue);
-#endif
+
 				#if ( configUSE_QUEUE_SETS == 1 )
 				{
 					if( pxQueue->pxQueueSetContainer != NULL )
@@ -840,6 +838,9 @@ Queue_t * const pxQueue = ( Queue_t * ) xQueue;
 				#endif /* configUSE_QUEUE_SETS */
 
 				taskEXIT_CRITICAL();
+#ifdef MXCHIP
+                event_rx_cb(pxQueue);
+#endif                
 				return pdPASS;
 			}
 			else

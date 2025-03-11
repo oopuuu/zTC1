@@ -254,6 +254,12 @@ typedef enum
 
 typedef enum
 {
+    MICO_IIS_MAX, /* Denotes the total number of IIS port aliases. Not a valid IIS alias */
+    MICO_IIS_NONE,
+} mico_iis_t;
+
+typedef enum
+{
     MICO_PWM_MAX, /* Denotes the total number of PWM port aliases. Not a valid PWM alias */
     MICO_PWM_NONE,
 } mico_pwm_t;

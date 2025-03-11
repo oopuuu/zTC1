@@ -65,7 +65,7 @@ int partition_remapping[] =
 #else
     [BT_PATCH_FIRMWARE_PARTITION_TCL]           = -1,
 #endif
-    [FILESYSTEM_IMAGE_PARTITION_TCL]            = -1,
+    [FILESYSTEM_IMAGE_PARTITION_TCL]            = MICO_PARTITION_FILESYS,
 
 };
 

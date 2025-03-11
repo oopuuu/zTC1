@@ -44,6 +44,11 @@ void init_debug_uart(void)
 	MicoUartInitialize(STDIO_UART, &stdio_uart_config,
                         (ring_buffer_t*) &stdio_rx_buffer );
 }
+#else
+void init_debug_uart(void)
+{
+    return;
+}
 #endif
 
 mico_api_t *moc_adapter(new_mico_api_t *new_mico_api)
@@ -261,7 +266,8 @@ mico_api_t *moc_adapter(new_mico_api_t *new_mico_api)
   mico_api.pwm_apis = _kernel_api.pwm_apis;
   mico_api.wdg_apis = _kernel_api.wdg_apis;
   mico_api.adc_apis = _kernel_api.adc_apis;
-  
+  mico_api.gtimer_apis = _kernel_api.gtimer_apis;
+
   return &mico_api;
 }
 
@@ -289,4 +295,31 @@ void autoconfig_start(int seconds, int mode)
 {
 	_kernel_api.wifi_apis->autoconfig_start(seconds, mode);
 }
+
+void wlan_set_softap_tdma(int value)
+{
+	_kernel_api.wifi_apis->wlan_set_softap_tdma(value);
+}
+
+int wifi_off_fastly(void)
+{
+    return _kernel_api.wifi_apis->wifi_off_fastly();
+}
+
+int OpenEasylink_softap(int timeout, char *ssid, char*key, int channel)
+{
+    return _kernel_api.wifi_apis->OpenEasylink_softap(timeout, ssid, key, channel);
+}
+
+void ssl_set_ecc(int enable)
+{
+    _kernel_api.ssl_crypto_apis->ssl_set_ecc(enable);
+}
+
+/* return 1=success; 0=fail*/
+int disable_log_uart(void)
+{
+    return _kernel_api.uart_apis->disable_log_uart();
+}
+
 

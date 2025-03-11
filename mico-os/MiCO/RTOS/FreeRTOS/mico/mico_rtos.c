@@ -163,9 +163,19 @@ int main( void )
     return 0;
 }
 
+WEAK void mico_main(void)
+{
+
+}
+
 static void application_thread_main( void *arg )
 {
     UNUSED_PARAMETER( arg );
+
+    /* Initialize after rtos is in initialized */
+    mico_main();
+    mico_rtos_init();
+
     if ( MicoShouldEnterMFGMode( ) )
         mico_system_qc_test( );
     else
@@ -845,6 +855,19 @@ void vApplicationMallocFailedHook( void )
     //WPRINT_RTOS_DEBUG(("Heap is out of memory during malloc\r\n"));
 }
 
+
+#if FreeRTOS_VERSION_MAJOR > 7
+void rtos_suppress_and_sleep( unsigned long sleep_ms )
+{
+    TickType_t missed_ticks = 0;
+    extern uint32_t platform_power_down_hook( unsigned long sleep_ms );
+
+    missed_ticks = platform_power_down_hook( sleep_ms );
+
+    vTaskStepTick( missed_ticks );
+}
+
+#endif
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

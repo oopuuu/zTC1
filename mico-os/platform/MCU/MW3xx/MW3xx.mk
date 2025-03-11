@@ -61,9 +61,6 @@ $(NAME)_SOURCES := ../../$(HOST_ARCH)/crt0_$(TOOLCHAIN_NAME).c \
 
 $(NAME)_CFLAGS += -Wno-implicit-function-declaration -Wno-unused-variable
 
-# These need to be forced into the final ELF since they are not referenced otherwise
-$(NAME)_LINK_FILES := ../../$(HOST_ARCH)/crt0_$(TOOLCHAIN_NAME).o
-
 ifneq ($(filter $(subst ., ,$(COMPONENTS)),mocOS),)
 ####################################################################################
 # MOC application
@@ -105,9 +102,7 @@ GLOBAL_INCLUDES += peripherals/boot2
 GLOBAL_DEFINES += CONFIG_FLASH_PARTITION_COUNT=10 \
                   CONFIG_CPU_MW300 \
                   ARM_GNU
-                  
-$(NAME)_LINK_FILES += ../../$(HOST_ARCH)/hardfault_handler.o \
-                      platform_vector_table.o
+
 endif
 
 ifneq ($(filter spi_flash_write, $(APP)),)

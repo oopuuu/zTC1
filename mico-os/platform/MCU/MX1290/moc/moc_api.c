@@ -379,6 +379,11 @@ char *mico_get_bootloader_ver(void)
 	return "bootloader";
 }
 
+void MicoWakeupSource( uint8_t wakeup_source )
+{
+  lib_api_p->pm_wakeup_source(wakeup_source);
+}
+
 void MicoSystemStandBy( uint32_t secondsToWakeup )
 {
   lib_api_p->wifi_off_mcu_standby(secondsToWakeup);
@@ -548,6 +553,22 @@ OSStatus MicoPwmStart(mico_pwm_t pwm)
 OSStatus MicoPwmStop(mico_pwm_t pwm)
 {
 	return lib_api_p->pwm_apis->pwm_stop(pwm);
+}
+
+
+OSStatus MicoGtimerInitialize(mico_gtimer_t gtimer)
+{
+	return lib_api_p->gtimer_apis->MicoGtimerInitialize(gtimer);
+}
+
+OSStatus MicoGtimerStart(mico_gtimer_t gtimer, mico_gtimer_mode_t mode, uint32_t time, mico_gtimer_irq_callback_t function, void *arg)
+{
+	return lib_api_p->gtimer_apis->MicoGtimerStart(gtimer, mode, time, function, arg);
+}
+
+OSStatus MicoGtimerStop(mico_gtimer_t gtimer)
+{
+	return lib_api_p->gtimer_apis->MicoGtimerStop(gtimer);
 }
 
 OSStatus MicoWdgInitialize( uint32_t timeout )

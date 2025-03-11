@@ -56,6 +56,7 @@ static mico_thread_t easylink_monitor_thread_handler = NULL;
 static bool easylink_thread_force_exit = false;
 
 static mico_config_source_t source = CONFIG_BY_NONE;
+static mico_connect_fail_config_t connect_fail_config = EXIT_EASYLINK;
 
 /******************************************************
  *               Function Definitions
@@ -274,33 +275,32 @@ restart:
             goto exit;
         }
 
-        /*SSID or Password is not correct, module cannot connect to wlan, so restart EasyLink again*/
-        require_noerr_action_string( err, restart, micoWlanSuspend(), "Re-start easylink combo mode" );
-
-        /* Start bonjour service for new device discovery */
-        err = easylink_bonjour_start( Station, easylink_id, context );
-        require_noerr( err, exit );
-        SetTimer( 60 * 1000, easylink_remove_bonjour );
-
         source = (source == CONFIG_BY_NONE) ? CONFIG_BY_MONITOR : source;
-        mico_system_delegate_config_success( source );
-        mico_easylink_monitor_delegate_connect_success( source );
 
-        goto exit;
+        /* Easylink connect result */
+        if ( err != kNoErr )
+        {
+            connect_fail_config = mico_system_delegate_config_result( source, MICO_FALSE );
+            if ( RESTART_EASYLINK == connect_fail_config )
+                 {
+                system_log("Re-start easylink combo mode");
+                micoWlanSuspend( );
+                goto restart;
+            } else {
+                system_log("exit easylink combo mode");
+                micoWlanSuspendStation( );
+                goto exit;
+            }
+        }
+        else
+        {
+            mico_system_delegate_config_result( source, MICO_TRUE );
+            mico_easylink_monitor_delegate_connect_success( source );
+        }
     }
     else /* EasyLink failed */
     {
-        /* so roll back to previous settings  (if it has) and connect */
-        if ( context->flashContentInRam.micoSystemConfig.configured != unConfigured ) {
-            system_log("Roll back to previous settings");
-            MICOReadConfiguration( context );
-            system_connect_wifi_normal( context );
-        }
-        else {
-            /*module should power down in default setting*/
-            system_log("Wi-Fi power off");
-            micoWlanPowerOff();
-        }
+        mico_system_delegate_easylink_timeout( context );
     }
 
 exit:
@@ -348,7 +348,7 @@ OSStatus mico_easylink_monitor_save_result( network_InitTypeDef_st *nwkpara )
 
 OSStatus mico_easylink_monitor_with_easylink( mico_Context_t * const in_context, mico_bool_t enable )
 {
-    OSStatus err = kUnknownErr;
+    OSStatus err = kNoErr;
 
     require_action( in_context, exit, err = kNotPreparedErr );
 

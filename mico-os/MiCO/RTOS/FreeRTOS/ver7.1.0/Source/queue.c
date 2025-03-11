@@ -518,9 +518,6 @@ xTimeOutType xTimeOut;
 			{
 				traceQUEUE_SEND( pxQueue );
 				prvCopyDataToQueue( pxQueue, pvItemToQueue, xCopyPosition );
-#ifdef MXCHIP                
-                event_rx_cb(pxQueue);
-#endif
 				/* If there was a task waiting for data to arrive on the
 				queue then unblock it now. */
 				if( listLIST_IS_EMPTY( &( pxQueue->xTasksWaitingToReceive ) ) == pdFALSE )
@@ -536,6 +533,9 @@ xTimeOutType xTimeOut;
 				}
 
 				taskEXIT_CRITICAL();
+#ifdef MXCHIP                
+                event_rx_cb(pxQueue);
+#endif
 
 				/* Return to the original privilege level before exiting the
 				function. */

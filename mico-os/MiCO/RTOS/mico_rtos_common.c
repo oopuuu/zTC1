@@ -208,7 +208,6 @@ OSStatus mico_rtos_deregister_timed_event( mico_timed_event_t* event_object )
         return kGeneralErr;
     }
 
-    memset( event_object, 0, sizeof( *event_object ) );
 
     return kNoErr;
 }

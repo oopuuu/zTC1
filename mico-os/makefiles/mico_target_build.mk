@@ -227,7 +227,9 @@ display_map_summary: $(LINK_OUTPUT_FILE) $(MiCO_SDK_CONVERTER_OUTPUT_FILE) $(MiC
 # $(info $(BIN_OUTPUT_FILE))
 build_done: $(EXTRA_PRE_BUILD_TARGETS) $(BIN_OUTPUT_FILE) $(HEX_OUTPUT_FILE) display_map_summary
 
-$(BUILD_STRING): build_done $(EXTRA_POST_BUILD_TARGETS)
+$(EXTRA_POST_BUILD_TARGETS): build_done
+
+$(BUILD_STRING): $(if $(EXTRA_POST_BUILD_TARGETS),$(EXTRA_POST_BUILD_TARGETS),build_done)
 
 # Stack usage target - Currently not working outputs a CSV file showing function stack usage
 $(OUTPUT_DIR)/stack_usage.csv: $(OUTPUT_DIR)/binary/$(CLEANED_BUILD_STRING)$(LINK_OUTPUT_SUFFIX)

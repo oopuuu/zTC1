@@ -21,13 +21,11 @@
 #include "common.h"
 #include "platform_peripheral.h"
 
+#include "portmacro.h"
+
 /******************************************************
  *                      Macros
  ******************************************************/
-
-#define DISABLE_INTERRUPTS() do { __asm("CPSID i"); } while (0)
-
-#define ENABLE_INTERRUPTS() do { __asm("CPSIE i"); } while (0)
 
 /******************************************************
  *                    Constants
@@ -69,6 +67,13 @@ typedef volatile struct _noos_mutex_t
 /******************************************************
  *               Variable Definitions
  ******************************************************/
+
+#ifdef  MICO_DEFAULT_TICK_RATE_HZ
+uint32_t  ms_to_tick_ratio = (uint32_t)( 1000 / MICO_DEFAULT_TICK_RATE_HZ );
+#else
+uint32_t  ms_to_tick_ratio = 1; // Default OS tick is 1000Hz
+#endif
+
 
 uint8_t semaphore_pool_init = 0;
 noos_semaphore_t semaphore_pool[SEMAPHORE_POOL_NUM];
@@ -251,7 +256,8 @@ extern uint32_t mico_get_time_no_os(void);
 
 mico_time_t mico_rtos_get_time(void)
 {
-    return mico_get_time_no_os( );
+    uint32_t tick = mico_get_time_no_os( );
+    return ms_to_tick_ratio * tick;
 }
 
 /**

@@ -33,7 +33,7 @@ APP_OFFSET:= 0xC000
 
 #ate firmware
 ATE_BIN_FILE := $(MICO_OS_PATH)/resources/ate_firmware/3165/ate.bin
-ATE_OFFSET:= 0x7FFFF
+ATE_OFFSET:= 0x80000
 
 #wifi firmware
 

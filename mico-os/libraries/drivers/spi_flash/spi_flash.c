@@ -29,6 +29,12 @@ int sflash_read_ID( const sflash_handle_t* const handle, void* const data_addr )
     return generic_sflash_command( handle, SFLASH_READ_JEDEC_ID, 0, NULL, 3, NULL, data_addr );
 }
 
+int sflash_enter_dpmode( const sflash_handle_t* const handle )
+{
+    return generic_sflash_command( handle, SFLASH_DEEP_POWER_DOWN, 0, NULL, 0, NULL, NULL );
+}
+
+
 int sflash_write_enable( const sflash_handle_t* const handle )
 {
     if ( handle->write_allowed == SFLASH_WRITE_ALLOWED )

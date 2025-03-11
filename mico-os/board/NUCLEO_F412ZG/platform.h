@@ -79,7 +79,14 @@ typedef enum
     MICO_GPIO_22,
     MICO_USART3_RX,
     MICO_USART3_TX,
-
+	MICO_USART_NBIOT_TX,
+	MICO_USART_NBIOT_RX,
+	MICO_USART_NBIOT_RTS,
+	MICO_USART_NBIOT_CTS,
+	MICO_GPIO_POWER,
+	MICO_GPIO_GPRS_RST,
+	MICO_GPIO_GPRS_START,
+	MICO_GPIO_GPRS_WAKEUP,
     MICO_GPIO_MAX, /* Denotes the total number of GPIO port aliases. Not a valid GPIO alias */
     MICO_GPIO_NONE,
 } mico_gpio_t;
@@ -101,6 +108,12 @@ typedef enum
 
 typedef enum
 {
+    MICO_IIS_MAX, /* Denotes the total number of IIS port aliases. Not a valid IIS alias */
+    MICO_IIS_NONE,
+} mico_iis_t;
+
+typedef enum
+{
     MICO_PWM_MAX, /* Denotes the total number of PWM port aliases. Not a valid PWM alias */
     MICO_PWM_NONE,
 } mico_pwm_t;
@@ -117,6 +130,9 @@ typedef enum
 {
     MICO_UART_1,
     MICO_UART_2,
+	MICO_UART_3,
+	MICO_UART_4,
+	MICO_UART_5,
     MICO_UART_MAX, /* Denotes the total number of UART port aliases. Not a valid UART alias */
     MICO_UART_NONE,
 } mico_uart_t;
@@ -143,7 +159,8 @@ typedef enum
 #define STDIO_UART_BAUDRATE (115200) 
 #endif
 
-#define UART_FOR_APP     (MICO_UART_1)
+#define UART_FOR_APP     (MICO_UART_2)
+#define UART_FOR_NBIOT   (MICO_UART_3)
 #define MFG_TEST         (MICO_UART_1)
 #define CLI_UART         (MICO_UART_1)
 

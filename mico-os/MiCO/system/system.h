@@ -27,7 +27,7 @@
 #define CONFIG_MODE_USER                        (2)
 #define CONFIG_MODE_WAC                         (3)
 #define CONFIG_MODE_EASYLINK                    (4)
-#define CONFIG_MODE_EASYLINK_WITH_SOFTAP        (4)  //Legacy definition, not supported any more
+#define CONFIG_MODE_EASYLINK_WITH_SOFTAP        (8)  
 #define CONFIG_MODE_SOFTAP                      (5)
 #define CONFIG_MODE_MONITOR                     (6)
 #define CONFIG_MODE_MONITOR_EASYLINK            (7)

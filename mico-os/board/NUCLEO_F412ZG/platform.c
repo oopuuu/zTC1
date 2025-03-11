@@ -116,8 +116,16 @@ const platform_gpio_t platform_gpio_pins[] =
   [MICO_GPIO_20]                      = { GPIOC,  4 },//PASS,Arduino_A4,WIFI WAKEIN
   [MICO_GPIO_22]                      = { GPIOC,  5 },//PASS,Arduino_A5,WIFI WAKEOUT
 
-  [MICO_USART3_RX]                      = { GPIOD,  9 },//PASS,STDIO_UART_RX,USART3_RX,Nucleo STLK_RX
-  [MICO_USART3_TX]                      = { GPIOD,  8 },//PASS,STDIO_UART_TX,USART3_TX,Nucleo STLK_TX
+  [MICO_USART3_RX]                    = { GPIOD,  9 },//PASS,STDIO_UART_RX,USART3_RX,Nucleo STLK_RX
+  [MICO_USART3_TX]                    = { GPIOD,  8 },//PASS,STDIO_UART_TX,USART3_TX,Nucleo STLK_TX
+  [MICO_USART_NBIOT_TX]               = { GPIOA,  9 },
+  [MICO_USART_NBIOT_RX]               = { GPIOA,  10},
+  [MICO_USART_NBIOT_RTS]              = { GPIOA,  12},
+  [MICO_USART_NBIOT_CTS]              = { GPIOA,  11},
+  [MICO_GPIO_POWER]                   = { GPIOD,  2 },
+  [MICO_GPIO_GPRS_START]              = { GPIOB,  5 },
+  [MICO_GPIO_GPRS_RST]                = { GPIOA,  8 },
+  [MICO_GPIO_GPRS_WAKEUP]             = { GPIOA,  1 },
 };
 
 const platform_pwm_t *platform_pwm_peripherals = NULL;
@@ -183,11 +191,11 @@ const platform_uart_t platform_uart_peripherals[] =
     .tx_dma_config =
     {
       .controller                 = DMA2,
-      .stream                     = DMA2_Stream7,
+      .stream                     = DMA2_Stream6,
       .channel                    = DMA_Channel_5,
-      .irq_vector                 = DMA2_Stream7_IRQn,
-      .complete_flags             = DMA_HISR_TCIF7,
-      .error_flags                = ( DMA_HISR_TEIF7 | DMA_HISR_FEIF7 ),
+      .irq_vector                 = DMA2_Stream6_IRQn,
+      .complete_flags             = DMA_HISR_TCIF6,
+      .error_flags                = ( DMA_HISR_TEIF6 | DMA_HISR_FEIF6 ),
     },
     .rx_dma_config =
     {
@@ -197,6 +205,32 @@ const platform_uart_t platform_uart_peripherals[] =
       .irq_vector                 = DMA2_Stream1_IRQn,
       .complete_flags             = DMA_LISR_TCIF1,
       .error_flags                = ( DMA_LISR_TEIF1 | DMA_LISR_FEIF1 | DMA_LISR_DMEIF1 ),
+    },
+  },
+  [MICO_UART_3] =
+  {
+    .port                         = USART1,
+    .pin_tx                       = &platform_gpio_pins[MICO_USART_NBIOT_TX],
+    .pin_rx                       = &platform_gpio_pins[MICO_USART_NBIOT_RX],
+    .pin_cts                      = NULL,
+    .pin_rts                      = NULL,
+    .tx_dma_config =
+    {
+      .controller                 = DMA2,
+      .stream                     = DMA2_Stream7,
+      .channel                    = DMA_Channel_4,
+      .irq_vector                 = DMA2_Stream7_IRQn,
+      .complete_flags             = DMA_HISR_TCIF7,
+      .error_flags                = ( DMA_HISR_TEIF7 | DMA_HISR_FEIF7 ),
+    },
+    .rx_dma_config =
+    {
+      .controller                 = DMA2,
+      .stream                     = DMA2_Stream5,
+      .channel                    = DMA_Channel_4,
+      .irq_vector                 = DMA2_Stream5_IRQn,
+      .complete_flags             = DMA_HISR_TCIF5,
+      .error_flags                = ( DMA_HISR_TEIF5 | DMA_HISR_FEIF5 | DMA_HISR_DMEIF5 ),
     },
   },
 };
@@ -389,6 +423,7 @@ const platform_spi_t wifi_spi =
 
 
 
+
 /******************************************************
 *           Interrupt Handler Definitions
 ******************************************************/
@@ -409,14 +444,24 @@ MICO_RTOS_DEFINE_ISR( USART3_IRQHandler )
   platform_uart_irq( &platform_uart_drivers[MICO_UART_1] );
 }
 
+MICO_RTOS_DEFINE_ISR( USART1_IRQHandler )
+{
+  platform_uart_irq( &platform_uart_drivers[MICO_UART_3] );
+}
+
 MICO_RTOS_DEFINE_ISR( DMA1_Stream4_IRQHandler )
 {
   platform_uart_tx_dma_irq( &platform_uart_drivers[MICO_UART_1] );
 }
 
-MICO_RTOS_DEFINE_ISR( DMA2_Stream7_IRQHandler )
+MICO_RTOS_DEFINE_ISR( DMA2_Stream6_IRQHandler )
 {
   platform_uart_tx_dma_irq( &platform_uart_drivers[MICO_UART_2] );
+}
+
+MICO_RTOS_DEFINE_ISR( DMA2_Stream7_IRQHandler )
+{
+  platform_uart_tx_dma_irq( &platform_uart_drivers[MICO_UART_3] );
 }
 
 MICO_RTOS_DEFINE_ISR( DMA1_Stream1_IRQHandler )
@@ -428,6 +473,11 @@ MICO_RTOS_DEFINE_ISR( DMA1_Stream1_IRQHandler )
 MICO_RTOS_DEFINE_ISR( DMA2_Stream1_IRQHandler )
 {
   platform_uart_rx_dma_irq( &platform_uart_drivers[MICO_UART_2] );
+}
+
+MICO_RTOS_DEFINE_ISR( DMA2_Stream5_IRQHandler )
+{
+  platform_uart_rx_dma_irq( &platform_uart_drivers[MICO_UART_3] );
 }
 
 
@@ -443,10 +493,13 @@ void platform_init_peripheral_irq_priorities( void )
   NVIC_SetPriority( DMA2_Stream2_IRQn,  3 ); /* WLAN SPI DMA        */
   NVIC_SetPriority( USART3_IRQn      ,  6 ); /* MICO_UART_1         */
   NVIC_SetPriority( USART6_IRQn      ,  6 ); /* MICO_UART_2         */
+  NVIC_SetPriority( USART1_IRQn      ,  6 ); /* MICO_UART_3         */
   NVIC_SetPriority( DMA1_Stream4_IRQn,  7 ); /* MICO_UART_1 TX DMA  */
   NVIC_SetPriority( DMA1_Stream1_IRQn,  7 ); /* MICO_UART_1 RX DMA  */
-  NVIC_SetPriority( DMA2_Stream7_IRQn,  7 ); /* MICO_UART_2 TX DMA  */
+  NVIC_SetPriority( DMA2_Stream6_IRQn,  7 ); /* MICO_UART_2 TX DMA  */
   NVIC_SetPriority( DMA2_Stream1_IRQn,  7 ); /* MICO_UART_2 RX DMA  */
+  NVIC_SetPriority( DMA2_Stream7_IRQn,  7 ); /* MICO_UART_3 TX DMA  */
+  NVIC_SetPriority( DMA2_Stream5_IRQn,  7 ); /* MICO_UART_3 RX DMA  */
   NVIC_SetPriority( EXTI0_IRQn       , 14 ); /* GPIO                */
   NVIC_SetPriority( EXTI1_IRQn       , 14 ); /* GPIO                */
   NVIC_SetPriority( EXTI2_IRQn       , 14 ); /* GPIO                */

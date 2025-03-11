@@ -26,7 +26,7 @@ NAME := Board_EMW5031
 WLAN_CHIP            	:= mw30x
 WLAN_CHIP_REVISION   	:= _uapsta
 WLAN_CHIP_FAMILY     	:= MW3xx
-WLAN_CHIP_FIRMWARE_VER  := 14.76.36.p84
+WLAN_CHIP_FIRMWARE_VER  := 14.76.36.p103
 
 MODULE              	:= 5031
 HOST_MCU_FAMILY      	:= MW3xx

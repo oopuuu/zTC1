@@ -85,6 +85,10 @@
  * Platform provide OTA temporary partition as secondary application partition */
 //#define MICO_ENABLE_SECONDARY_APPLICATION
 
+/************************************************************************
+ * Support Easylink&softap mode */
+#define MICO_EASYLINK_AND_SOFTAP_ENABLED
+
 /******************************************************
 *                   Enumerations
 ******************************************************/

@@ -15,5 +15,17 @@ GLOBAL_INCLUDES := .
 
 $(NAME)_SOURCES := rtos.c
 
+Cortex-M3_SOURCES  := 
+Cortex-M3_INCLUDES := portable/GCC/ARM_CM
 
+Cortex-M4_SOURCES  := 
+Cortex-M4_INCLUDES := portable/GCC/ARM_CM
 
+Cortex-M4F_SOURCES  := 
+Cortex-M4F_INCLUDES := portable/GCC/ARM_CM
+
+ARM968E-S_SOURCES	:= portable/GCC/ARM968E_S/port.c 
+ARM968E-S_INCLUDES 	:= portable/GCC/ARM968E_S
+
+$(NAME)_SOURCES += $($(HOST_ARCH)_SOURCES)
+GLOBAL_INCLUDES += $($(HOST_ARCH)_INCLUDES)

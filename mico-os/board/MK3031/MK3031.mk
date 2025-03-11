@@ -26,7 +26,7 @@ NAME := Board_MK3031
 WLAN_CHIP            	:= mw30x
 WLAN_CHIP_REVISION   	:= _uapsta
 WLAN_CHIP_FAMILY     	:= MW3xx
-WLAN_CHIP_FIRMWARE_VER  := 14.76.36.p84
+WLAN_CHIP_FIRMWARE_VER  := 14.76.36.p103
 
 MODULE              	:= 3031
 HOST_MCU_FAMILY      	:= MW3xx
@@ -57,6 +57,8 @@ MOC_APP_OFFSET      := 0x64000
 ifndef NO_WIFI_FIRMWARE
 WIFI_FIRMWARE := $(MICO_OS_PATH)/resources/wifi_firmware/$(WLAN_CHIP)/$(WLAN_CHIP)$(WLAN_CHIP_REVISION)$(WLAN_CHIP_BIN_TYPE)-$(WLAN_CHIP_FIRMWARE_VER).bin
 endif
+
+FILESYSTEM_IMAGE := build/$(APP_FULL)@$(PLATFORM)/resources/filesystem.bin
 
 VALID_OSNS_COMBOS  := mocOS@mocIP NoRTOS@LwIP
 VALID_TLS          := mocSSL wolfSSL

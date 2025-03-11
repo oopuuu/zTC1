@@ -646,7 +646,8 @@ OSStatus MicoFlashWrite( mico_partition_t partition, volatile uint32_t* off_set,
 
   start_addr = partition_info->partition_start_addr + *off_set;
   end_addr = partition_info->partition_start_addr + *off_set + inBufferLength - 1;
-  require_action_quiet( end_addr < partition_info->partition_start_addr + mico_partitions[ partition ].partition_length , exit, err = kParamErr );
+
+  require_action_quiet( end_addr < partition_info->partition_start_addr + partition_info->partition_length , exit, err = kParamErr );
   
   if( platform_flash_drivers[ partition_info->partition_owner ].initialized == false )
   {

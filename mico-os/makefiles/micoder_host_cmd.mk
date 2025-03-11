@@ -221,6 +221,7 @@ endif # Win32
 # Set shortcuts to the compiler and other tools
 RM      := "$(COMMON_TOOLS_PATH)rm$(EXECUTABLE_SUFFIX)" -f
 CP      := "$(COMMON_TOOLS_PATH)cp$(EXECUTABLE_SUFFIX)" -f
+MV      := "$(COMMON_TOOLS_PATH)mv$(EXECUTABLE_SUFFIX)" -f
 MAKE    := "$(COMMON_TOOLS_PATH)make$(EXECUTABLE_SUFFIX)"
 BIN2C   := "$(COMMON_TOOLS_PATH)bin2c$(EXECUTABLE_SUFFIX)"
 

@@ -87,7 +87,7 @@ void mico_notify_WifiScanCompleteHandler( ScanResult *pApList, void * inContext 
     pApList->ApList[0].ssid[10] = '\0';  // truncate first 10 char
     sprintf( str, "SSID :%10s\r\nPOWER:%10d",
              pApList->ApList[0].ssid,
-             pApList->ApList[0].ApPower );
+             pApList->ApList[0].rssi );
     mf_printf_pos( 0, 4, str );
     scanap_done = true;
 }

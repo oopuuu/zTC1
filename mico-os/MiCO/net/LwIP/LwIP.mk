@@ -9,10 +9,14 @@
 
 NAME := LwIP
 
+ifneq ($(filter $(HOST_MCU_FAMILY),MOC108),)
+VERSION := 2.0.2
+else
 ifneq ($(filter $(HOST_MCU_FAMILY),MTK7697),)
 VERSION := 1.5.0
 else
 VERSION := 1.4.0.rc1
+endif
 endif
 
 VERSION_MAJOR 		= $(word 1, $(subst ., ,$(VERSION)))

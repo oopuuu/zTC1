@@ -315,6 +315,9 @@ static void ota_server_thread( mico_thread_arg_t arg )
 
         if ( ota_server_context->download_state.download_len == ota_server_context->download_state.download_begin_pos )
         {
+            if( httpHeader->statusCode != 200 ){
+                goto DELETE;
+            }
             CRC16_Final( &crc_context, &crc16 );
             if( ota_server_context->ota_check.is_md5 == true ){
                 Md5Final( &md5, (unsigned char *) md5_value );

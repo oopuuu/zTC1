@@ -85,6 +85,12 @@ typedef enum
 
 typedef enum
 {
+    MICO_IIS_MAX, /* Denotes the total number of IIS port aliases. Not a valid IIS alias */
+    MICO_IIS_NONE,
+} mico_iis_t;
+
+typedef enum
+{
     MICO_PWM_1,
     MICO_PWM_2,
     MICO_PWM_3,
@@ -94,6 +100,17 @@ typedef enum
     MICO_PWM_MAX, /* Denotes the total number of PWM port aliases. Not a valid PWM alias */
     MICO_PWM_NONE,
 } mico_pwm_t;
+
+typedef enum
+{
+    MICO_GTIMER_1,
+    MICO_GTIMER_2,
+    MICO_GTIMER_3,
+    MICO_GTIMER_4,
+    MICO_GTIMER_5,
+    MICO_GTIMER_MAX, /* Denotes the total number of GTIMER port aliases. Not a valid GTIMER alias */
+    MICO_GTIMER_NONE,
+} mico_gtimer_t;
 
 typedef enum
 {

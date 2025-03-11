@@ -84,11 +84,38 @@ WEAK void mico_system_delegate_config_recv_ssid ( char *ssid, char *key )
   return;
 }
 
+WEAK mico_connect_fail_config_t mico_system_delegate_config_result( mico_config_source_t source, uint8_t result )
+{
+  //system_log( "Configed by %d", source );
+  UNUSED_PARAMETER(source);
+  if(MICO_FALSE == result)
+  {
+    return RESTART_EASYLINK;
+  }
+  else
+  {
+    return EXIT_EASYLINK;
+  }
+}
+
 WEAK void mico_system_delegate_config_success( mico_config_source_t source )
 {
   //system_log( "Configed by %d", source );
   UNUSED_PARAMETER(source);
   return;
+}
+
+WEAK void mico_system_delegate_easylink_timeout( system_context_t *context )
+{
+    /* so roll back to previous settings  (if it has) and connect */
+    if ( context->flashContentInRam.micoSystemConfig.configured != unConfigured ) {
+        MICOReadConfiguration( context );
+        system_connect_wifi_normal( context );
+    }
+    else {
+        /*module should power down in default setting*/
+        micoWlanPowerOff();
+    }
 }
 
 

@@ -62,6 +62,16 @@ typedef struct
  */ 
 int init_sflash ( /*@out@*/ sflash_handle_t* const handle, /*@shared@*/ void* peripheral_id, sflash_write_allowed_t write_allowed_in );
 
+/**
+ * @brief SPI flash enter deep sleep mode
+ *
+ * @param  handle:  handle of spi flash to init
+ *
+ * @return   kNoErr        : on success.
+ * @return   kGeneralErr   : if an error occurred
+ */ 
+
+int sflash_enter_dpmode( const sflash_handle_t* const handle );
 
 /**
  *  De-initializes a SPI Flash chip

@@ -69,11 +69,6 @@ else
 endif #NO_WIFI
 
 
-# These need to be forced into the final ELF since they are not referenced otherwise
-$(NAME)_LINK_FILES := ../../$(HOST_ARCH)/crt0_$(TOOLCHAIN_NAME).o \
-                      ../../$(HOST_ARCH)/hardfault_handler.o \
-                      platform_vector_table.o \
-
 # $(NAME)_CFLAGS = $(COMPILER_SPECIFIC_PEDANTIC_CFLAGS)
 
 

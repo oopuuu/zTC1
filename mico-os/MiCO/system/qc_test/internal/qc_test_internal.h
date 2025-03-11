@@ -51,7 +51,7 @@ int mf_get_line( char** p_cmd_str );
 void qc_test_ble(void);
 void qc_test_gpio(void);
 void qc_test_tcpip(void);
-
+void qc_scan(void);
 
 
 

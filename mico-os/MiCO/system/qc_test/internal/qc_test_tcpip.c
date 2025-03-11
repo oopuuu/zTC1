@@ -31,7 +31,7 @@ extern void mfg_option (int use_udp, uint32_t remoteaddr);  //TODO: Get it from 
 *               Function Definitions
 ******************************************************/
 
-static char * ssid_get(void)
+MAY_BE_UNUSED static char * ssid_get(void)
 {
   char *cmd;
   uint32_t remote_addr = 0xFFFFFFFF;
@@ -65,7 +65,7 @@ static char * ssid_get(void)
 
 void qc_test_tcpip(void)
 {
-    mfg_connect (ssid_get());
+    //mfg_connect (ssid_get());
 }
 
 

@@ -52,7 +52,11 @@ OSStatus system_discovery_init( system_context_t * const inContext )
                                                      inContext->micoStatus.mac[15], inContext->micoStatus.mac[16] );
   init.instance_name = (char*)__strdup(temp_txt);
 
+#ifndef MICO_LOCAL_SERVER_PORT
   init.service_port = MICO_CONFIG_SERVER_PORT;
+#else
+  init.service_port = MICO_LOCAL_SERVER_PORT;
+#endif
 
   temp_txt2 = __strdup_trans_dot(inContext->micoStatus.mac);
   sprintf(temp_txt, "MAC=%s.", temp_txt2);

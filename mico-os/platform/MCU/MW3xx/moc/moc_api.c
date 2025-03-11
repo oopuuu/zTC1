@@ -16,6 +16,12 @@ OSStatus StartAdvNetwork(network_InitTypeDef_adv_st* inNetworkInitParaAdv)
 {
 	return lib_api_p->micoWlanStartAdv(inNetworkInitParaAdv);
 }
+
+OSStatus micoWlanStartEnt(network_Enterprise_st* inNetworkInitPara)
+{
+	return lib_api_p->micoWlanStartEnt(inNetworkInitPara);
+}
+
 OSStatus getNetPara(IPStatusTypedef *outNetpara, WiFi_Interface inInterface)
 {
 	return lib_api_p->micoWlanGetIPStatus(outNetpara, inInterface);
@@ -660,6 +666,7 @@ OSStatus MicoSpiInitialize( const mico_spi_device_t* spi )
 
 OSStatus MicoSpiFinalize( const mico_spi_device_t* spi )
 {
+    platform_spi_drivers[spi->port].initialized = MICO_FALSE;
     return lib_api_p->spi_apis->spi_finalize(spi);
 }
 
@@ -764,4 +771,34 @@ int send_easylink_minus(uint32_t ip, char *ssid, char *key)
 	return lib_api_p->send_easylink_minus(ip, ssid, key);
 }
 
+OSStatus MicoIISInitialize( const mico_iis_device_t* iis )
+{
+  	return lib_api_p->iis_apis->iis_init(iis);
+}
 
+OSStatus MicoIISFinalize( const mico_iis_device_t* iis )
+{
+    return lib_api_p->iis_apis->iis_finalize(iis);
+}
+
+OSStatus MicoIISTransfer( const mico_iis_device_t* iis, const mico_iis_message_segment_t* segments, uint16_t number_of_segments )
+{
+	return lib_api_p->iis_apis->iis_transfer(iis,segments,number_of_segments);
+}
+
+OSStatus MicoIISWrite( const mico_iis_device_t* iis, uint8_t *p_buf, uint32_t size )
+{
+	return lib_api_p->iis_apis->iis_write(iis, p_buf, size);
+}
+
+OSStatus MicoIISRead( const mico_iis_device_t* iis, uint8_t *p_buf, uint32_t size )
+{
+	return lib_api_p->iis_apis->iis_read(iis, p_buf, size);
+}
+
+
+OSStatus mico_wlan_get_channel( uint8_t *channel )
+{
+  *channel = lib_api_p->mico_wlan_get_channel();
+  return kNoErr;
+}
