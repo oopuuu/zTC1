@@ -427,6 +427,7 @@ static int LedSetEnabled(httpd_request_t *req) {
     } else {
         UserLedSet(0);
     }
+    UserMqttSendLedState();
     mico_system_context_update(sys_config);
 
     send_http("OK", 2, exit, &err);

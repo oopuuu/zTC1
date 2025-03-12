@@ -16,6 +16,7 @@
 char rtc_init = 0; //sntp校时成功标志位
 uint32_t total_time = 0;
 char str_mac[16] = {0};
+time_t last_check_time = 0;
 
 system_config_t *sys_config;
 user_config_t *user_config;
@@ -58,16 +59,31 @@ void recordDailyPCount() {
     time_t now;
     time(&now);
     struct tm *current_time = localtime(&now);
-    if (current_time->tm_hour != 0 || current_time->tm_min != 0) {
-        return;
+      // 判断上次检查的时间与当前时间的日期是否不同
+    if (last_check_time != 0) {
+        struct tm *last_check_time_tm = localtime(&last_check_time);
+
+        // 如果日期发生变化（即跨天了），则进行记录
+        if (current_time->tm_year != last_check_time_tm->tm_year ||
+            current_time->tm_mon != last_check_time_tm->tm_mon ||
+            current_time->tm_mday != last_check_time_tm->tm_mday) {
+            // 记录数据
+            if (user_config->p_count_1_day_ago != 0) {
+                user_config->p_count_2_days_ago = user_config->p_count_1_day_ago;
+            }
+            user_config->p_count_1_day_ago = p_count;
+
+            // 更新系统配置
+            mico_system_context_update(sys_config);
+
+            tc1_log("WARNGIN: p_count record! p_count_1_day_ago:%d p_count_2_days_ago:%d",
+                    user_config->p_count_1_day_ago, user_config->p_count_2_days_ago);
+        }
     }
-    if (user_config->p_count_1_day_ago != 0) {
-        user_config->p_count_2_days_ago = user_config->p_count_1_day_ago;
-    }
-    user_config->p_count_1_day_ago = p_count;
-    mico_system_context_update(sys_config);tc1_log(
-            "WARNGIN: p_count record! p_count_1_day_ago:%d p_count_2_days_ago:%d",
-            user_config->p_count_1_day_ago, user_config->p_count_2_days_ago);
+
+    // 更新上次检查时间
+    last_check_time = now;
+
 }
 
 void schedule_p_count_task(mico_thread_arg_t arg) {

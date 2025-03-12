@@ -2,7 +2,4 @@
 ~*
 build
 zTC1.*
-*.bin
 *.rar
-
-TC1/http_server/web/assets/*
