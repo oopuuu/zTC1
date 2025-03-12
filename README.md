@@ -57,7 +57,7 @@ TC1 排插硬件分 A1 A2 两个版本, 本固件仅支持 **A1 版本**. A1 A2 
 # 编译固件
 
 - windows环境，先安装python2.7
-- 安装[mico-cube 1.0.0](https://files.pythonhosted.org/packages/a8/4e/687a3ef2edabfd9fdd797747d6eeb2ddbe70e65c49fa4062268281a0ded4/mico-cube-1.0.0.tar.gz#sha256=4a930d394344f72c862c203d5d8a832357c3b3dc940c825ca3e528453dd2f17f)
+- 安装[mico-cube 1.0.0](https://files.pythonhosted.org/packages/a8/4e/687a3ef2edabfd9fdd797747d6eeb2ddbe70e65c49fa4062268281a0ded4/mico-cube-1.0.0.tar.gz#sha256=4a930d394344f72c862c203d5d8a832357c3b3dc940c825ca3e528453dd2f17f) python2 -m pip install ./mico-cube-1.0.0.tar.gz
 - 安装[Micoder](http://firmware.mxchip.com/MiCoder_v1.3_Win32:64.zip)下载完解压出来（不要有中文路径）
 - 安装完成后添加micoder路径 mico config --global MICODER (micoder所在路径)/MiCoder
 - 最后切换到此项目根目录执行build.sh即可编译固件
