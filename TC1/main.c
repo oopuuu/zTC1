@@ -63,7 +63,7 @@ void recordDailyPCount() {
       // 判断上次检查的时间与当前时间的日期是否不同
     if (last_check_time != 0) {
         struct tm *last_check_time_tm = localtime(&last_check_time);
-
+        tc1_log("WARNGIN: last_check_time day %d ,current_time day %d",last_check_time_tm->tm_mday,current_time->tm_mday);
         // 如果日期发生变化（即跨天了），则进行记录
         if (current_time->tm_year != last_check_time_tm->tm_year ||
             current_time->tm_mon != last_check_time_tm->tm_mon ||
