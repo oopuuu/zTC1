@@ -81,10 +81,10 @@ void recordDailyPCount() {
 
             tc1_log("WARNGIN: p_count record! p_count_1_day_ago:%d p_count_2_days_ago:%d",
                     user_config->p_count_1_day_ago, user_config->p_count_2_days_ago);
+        }else{
+            tc1_log("WARNGIN: pcount day not changed , waiting for next run! ");
         }
     }
-
-    tc1_log("WARNGIN: pcount day not changed , waiting for next run! ");
     // 更新上次检查时间
     last_check_time = now;
 
