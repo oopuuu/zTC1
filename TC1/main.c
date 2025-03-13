@@ -55,6 +55,7 @@ void appRestoreDefault_callback(void *const user_config_data, uint32_t size) {
 }
 
 void recordDailyPCount() {
+    tc1_log("WARNGIN: enter recordDailyPCount! ");
     // 获取当前时间
     time_t now;
     time(&now);
@@ -67,6 +68,8 @@ void recordDailyPCount() {
         if (current_time->tm_year != last_check_time_tm->tm_year ||
             current_time->tm_mon != last_check_time_tm->tm_mon ||
             current_time->tm_mday != last_check_time_tm->tm_mday) {
+
+            tc1_log("WARNGIN: pcount day changed! ");
             // 记录数据
             if (user_config->p_count_1_day_ago != 0) {
                 user_config->p_count_2_days_ago = user_config->p_count_1_day_ago;
@@ -81,6 +84,7 @@ void recordDailyPCount() {
         }
     }
 
+    tc1_log("WARNGIN: pcount day not changed , waiting for next run! ");
     // 更新上次检查时间
     last_check_time = now;
 
