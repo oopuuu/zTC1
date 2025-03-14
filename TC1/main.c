@@ -16,7 +16,7 @@
 char rtc_init = 0; //sntp校时成功标志位
 uint32_t total_time = 0;
 char str_mac[16] = {0};
-time_t last_check_time = 0;
+int last_check_day = 0;
 
 system_config_t *sys_config;
 user_config_t *user_config;
@@ -60,33 +60,30 @@ void recordDailyPCount() {
     time_t now;
     time(&now);
     struct tm *current_time = localtime(&now);
-      // 判断上次检查的时间与当前时间的日期是否不同
-    if (last_check_time != 0) {
-        struct tm *last_check_time_tm = localtime(&last_check_time);
-        tc1_log("WARNGIN: last_check_time day %d ,current_time day %d",last_check_time_tm->tm_mday,current_time->tm_mday);
+    // 判断上次检查的时间与当前时间的日期是否不同
+    if (last_check_day != 0) { tc1_log(
+                "WARNGIN: last_check_time day %d ,current_time day %d", last_check_day,
+                current_time->tm_min);
         // 如果日期发生变化（即跨天了），则进行记录
-        if (current_time->tm_year != last_check_time_tm->tm_year ||
-            current_time->tm_mon != last_check_time_tm->tm_mon ||
-            current_time->tm_mday != last_check_time_tm->tm_mday) {
+        if (current_time->tm_min != last_check_time) {
 
             tc1_log("WARNGIN: pcount day changed! ");
             // 记录数据
-            if (user_config->p_count_1_day_ago != 0) {
-                user_config->p_count_2_days_ago = user_config->p_count_1_day_ago;
-            }
-            user_config->p_count_1_day_ago = p_count;
-
-            // 更新系统配置
-            mico_system_context_update(sys_config);
+//            if (user_config->p_count_1_day_ago != 0) {
+//                user_config->p_count_2_days_ago = user_config->p_count_1_day_ago;
+//            }
+//            user_config->p_count_1_day_ago = p_count;
+//
+//            // 更新系统配置
+//            mico_system_context_update(sys_config);
 
             tc1_log("WARNGIN: p_count record! p_count_1_day_ago:%d p_count_2_days_ago:%d",
                     user_config->p_count_1_day_ago, user_config->p_count_2_days_ago);
-        }else{
-            tc1_log("WARNGIN: pcount day not changed , waiting for next run! ");
+        } else { tc1_log("WARNGIN: pcount day not changed , waiting for next run! ");
         }
     }
     // 更新上次检查时间
-    last_check_time = now;
+    last_check_time = current_time->tm_min;
 
 }
 
@@ -94,7 +91,7 @@ void schedule_p_count_task(mico_thread_arg_t arg) {
     mico_thread_sleep(20);tc1_log("WARNGIN: p_count timer thread created!");
     while (1) {
         recordDailyPCount();
-        mico_thread_sleep(60);
+        mico_thread_sleep(20);
     }
 }
 
