@@ -63,19 +63,19 @@ void recordDailyPCount() {
     // 判断上次检查的时间与当前时间的日期是否不同
     if (last_check_day != 0) { tc1_log(
                 "WARNGIN: last_check_time day %d ,current_time day %d", last_check_day,
-                current_time->tm_min);
+                current_time->tm_mday);
         // 如果日期发生变化（即跨天了），则进行记录
-        if (current_time->tm_min != last_check_day) {
+        if (current_time->tm_mday != last_check_day) {
 
             tc1_log("WARNGIN: pcount day changed! ");
             // 记录数据
-//            if (user_config->p_count_1_day_ago != 0) {
-//                user_config->p_count_2_days_ago = user_config->p_count_1_day_ago;
-//            }
-//            user_config->p_count_1_day_ago = p_count;
-//
-//            // 更新系统配置
-//            mico_system_context_update(sys_config);
+            if (user_config->p_count_1_day_ago != 0) {
+                user_config->p_count_2_days_ago = user_config->p_count_1_day_ago;
+            }
+            user_config->p_count_1_day_ago = p_count;
+
+            // 更新系统配置
+            mico_system_context_update(sys_config);
 
             tc1_log("WARNGIN: p_count record! p_count_1_day_ago:%d p_count_2_days_ago:%d",
                     user_config->p_count_1_day_ago, user_config->p_count_2_days_ago);
@@ -83,7 +83,7 @@ void recordDailyPCount() {
         }
     }
     // 更新上次检查时间
-    last_check_day = current_time->tm_min;
+    last_check_day = current_time->tm_mday;
 
 }
 
@@ -91,7 +91,7 @@ void schedule_p_count_task(mico_thread_arg_t arg) {
     mico_thread_sleep(20);tc1_log("WARNGIN: p_count timer thread created!");
     while (1) {
         recordDailyPCount();
-        mico_thread_sleep(20);
+        mico_thread_sleep(60);
     }
 }
 
@@ -121,8 +121,6 @@ int application_start(void) {
 
     err = mico_system_init(sys_config);
     require_noerr(err, exit);
-
-    p_count = user_config->p_count_1_day_ago;
 
     uint8_t mac[8];
     mico_wlan_get_mac_address(mac);
