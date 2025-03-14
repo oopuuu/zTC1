@@ -83,7 +83,7 @@ void recordDailyPCount() {
         }
     }
     // 更新上次检查时间
-    last_check_time = current_time->tm_min;
+    last_check_day = current_time->tm_min;
 
 }
 
