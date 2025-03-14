@@ -91,7 +91,7 @@ void schedule_p_count_task(mico_thread_arg_t arg) {
     mico_thread_sleep(20);tc1_log("WARNGIN: p_count timer thread created!");
     while (1) {
         recordDailyPCount();
-        mico_thread_sleep(20);
+        mico_thread_sleep(60);
     }
 }
 
