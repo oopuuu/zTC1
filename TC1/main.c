@@ -65,7 +65,7 @@ void recordDailyPCount() {
                 "WARNGIN: last_check_time day %d ,current_time day %d", last_check_day,
                 current_time->tm_min);
         // 如果日期发生变化（即跨天了），则进行记录
-        if (current_time->tm_min != last_check_time) {
+        if (current_time->tm_min != last_check_day) {
 
             tc1_log("WARNGIN: pcount day changed! ");
             // 记录数据
