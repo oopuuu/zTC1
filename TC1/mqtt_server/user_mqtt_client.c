@@ -497,7 +497,7 @@ void UserMqttHassAuto(char socket_id)
     socket_id--;
     char *send_buf = NULL;
     char *topic_buf = NULL;
-    send_buf = (char *) malloc(300);
+    send_buf = (char *) malloc(1024);
     topic_buf = (char *) malloc(64);
     if (send_buf != NULL && topic_buf != NULL)
     {
@@ -514,7 +514,7 @@ void UserMqttHassAuto(char socket_id)
     "\"name\":\"TC1_%s\","
     "\"model\":\"TC1\","
     "\"manufacturer\":\"PHICOMM\"}}",
-    str_mac+8, socket_id+1, str_mac, socket_id, str_mac, socket_id, str_mac, socket_id, str_mac, socket_id, str_mac, str_mac+8, str_mac, str_mac);
+	str_mac+8, socket_id+1, str_mac, socket_id, str_mac, socket_id, str_mac, socket_id, str_mac, socket_id, str_mac, str_mac);
         UserMqttSendTopic(topic_buf, send_buf, 1);
     }
     if (send_buf)
@@ -527,20 +527,18 @@ void UserMqttHassAutoLed(void)
 {
     char *send_buf = NULL;
     char *topic_buf = NULL;
-    send_buf = (char *) malloc(300);
+    send_buf = (char *) malloc(1024);
     topic_buf = (char *) malloc(64);
     if (send_buf != NULL && topic_buf != NULL)
     {
     	 sprintf(topic_buf, "homeassistant/switch/%s/led/config", str_mac);
-    	        sprintf(send_buf, "set led %s %d", str_mac, (int)user_config->power_led_enabled);
-
-        sprintf(send_buf,
+    	 sprintf(send_buf,
             "{\"name\":\"TC1_%s_Led\","
             "\"uniq_id\":\"%s_led\","
             "\"stat_t\":\"homeassistant/switch/%s/led/state\","
             "\"cmd_t\":\"device/ztc1/set\","
             "\"pl_on\":\"set led %s 1\","
-            "\"pl_off\":\"set led %s 0\",
+            "\"pl_off\":\"set led %s 0\","
             "\"device\":{"
     "\"identifiers\":[\"tc1_%s\"],"
     "\"name\":\"TC1_%s\","
@@ -559,7 +557,7 @@ void UserMqttHassAutoPower(void)
 {
     char *send_buf = NULL;
     char *topic_buf = NULL;
-    send_buf = malloc(512);
+    send_buf = malloc(1024);
     topic_buf = malloc(128);
     if (send_buf != NULL && topic_buf != NULL)
     {
@@ -570,7 +568,7 @@ void UserMqttHassAutoPower(void)
             "\"state_topic\":\"homeassistant/sensor/%s/power/state\","
             "\"unit_of_measurement\":\"W\","
             "\"icon\":\"mdi:gauge\","
-            "\"value_template\":\"{{ value_json.power }}\","\"device\":{"
+            "\"value_template\":\"{{ value_json.power }}\",""\"device\":{"
     "\"identifiers\":[\"tc1_%s\"],"
     "\"name\":\"TC1_%s\","
     "\"model\":\"TC1\","
@@ -584,7 +582,7 @@ void UserMqttHassAutoPower(void)
                     "\"state_topic\":\"homeassistant/sensor/%s/powerConsumption/state\","
                     "\"unit_of_measurement\":\"kWh\","
                     "\"icon\":\"mdi:fence-electric\","
-                    "\"value_template\":\"{{ value_json.powerConsumption }}\","\"device\":{"
+                    "\"value_template\":\"{{ value_json.powerConsumption }}\",""\"device\":{"
     "\"identifiers\":[\"tc1_%s\"],"
     "\"name\":\"TC1_%s\","
     "\"model\":\"TC1\","
@@ -599,11 +597,11 @@ void UserMqttHassAutoPower(void)
                             "\"state_topic\":\"homeassistant/sensor/%s/powerConsumptionToday/state\","
                             "\"unit_of_measurement\":\"kWh\","
                             "\"icon\":\"mdi:fence-electric\","
-                            "\"value_template\":\"{{ value_json.powerConsumptionToday }}\","\"device\":{"
+                            "\"value_template\":\"{{ value_json.powerConsumptionToday }}\",""\"device\":{"
     "\"identifiers\":[\"tc1_%s\"],"
     "\"name\":\"TC1_%s\","
     "\"model\":\"TC1\","
-    "\"manufacturer\":\"PHICOMM\"}",
+    "\"manufacturer\":\"PHICOMM\"}}",
                             str_mac+8, str_mac, str_mac, str_mac, str_mac);
         UserMqttSendTopic(topic_buf, send_buf, 1);
 
@@ -614,7 +612,7 @@ void UserMqttHassAutoPower(void)
                                     "\"state_topic\":\"homeassistant/sensor/%s/powerConsumptionYesterday/state\","
                                     "\"unit_of_measurement\":\"kWh\","
                                     "\"icon\":\"mdi:fence-electric\","
-                                    "\"value_template\":\"{{ value_json.powerConsumptionYesterday }}\","\"device\":{"
+                                    "\"value_template\":\"{{ value_json.powerConsumptionYesterday }}\",""\"device\":{"
     "\"identifiers\":[\"tc1_%s\"],"
     "\"name\":\"TC1_%s\","
     "\"model\":\"TC1\","
