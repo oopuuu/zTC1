@@ -6,7 +6,7 @@
 #include "mqtt_server/user_mqtt_client.h"
 #include "user_power.h"
 
-uint32_t p_count = 0;
+uint32_t p_count = user_config->p_count_1_day_ago;
 PowerRecord power_record = { 1,{ 0 } };
 char power_record_str[1101] = { 0 };
 float real_time_power = 0;
