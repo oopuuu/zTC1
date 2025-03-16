@@ -56,13 +56,11 @@ void appRestoreDefault_callback(void *const user_config_data, uint32_t size) {
 
 void recordDailyPCount() {
 
-    // 获取当前时间
-    time_t now = time(NULL) + 28800; //东8区
-
-    struct tm *current_time = localtime(&now);
-
-    tc1_log("WARNGIN: enter recordDailyPCount! now day %d hour %d min %d",current_time->tm_mday,current_time->tm_hour,current_time->tm_min);
-
+        // 获取当前时间
+  mico_utc_time_t utc_time;
+  mico_time_get_utc_time(&utc_time);
+  utc_time += 28800;
+  struct tm * current_time = localtime((const time_t *) &utc_time);
     // 判断上次检查的时间与当前时间的日期是否不同
     if (last_check_day != 0) { tc1_log(
                 "WARNGIN: last_check_time day %d ,current_time day %d", last_check_day,
