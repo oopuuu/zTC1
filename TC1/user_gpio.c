@@ -57,6 +57,7 @@ void SetSocketStatus(char* socket_status)
         UserRelaySet(i, user_config->socket_status[i]);
         UserMqttSendSocketState(i);
     }
+    UserMqttSendTotalSocketState();
     mico_system_context_update(sys_config);
 }
 
