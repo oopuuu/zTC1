@@ -140,7 +140,7 @@
                                 <span class="mdl-list__item-secondary-action">
                       <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect"
                              for="list-switch-all">
-                        <input type="checkbox" id="list-switch-all"
+                        <input type="checkbox" id="list-switch-all" class="mdl-switch__input"
                                checked/>
                       </label>
                     </span>
@@ -801,6 +801,9 @@
     var checkboxs = socket_ul.getElementsByClassName("mdl-switch__input");
     var switch_lables = socket_ul.getElementsByClassName("mdl-switch");
     $(".mdl-switch__input").on("click", function() {
+    if("list-switch-all" == this.id){
+    return;
+    }
       var sockets_st = "";
       for (var i = 2; i < checkboxs.length; i++) {
         sockets_st += (checkboxs[i].checked ? "1," : "0,");
