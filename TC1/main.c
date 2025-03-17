@@ -55,19 +55,18 @@ void appRestoreDefault_callback(void *const user_config_data, uint32_t size) {
 }
 
 void recordDailyPCount() {
-    tc1_log("WARNGIN: enter recordDailyPCount! ");
     // 获取当前时间
-    time_t now;
-    time(&now);
-    struct tm *current_time = localtime(&now);
+  mico_utc_time_t utc_time;
+  mico_time_get_utc_time(&utc_time);
+  utc_time += 28800;
+  struct tm * current_time = localtime((const time_t *) &utc_time);
     // 判断上次检查的时间与当前时间的日期是否不同
-    if (last_check_day != 0) { tc1_log(
-                "WARNGIN: last_check_time day %d ,current_time day %d", last_check_day,
-                current_time->tm_mday);
+    if (last_check_day != 0) {
         // 如果日期发生变化（即跨天了），则进行记录
         if (current_time->tm_mday != last_check_day) {
+    tc1_log("WARNGIN: pcount day changed! now day %d hour %d min %d ,lastCheck day %d",current_time->tm_mday,current_time->tm_hour,current_time->tm_min,last_check_day);
 
-            tc1_log("WARNGIN: pcount day changed! ");
+//            tc1_log("WARNGIN: pcount day changed! ");
             // 记录数据
             if (user_config->p_count_1_day_ago != 0) {
                 user_config->p_count_2_days_ago = user_config->p_count_1_day_ago;
@@ -79,12 +78,14 @@ void recordDailyPCount() {
 
             tc1_log("WARNGIN: p_count record! p_count_1_day_ago:%d p_count_2_days_ago:%d",
                     user_config->p_count_1_day_ago, user_config->p_count_2_days_ago);
-        } else { tc1_log("WARNGIN: pcount day not changed , waiting for next run! ");
+        } else {
+//        	tc1_log("WARNGIN: pcount day not changed , waiting for next run! ");
         }
+    }else{
+        	    tc1_log("WARNGIN: now day %d hour %d min %d ,lastCheck day %d",current_time->tm_mday,current_time->tm_hour,current_time->tm_min,last_check_day);
     }
     // 更新上次检查时间
     last_check_day = current_time->tm_mday;
-
 }
 
 void schedule_p_count_task(mico_thread_arg_t arg) {

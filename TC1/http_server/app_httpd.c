@@ -205,7 +205,7 @@ static int HttpGetPowerInfo(httpd_request_t *req) {
     char *powers = GetPowerRecord(idx);
     char *sockets = GetSocketStatus();
     sprintf(power_info_json, POWER_INFO_JSON, sockets, power_record.idx, PW_NUM, p_count, powers,
-            up_time,user_config->power_led_enabled);
+            up_time,user_config->power_led_enabled,RelayOut()?1:0);
     send_http(power_info_json, strlen(power_info_json), exit, &err);
     exit:
     return err;
@@ -437,6 +437,26 @@ static int LedSetEnabled(httpd_request_t *req) {
     return err;
 }
 
+static int TotalSocketSetEnabled(httpd_request_t *req){
+    OSStatus err = kNoErr;
+
+    int buf_size = 97;
+    int on;
+    char *buf = malloc(buf_size);
+
+    err = httpd_get_data(req, buf, buf_size);
+    require_noerr(err, exit);
+
+    sscanf(buf, "%d", &on);
+    UserRelaySetAll(on);
+    UserMqttSendTotalSocketState();
+    send_http("OK", 2, exit, &err);
+
+    exit:
+    if (buf) free(buf);
+    return err;
+}
+
 static int Otastatus(httpd_request_t *req) {
     OSStatus err = kNoErr;
     char buf[16] = {0};
@@ -477,6 +497,7 @@ const struct httpd_wsgi_call g_app_handlers[] = {
         {"/task",             HTTPD_HDR_DEFORT, APP_HTTP_FLAGS_NO_EXACT_MATCH, HttpGetTasks,          HttpAddTask,           NULL, HttpDelTask},
         {"/ota",              HTTPD_HDR_DEFORT, 0,                             Otastatus,             OtaStart,              NULL, NULL},
         {"/led",              HTTPD_HDR_DEFORT, 0,                             LedStatus,             LedSetEnabled,         NULL, NULL},
+        {"/socketAll",              HTTPD_HDR_DEFORT, 0,                             NULL,             TotalSocketSetEnabled,         NULL, NULL},
 };
 
 static int g_app_handlers_no = sizeof(g_app_handlers) / sizeof(struct httpd_wsgi_call);
