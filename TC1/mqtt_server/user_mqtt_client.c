@@ -489,7 +489,7 @@ OSStatus UserMqttSendSocketState(char socket_id)
     return oss_status;
 }
 
-OSStatus UserMqttSendTotalSocketState()
+OSStatus UserMqttSendTotalSocketState(void)
 {
     char *send_buf = malloc(64);
     char *topic_buf = malloc(64);
