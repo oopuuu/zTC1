@@ -420,6 +420,7 @@ void ProcessHaCmd(char* cmd)
         if (strcmp(mac, str_mac)) return;
         mqtt_log("set total_socket on[%d]", on);
         UserRelaySetAll(on);
+        int i =0;
         for (i = 0; i < SOCKET_NUM; i++)
         {
             UserRelaySet(i, user_config->socket_status[i]);
