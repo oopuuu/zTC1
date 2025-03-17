@@ -133,6 +133,7 @@ static void KeyShortPress(void)
     {
         UserMqttSendSocketState(i);
     }
+    UserMqttSendTotalSocketState();
 }
 mico_timer_t user_key_timer;
 uint16_t key_time = 0;

@@ -135,6 +135,18 @@
                             </li>
                             <li class="mdl-list__item">
                     <span class="mdl-list__item-primary-content">
+                      <span class="lang" langKey="SocketAll">总开关</span>
+                    </span>
+                                <span class="mdl-list__item-secondary-action">
+                      <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect"
+                             for="list-switch-all">
+                        <input type="checkbox" id="list-switch-all" class="mdl-switch__input"
+                               checked/>
+                      </label>
+                    </span>
+                            </li>
+                            <li class="mdl-list__item">
+                    <span class="mdl-list__item-primary-content">
                       <span class="lang" langKey="Socket">插座</span>-1
                     </span>
                                 <span class="mdl-list__item-secondary-action">
@@ -634,7 +646,8 @@
       About: {en: "About", cn: "关于"},
       //主页
       Socket: {en: "Socket", cn: "插座"},
-      Led:{en: "PowerLed", cn: "电源指示灯"}
+      Led:{en: "PowerLed", cn: "电源指示灯"},
+      SocketAll:{en: "Total switch", cn: "总开关"}
     }
     function ChangeLanguage(lang) {
       if (lang == "jp") {
@@ -789,13 +802,15 @@
     var switch_lables = socket_ul.getElementsByClassName("mdl-switch");
     $(".mdl-switch__input").on("click", function() {
       var sockets_st = "";
-      for (var i = 1; i < checkboxs.length; i++) {
+      for (var i = 2; i < checkboxs.length; i++) {
         sockets_st += (checkboxs[i].checked ? "1," : "0,");
       }
       HttpPost("/socket", function (re) {
       }, sockets_st);
         HttpPost("/led", function (re) {
       }, checkboxs[0].checked ? "1" : "0");
+      HttpPost("/socketAll", function (re) {
+      }, checkboxs[1].checked ? "1" : "0");
     });
     //Socket-end
 
@@ -952,13 +967,18 @@
           } else {
             switch_lables[0].MaterialSwitch.off();
           }
+              if (power.total_switch_on == 1) {
+            switch_lables[1].MaterialSwitch.on();
+          } else {
+            switch_lables[1].MaterialSwitch.off();
+          }
         var status_arr = power.sockets.split(",");
         for (var i = 0; i < status_arr.length; i++) {
           //checkboxs[i].checked = status_arr[i] == "1";
           if (status_arr[i] == "1") {
-            switch_lables[i+1].MaterialSwitch.on();
+            switch_lables[i+2].MaterialSwitch.on();
           } else {
-            switch_lables[i+1].MaterialSwitch.off();
+            switch_lables[i+2].MaterialSwitch.off();
           }
         }
 

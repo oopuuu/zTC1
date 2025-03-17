@@ -31,6 +31,8 @@ extern OSStatus UserMqttSendSocketState(char socket_id);
 
 extern OSStatus UserMqttSendLedState(void);
 
+extern OSStatus UserMqttSendTotalSocketState(void);
+
 extern void UserMqttHassAuto(char socket_id);
 
 extern void UserMqttHassPower(void);
