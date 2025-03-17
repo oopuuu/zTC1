@@ -449,6 +449,10 @@ static int TotalSocketSetEnabled(httpd_request_t *req){
 
     sscanf(buf, "%d", &on);
     UserRelaySetAll(on);
+    int i = 0;
+    for (; i < SOCKET_NUM; i++) {
+        UserMqttSendSocketState(i);
+    }
     UserMqttSendTotalSocketState();
     send_http("OK", 2, exit, &err);
 
