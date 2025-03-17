@@ -41,4 +41,6 @@ extern void UserMqttHassAutoPower(void);
 
 extern void UserMqttHassAutoLed(void);
 
+extern void UserMqttHassAutoTotalSocket(void);
+
 #endif
