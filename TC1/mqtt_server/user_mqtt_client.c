@@ -399,6 +399,7 @@ void ProcessHaCmd(char* cmd)
         mqtt_log("set socket[%d] on[%d]", i, on);
         UserRelaySet(i, on);
         UserMqttSendSocketState(i);
+        UserMqttSendTotalSocketState();
         mico_system_context_update(sys_config);
     }else if(strcmp(cmd, "set led") == ' '){
     	int on;
@@ -419,6 +420,11 @@ void ProcessHaCmd(char* cmd)
         if (strcmp(mac, str_mac)) return;
         mqtt_log("set total_socket on[%d]", on);
         UserRelaySetAll(on);
+        for (i = 0; i < SOCKET_NUM; i++)
+        {
+            UserRelaySet(i, user_config->socket_status[i]);
+            UserMqttSendSocketState(i);
+        }
         UserMqttSendTotalSocketState();
     }
 }

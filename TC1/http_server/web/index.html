@@ -809,9 +809,12 @@
       }, sockets_st);
         HttpPost("/led", function (re) {
       }, checkboxs[0].checked ? "1" : "0");
-      HttpPost("/socketAll", function (re) {
-      }, checkboxs[1].checked ? "1" : "0");
+
     });
+    document.getElementById("list-switch-all").addEventListener("click", function() {
+     HttpPost("/socketAll", function (re) {
+      }, checkboxs[1].checked ? "1" : "0");});
+
     //Socket-end
 
     //Config-start
