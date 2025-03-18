@@ -23,7 +23,7 @@
 
 #define ZTC1_NAME "zTC1-%s"
 
-#define USER_CONFIG_VERSION 8
+#define USER_CONFIG_VERSION 9
 #define SETTING_MQTT_STRING_LENGTH_MAX 32 //必须4字节对齐。
 
 #define SOCKET_NAME_LENGTH   64
@@ -76,6 +76,5 @@ extern system_config_t* sys_config;
 extern user_config_t* user_config;
 extern mico_gpio_t Relay[Relay_NUM];
 
-extern void appRestoreDefault_callback1(void *const user_config_data, uint32_t size);
 
 #endif
