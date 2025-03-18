@@ -103,11 +103,11 @@ void UserRelaySetAll(char y)
         UserRelaySet(i, y);
 }
 
-static void KeyLongPress(void)
+static void KeyLong5sPress(void)
 {
-//  key_log("KeyLongPress");
-//  UserLedSet(1);
-//  UserMqttSend("mqtt test");
+    key_log("WARNGIN: wifi ap started!");
+    sys_config->micoSystemConfig.ssid[0] = 0;
+    mico_system_context_update(mico_system_context_get());
 }
 
 static void KeyLong10sPress(void)
@@ -156,9 +156,9 @@ static void KeyTimeoutHandler(void* arg)
         {
             key_log("button long pressed:%d",key_time);
 
-            if (key_time == 30)
+            if (key_time == 50)
             {
-                KeyLongPress();
+                KeyLong5sPress();
             }
             else if (key_time == 100)
             {
