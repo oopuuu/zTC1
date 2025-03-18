@@ -8,10 +8,10 @@
 
 # 固件web界面
 
-<img src="doc/2.png"><img src="doc/1.png">
+<img src="doc/IMG_0863.png"><img src="doc/1.png">
 
 # HASS接入效果
-<img src="doc/3.png">
+<img src="doc/IMG_0862.png">
 
 固件启动后, 会开启一个热点 TC1-AP-XXXXXX，连接热点后, 直接用浏览器访问: http://192.168.0.1 即可看到如上web界面.
 
@@ -53,6 +53,7 @@ TC1 排插硬件分 A1 A2 两个版本, 本固件仅支持 **A1 版本**. A1 A2 
 - [x] HomeAssistant中增加总耗电量传感器，今日耗电量传感器，昨日耗电量传感器，数据来自于插座历史统计
 - [x] 可以设置mqtt数据上报频率，默认2秒
 - [x] 可以设置电源 led 是否打开，默认打开（系统自检以及错误指示灯仍会工作）
+- [x] 后台和ha mqtt增加总开关控制
 
 # 编译固件
 
