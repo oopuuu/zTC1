@@ -113,9 +113,10 @@ static void KeyLong5sPress(void)
 static void KeyLong10sPress(void)
 {
     key_log("WARNGIN: user params restored!");
-    appRestoreDefault_callback(user_config, sizeof(user_config_t));
-    sys_config->micoSystemConfig.ssid[0] = 0;
-    mico_system_context_update(mico_system_context_get());
+    mico_system_context_restore(sys_config);
+//    appRestoreDefault_callback(user_config, sizeof(user_config_t));
+//    sys_config->micoSystemConfig.ssid[0] = 0;
+//    mico_system_context_update(mico_system_context_get());
 }
 static void KeyShortPress(void)
 {

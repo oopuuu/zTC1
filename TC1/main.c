@@ -147,7 +147,6 @@ int application_start(void) {
 
     if (user_config->version != USER_CONFIG_VERSION) { tc1_log("WARNGIN: user params restored!");
         err = mico_system_context_restore(sys_config);
-        appRestoreDefault_callback(user_config, sizeof(user_config_t))
         require_noerr(err, exit);
     }
 
