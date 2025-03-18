@@ -503,7 +503,7 @@ void UserMqttHassAuto(char socket_id) {
     socket_id--;
     char *send_buf = NULL;
     char *topic_buf = NULL;
-    send_buf = (char *) malloc(1024);
+    send_buf = (char *) malloc(600);
     topic_buf = (char *) malloc(64);
     if (send_buf != NULL && topic_buf != NULL) {
         sprintf(topic_buf, "homeassistant/switch/%s/socket_%d/config", str_mac, socket_id);
@@ -533,7 +533,7 @@ void UserMqttHassAuto(char socket_id) {
 void UserMqttHassAutoLed(void) {
     char *send_buf = NULL;
     char *topic_buf = NULL;
-    send_buf = (char *) malloc(1024);
+    send_buf = (char *) malloc(600);
     topic_buf = (char *) malloc(64);
     if (send_buf != NULL && topic_buf != NULL) {
         sprintf(topic_buf, "homeassistant/switch/%s/led/config", str_mac);
@@ -561,7 +561,7 @@ void UserMqttHassAutoLed(void) {
 void UserMqttHassAutoTotalSocket(void) {
     char *send_buf = NULL;
     char *topic_buf = NULL;
-    send_buf = (char *) malloc(1024);
+    send_buf = (char *) malloc(600);
     topic_buf = (char *) malloc(64);
     if (send_buf != NULL && topic_buf != NULL) {
         sprintf(topic_buf, "homeassistant/switch/%s/total_socket/config", str_mac);
@@ -590,7 +590,7 @@ void UserMqttHassAutoTotalSocket(void) {
 void UserMqttHassAutoPower(void) {
     char *send_buf = NULL;
     char *topic_buf = NULL;
-    send_buf = malloc(1024);
+    send_buf = malloc(600);
     topic_buf = malloc(128);
     if (send_buf != NULL && topic_buf != NULL) {
         sprintf(topic_buf, "homeassistant/sensor/%s/power/config", str_mac);

@@ -153,7 +153,7 @@ static void KeyTimeoutHandler(void* arg)
     {
         //any button pressed
         key_time++;
-        if (key_time <= BUTTON_LONG_PRESS_TIME)
+        if (key_time > BUTTON_LONG_PRESS_TIME)
         {
             key_log("button long pressed:%d",key_time);
 
