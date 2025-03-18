@@ -519,7 +519,7 @@ void UserMqttHassAuto(char socket_id) {
                 "\"name\":\"TC1_%s\","
                 "\"model\":\"TC1\","
                 "\"manufacturer\":\"PHICOMM\"}}",
-                user_config->socket_names[socket_id], str_mac, socket_id, str_mac, socket_id,
+                user_config->socket_names[(int)socket_id], str_mac, socket_id, str_mac, socket_id,
                 str_mac,
                 socket_id, str_mac, socket_id, str_mac, str_mac);
         UserMqttSendTopic(topic_buf, send_buf, 1);
