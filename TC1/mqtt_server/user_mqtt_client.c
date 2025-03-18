@@ -174,6 +174,10 @@ static OSStatus MqttMsgPublish(Client *c, const char *topic, char qos, char reta
     return err;
 }
 
+void registerMqttEvents(void) {
+    mico_start_timer(&timer_handle);
+}
+
 void MqttClientThread(mico_thread_arg_t arg) {
     OSStatus err = kUnknownErr;
 
@@ -261,7 +265,7 @@ void MqttClientThread(mico_thread_arg_t arg) {
     UserMqttSendLedState();
 
     mico_init_timer(&timer_handle, 150, UserMqttTimerFunc, &arg);
-    mico_start_timer(&timer_handle);
+    registerMqttEvents();
     /* 5. client loop for recv msg && keepalive */
     while (1) {
         isconnect = true;
@@ -504,7 +508,7 @@ void UserMqttHassAuto(char socket_id) {
     if (send_buf != NULL && topic_buf != NULL) {
         sprintf(topic_buf, "homeassistant/switch/%s/socket_%d/config", str_mac, socket_id);
         sprintf(send_buf,
-                "{\"name\":\"TC1_%s_Socket_%d\","
+                "{\"name\":\"%s\","
                 "\"uniq_id\":\"%s_s%d\","
                 "\"stat_t\":\"homeassistant/switch/%s/socket_%d/state\","
                 "\"cmd_t\":\"device/ztc1/set\","
@@ -515,7 +519,8 @@ void UserMqttHassAuto(char socket_id) {
                 "\"name\":\"TC1_%s\","
                 "\"model\":\"TC1\","
                 "\"manufacturer\":\"PHICOMM\"}}",
-                str_mac + 8, socket_id + 1, str_mac, socket_id, str_mac, socket_id, str_mac,
+                user_config->socket_names[socket_id], str_mac, socket_id, str_mac, socket_id,
+                str_mac,
                 socket_id, str_mac, socket_id, str_mac, str_mac);
         UserMqttSendTopic(topic_buf, send_buf, 1);
     }
@@ -533,7 +538,7 @@ void UserMqttHassAutoLed(void) {
     if (send_buf != NULL && topic_buf != NULL) {
         sprintf(topic_buf, "homeassistant/switch/%s/led/config", str_mac);
         sprintf(send_buf,
-                "{\"name\":\"TC1_%s_Led\","
+                "{\"name\":\"LED指示灯\","
                 "\"uniq_id\":\"%s_led\","
                 "\"stat_t\":\"homeassistant/switch/%s/led/state\","
                 "\"cmd_t\":\"device/ztc1/set\","
@@ -544,7 +549,7 @@ void UserMqttHassAutoLed(void) {
                 "\"name\":\"TC1_%s\","
                 "\"model\":\"TC1\","
                 "\"manufacturer\":\"PHICOMM\"}}",
-                str_mac + 8, str_mac, str_mac, str_mac, str_mac, str_mac, str_mac);
+                str_mac, str_mac, str_mac, str_mac, str_mac, str_mac);
         UserMqttSendTopic(topic_buf, send_buf, 1);
     }
     if (send_buf)
@@ -561,7 +566,7 @@ void UserMqttHassAutoTotalSocket(void) {
     if (send_buf != NULL && topic_buf != NULL) {
         sprintf(topic_buf, "homeassistant/switch/%s/total_socket/config", str_mac);
         sprintf(send_buf,
-                "{\"name\":\"TC1_%s_TotalSocket\","
+                "{\"name\":\"总开关\","
                 "\"uniq_id\":\"%s_total_socket\","
                 "\"stat_t\":\"homeassistant/switch/%s/total_socket/state\","
                 "\"cmd_t\":\"device/ztc1/set\","
@@ -572,7 +577,7 @@ void UserMqttHassAutoTotalSocket(void) {
                 "\"name\":\"TC1_%s\","
                 "\"model\":\"TC1\","
                 "\"manufacturer\":\"PHICOMM\"}}",
-                str_mac + 8, str_mac, str_mac, str_mac, str_mac, str_mac, str_mac);
+                str_mac, str_mac, str_mac, str_mac, str_mac, str_mac);
         UserMqttSendTopic(topic_buf, send_buf, 1);
     }
     if (send_buf)
@@ -590,7 +595,7 @@ void UserMqttHassAutoPower(void) {
     if (send_buf != NULL && topic_buf != NULL) {
         sprintf(topic_buf, "homeassistant/sensor/%s/power/config", str_mac);
         sprintf(send_buf,
-                "{\"name\":\"TC1_%s_Power\","
+                "{\"name\":\"功率\","
                 "\"uniq_id\":\"%s_p\","
                 "\"state_topic\":\"homeassistant/sensor/%s/power/state\","
                 "\"unit_of_measurement\":\"W\","
@@ -600,11 +605,11 @@ void UserMqttHassAutoPower(void) {
                 "\"name\":\"TC1_%s\","
                 "\"model\":\"TC1\","
                 "\"manufacturer\":\"PHICOMM\"}}",
-                str_mac + 8, str_mac, str_mac, str_mac, str_mac);
+                str_mac, str_mac, str_mac, str_mac);
         UserMqttSendTopic(topic_buf, send_buf, 1);
         sprintf(topic_buf, "homeassistant/sensor/%s/powerConsumption/config", str_mac);
         sprintf(send_buf,
-                "{\"name\":\"TC1_%s_PowerConsumption\","
+                "{\"name\":\"总耗电量\","
                 "\"uniq_id\":\"%s_pc\","
                 "\"state_topic\":\"homeassistant/sensor/%s/powerConsumption/state\","
                 "\"unit_of_measurement\":\"kWh\","
@@ -614,12 +619,12 @@ void UserMqttHassAutoPower(void) {
                 "\"name\":\"TC1_%s\","
                 "\"model\":\"TC1\","
                 "\"manufacturer\":\"PHICOMM\"}}",
-                str_mac + 8, str_mac, str_mac, str_mac, str_mac);
+                str_mac, str_mac, str_mac, str_mac);
         UserMqttSendTopic(topic_buf, send_buf, 1);
 
         sprintf(topic_buf, "homeassistant/sensor/%s/powerConsumptionToday/config", str_mac);
         sprintf(send_buf,
-                "{\"name\":\"TC1_%s_powerConsumptionToday\","
+                "{\"name\":\"今日耗电量\","
                 "\"uniq_id\":\"%s_pc_today\","
                 "\"state_topic\":\"homeassistant/sensor/%s/powerConsumptionToday/state\","
                 "\"unit_of_measurement\":\"kWh\","
@@ -629,12 +634,12 @@ void UserMqttHassAutoPower(void) {
                 "\"name\":\"TC1_%s\","
                 "\"model\":\"TC1\","
                 "\"manufacturer\":\"PHICOMM\"}}",
-                str_mac + 8, str_mac, str_mac, str_mac, str_mac);
+                str_mac, str_mac, str_mac, str_mac);
         UserMqttSendTopic(topic_buf, send_buf, 1);
 
         sprintf(topic_buf, "homeassistant/sensor/%s/powerConsumptionYesterday/config", str_mac);
         sprintf(send_buf,
-                "{\"name\":\"TC1_%s_powerConsumptionYesterday\","
+                "{\"name\":\"昨日耗电量\","
                 "\"uniq_id\":\"%s_pc_yesterday\","
                 "\"state_topic\":\"homeassistant/sensor/%s/powerConsumptionYesterday/state\","
                 "\"unit_of_measurement\":\"kWh\","
@@ -644,7 +649,7 @@ void UserMqttHassAutoPower(void) {
                 "\"name\":\"TC1_%s\","
                 "\"model\":\"TC1\","
                 "\"manufacturer\":\"PHICOMM\"}}",
-                str_mac + 8, str_mac, str_mac, str_mac, str_mac);
+                str_mac, str_mac, str_mac, str_mac);
         UserMqttSendTopic(topic_buf, send_buf, 1);
     }
     if (send_buf) free(send_buf);

@@ -26,7 +26,7 @@
 #define USER_CONFIG_VERSION 8
 #define SETTING_MQTT_STRING_LENGTH_MAX 32 //必须4字节对齐。
 
-#define SOCKET_NAME_LENGTH   32
+#define SOCKET_NAME_LENGTH   64
 #define SOCKET_NUM           6  //插座数量
 
 #define Led    MICO_GPIO_5
@@ -51,6 +51,7 @@ typedef struct
 {
     char version;
     char mqtt_ip[SETTING_MQTT_STRING_LENGTH_MAX];
+    char socket_names[SOCKET_NUM][SOCKET_NAME_LENGTH];
     int mqtt_port;
     int mqtt_report_freq;
     char mqtt_user[SETTING_MQTT_STRING_LENGTH_MAX];
@@ -74,5 +75,7 @@ extern char str_mac[16];
 extern system_config_t* sys_config;
 extern user_config_t* user_config;
 extern mico_gpio_t Relay[Relay_NUM];
+
+extern void appRestoreDefault_callback1(void *const user_config_data, uint32_t size);
 
 #endif

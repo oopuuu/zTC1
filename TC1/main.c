@@ -24,7 +24,7 @@ user_config_t *user_config;
 mico_gpio_t Relay[Relay_NUM] = {Relay_0, Relay_1, Relay_2, Relay_3, Relay_4, Relay_5};
 
 /* MICO system callback: Restore default configuration provided by application */
-void appRestoreDefault_callback(void *const user_config_data, uint32_t size) {
+void appRestoreDefault_callback1(void *const user_config_data, uint32_t size) {
     UNUSED_PARAMETER(size);
 
     mico_system_context_get()->micoSystemConfig.name[0] = 1; //在下次重启时使用默认名称
@@ -47,6 +47,7 @@ void appRestoreDefault_callback(void *const user_config_data, uint32_t size) {
     int i;
     for (i = 0; i < SOCKET_NUM; i++) {
         userConfigDefault->socket_status[i] = 1;
+        snprintf(userConfigDefault->socket_names[i], SOCKET_NAME_LENGTH, "插座-%d", i+1);
     }
     for (i = 0; i < MAX_TASK_NUM; i++) {
         userConfigDefault->timed_tasks[i].on_use = false;

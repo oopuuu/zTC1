@@ -52,7 +52,7 @@
 static bool is_http_init;
 static bool is_handlers_registered;
 const struct httpd_wsgi_call g_app_handlers[];
-char power_info_json[1552] = {0};
+char power_info_json[1952] = {0};
 char up_time[16] = "00:00:00";
 
 /*
@@ -149,13 +149,21 @@ static int HttpGetAssets(httpd_request_t *req) {
 
 static int HttpGetTc1Status(httpd_request_t *req) {
     char *sockets = GetSocketStatus();
-    char *tc1_status = malloc(512);
+    char *tc1_status = malloc(1024);
+    char *socket_names = malloc(512);
+    sprintf(socket_names, "%s,%s,%s,%s,%s,%s",
+            user_config->socket_names[0],
+            user_config->socket_names[1],
+            user_config->socket_names[2],
+            user_config->socket_names[3],
+            user_config->socket_names[4],
+            user_config->socket_names[5]);
     sprintf(tc1_status, TC1_STATUS_JSON, sockets, ip_status.mode,
             sys_config->micoSystemConfig.ssid, sys_config->micoSystemConfig.user_key,
             user_config->ap_name, user_config->ap_key, MQTT_SERVER, MQTT_SERVER_PORT,
             MQTT_SERVER_USR, MQTT_SERVER_PWD,
             VERSION, ip_status.ip, ip_status.mask, ip_status.gateway, user_config->mqtt_report_freq,
-            user_config->power_led_enabled, 0L);
+            user_config->power_led_enabled, 0L,socket_names);
 
     OSStatus err = kNoErr;
     send_http(tc1_status, strlen(tc1_status), exit, &err);
@@ -176,6 +184,31 @@ static int HttpSetSocketStatus(httpd_request_t *req) {
 
     SetSocketStatus(buf);
 
+    send_http("OK", 2, exit, &err);
+
+    exit:
+    if (buf) free(buf);
+    return err;
+}
+
+static int HttpSetSocketName(httpd_request_t *req) {
+    OSStatus err = kNoErr;
+
+    int buf_size = 512;
+    char *buf = malloc(buf_size);
+
+    err = httpd_get_data(req, buf, buf_size);
+    require_noerr(err, exit);
+
+    sscanf(buf, "%s,%s,%s,%s,%s,%s",
+           user_config->socket_names[0],
+           user_config->socket_names[1],
+           user_config->socket_names[2],
+           user_config->socket_names[3],
+           user_config->socket_names[4],
+           user_config->socket_names[5]);
+    mico_system_context_update(sys_config);
+    registerMqttEvents();
     send_http("OK", 2, exit, &err);
 
     exit:
@@ -204,8 +237,16 @@ static int HttpGetPowerInfo(httpd_request_t *req) {
 
     char *powers = GetPowerRecord(idx);
     char *sockets = GetSocketStatus();
+    char *socket_names = malloc(512);
+    sprintf(socket_names, "%s,%s,%s,%s,%s,%s",
+            user_config->socket_names[0],
+            user_config->socket_names[1],
+            user_config->socket_names[2],
+            user_config->socket_names[3],
+            user_config->socket_names[4],
+            user_config->socket_names[5]);
     sprintf(power_info_json, POWER_INFO_JSON, sockets, power_record.idx, PW_NUM, p_count, powers,
-            up_time,user_config->power_led_enabled,RelayOut()?1:0);
+            up_time,user_config->power_led_enabled,RelayOut()?1:0,socket_names);
     send_http(power_info_json, strlen(power_info_json), exit, &err);
     exit:
     return err;
@@ -502,6 +543,7 @@ const struct httpd_wsgi_call g_app_handlers[] = {
         {"/ota",              HTTPD_HDR_DEFORT, 0,                             Otastatus,             OtaStart,              NULL, NULL},
         {"/led",              HTTPD_HDR_DEFORT, 0,                             LedStatus,             LedSetEnabled,         NULL, NULL},
         {"/socketAll",              HTTPD_HDR_DEFORT, 0,                             NULL,             TotalSocketSetEnabled,         NULL, NULL},
+        {"/socketNames",           HTTPD_HDR_DEFORT, 0, NULL,                                              HttpSetSocketName,   NULL, NULL},
 };
 
 static int g_app_handlers_no = sizeof(g_app_handlers) / sizeof(struct httpd_wsgi_call);
