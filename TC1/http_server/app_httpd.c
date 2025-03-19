@@ -243,7 +243,7 @@ static int HttpGetPowerInfo(httpd_request_t *req) {
             user_config->socket_names[4],
             user_config->socket_names[5]);
     sprintf(power_info_json, POWER_INFO_JSON, sockets, power_record.idx, PW_NUM, p_count, powers,
-            up_time,user_config->power_led_enabled,RelayOut()?1:0,socket_names);
+            up_time,user_config->power_led_enabled,RelayOut()?1:0,socket_names,user_config->p_count_1_day_ago,user_config->p_count_2_days_ago);
     send_http(power_info_json, strlen(power_info_json), exit, &err);
     if (socket_names) free(socket_names);
     exit:
