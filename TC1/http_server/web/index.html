@@ -1058,11 +1058,13 @@
         $("#uptime").html(power.up_time);
 
         var w_v = (17.1 * power.p_count) / 1000 / 36000;
-        w.innerHTML = w_v.toFixed(2);
-        var w_v_t = (17.1 * power.p_count_today) / 1000 / 36000;
-        w_t.innerHTML = w_v_t.toFixed(2);
-        var w_v_y = (17.1 * power.p_count_yesterday) / 1000 / 36000;
-        w_y.innerHTML = w_v_y.toFixed(2);
+        w.innerHTML = w_v.toFixed(3);
+        var w_v_t = (17.1 * (power.p_count - power.p_count_1_day_ago)) / 1000 / 36000;
+        w_v_t = w_v_t < 0 ? 0 : w_v_t;
+        w_t.innerHTML = w_v_t.toFixed(3);
+        var w_v_y = (17.1 * power.p_count_1_day_ago - power.p_count_2_days_ago) / 1000 / 36000;
+        w_v_y = w_v_y < 0 ? 0 : w_v_t;
+        w_y.innerHTML = w_v_y.toFixed(3);
     if (power.led_enabled == 1) {
             switch_lables[0].MaterialSwitch.on();
           } else {
