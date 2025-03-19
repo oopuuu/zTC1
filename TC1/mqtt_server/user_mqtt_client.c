@@ -263,6 +263,7 @@ void MqttClientThread(mico_thread_arg_t arg) {
     }
 
     UserMqttSendLedState();
+    UserMqttSendTotalSocketState();
 
     mico_init_timer(&timer_handle, 150, UserMqttTimerFunc, &arg);
     registerMqttEvents();
