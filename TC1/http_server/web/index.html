@@ -1080,7 +1080,7 @@
         w_v_t = w_v_t < 0 ? 0 : w_v_t;
         w_t.innerHTML = w_v_t.toFixed(3);
         var w_v_y = (17.1 * power.p_count_1_day_ago - power.p_count_2_days_ago) / 1000 / 36000;
-        w_v_y = w_v_y < 0 ? 0 : w_v_t;
+        w_v_y = w_v_y < 0 ? 0 : w_v_y;
         w_y.innerHTML = w_v_y.toFixed(3);
         if (power.child_lock_enabled == 1) {
             switch_lables[0].MaterialSwitch.on();
