@@ -509,8 +509,8 @@ void UserMqttHassAuto(char socket_id) {
         sprintf(topic_buf, "homeassistant/switch/%s/socket_%d/config", str_mac, socket_id);
         sprintf(send_buf,
                 "{\"name\":\"%s\","
-                "\"uniq_id\":\"%s_s%d\","
-                "\"object_id\":\"%s_s%d\","
+                "\"uniq_id\":\"tc1_%s_s%d\","
+                "\"object_id\":\"tc1_%s_s%d\","
                 "\"stat_t\":\"homeassistant/switch/%s/socket_%d/state\","
                 "\"cmd_t\":\"device/ztc1/set\","
                 "\"pl_on\":\"set socket %s %d 1\","
@@ -540,8 +540,8 @@ void UserMqttHassAutoLed(void) {
         sprintf(topic_buf, "homeassistant/switch/%s/led/config", str_mac);
         sprintf(send_buf,
                 "{\"name\":\"LED指示灯\","
-                "\"uniq_id\":\"%s_led\","
-                "\"object_id\":\"%s_led\","
+                "\"uniq_id\":\"tc1_%s_led\","
+                "\"object_id\":\"tc1_%s_led\","
                 "\"stat_t\":\"homeassistant/switch/%s/led/state\","
                 "\"cmd_t\":\"device/ztc1/set\","
                 "\"pl_on\":\"set led %s 1\","
@@ -569,8 +569,8 @@ void UserMqttHassAutoTotalSocket(void) {
         sprintf(topic_buf, "homeassistant/switch/%s/total_socket/config", str_mac);
         sprintf(send_buf,
                 "{\"name\":\"总开关\","
-                "\"uniq_id\":\"%s_total_socket\","
-                "\"object_id\":\"%s_total_socket\","
+                "\"uniq_id\":\"tc1_%s_total_socket\","
+                "\"object_id\":\"tc1_%s_total_socket\","
                 "\"stat_t\":\"homeassistant/switch/%s/total_socket/state\","
                 "\"cmd_t\":\"device/ztc1/set\","
                 "\"pl_on\":\"set total_socket %s 1\","
@@ -599,8 +599,8 @@ void UserMqttHassAutoPower(void) {
         sprintf(topic_buf, "homeassistant/sensor/%s/power/config", str_mac);
         sprintf(send_buf,
                 "{\"name\":\"功率\","
-                "\"uniq_id\":\"%s_p\","
-                "\"object_id\":\"%s_p\","
+                "\"uniq_id\":\"tc1_%s_p\","
+                "\"object_id\":\"tc1_%s_p\","
                 "\"state_topic\":\"homeassistant/sensor/%s/power/state\","
                 "\"unit_of_measurement\":\"W\","
                 "\"icon\":\"mdi:gauge\","
@@ -614,8 +614,8 @@ void UserMqttHassAutoPower(void) {
         sprintf(topic_buf, "homeassistant/sensor/%s/powerConsumption/config", str_mac);
         sprintf(send_buf,
                 "{\"name\":\"总耗电量\","
-                "\"uniq_id\":\"%s_pc\","
-                "\"object_id\":\"%s_pc\","
+                "\"uniq_id\":\"tc1_%s_pc\","
+                "\"object_id\":\"tc1_%s_pc\","
                 "\"state_topic\":\"homeassistant/sensor/%s/powerConsumption/state\","
                 "\"unit_of_measurement\":\"kWh\","
                 "\"icon\":\"mdi:fence-electric\","
@@ -630,8 +630,8 @@ void UserMqttHassAutoPower(void) {
         sprintf(topic_buf, "homeassistant/sensor/%s/powerConsumptionToday/config", str_mac);
         sprintf(send_buf,
                 "{\"name\":\"今日耗电量\","
-                "\"uniq_id\":\"%s_pc_today\","
-                "\"object_id\":\"%s_pc_today\","
+                "\"uniq_id\":\"tc1_%s_pc_today\","
+                "\"object_id\":\"tc1_%s_pc_today\","
                 "\"state_topic\":\"homeassistant/sensor/%s/powerConsumptionToday/state\","
                 "\"unit_of_measurement\":\"kWh\","
                 "\"icon\":\"mdi:fence-electric\","
@@ -646,8 +646,8 @@ void UserMqttHassAutoPower(void) {
         sprintf(topic_buf, "homeassistant/sensor/%s/powerConsumptionYesterday/config", str_mac);
         sprintf(send_buf,
                 "{\"name\":\"昨日耗电量\","
-                "\"uniq_id\":\"%s_pc_yesterday\","
-                "\"object_id\":\"%s_pc_yesterday\","
+                "\"uniq_id\":\"tc1_%s_pc_yesterday\","
+                "\"object_id\":\"tc1_%s_pc_yesterday\","
                 "\"state_topic\":\"homeassistant/sensor/%s/powerConsumptionYesterday/state\","
                 "\"unit_of_measurement\":\"kWh\","
                 "\"icon\":\"mdi:fence-electric\","
