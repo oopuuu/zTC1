@@ -25,6 +25,13 @@
 <div class="demo-layout mdl-layout mdl-js-layout mdl-layout--fixed-drawer mdl-layout--fixed-header">
     <header class="demo-header mdl-layout__header">
         <div class="mdl-layout__header-row">
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon edit-device-name">
+                <i class="material-icons">
+                    <svg>
+                        <use xlink:href="#icon-edit"/>
+                    </svg>
+                </i>
+            </button>
             <span class="mdl-layout-title">TC1智能插座</span>
             <div class="mdl-layout-spacer"></div>
 <!--            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button&#45;&#45;icon"-->
@@ -795,6 +802,8 @@
       var status_arr = status.sockets.split(",");
       var names_arr = status.socketNames.split(",");
       var switchTexts = document.querySelectorAll('.mdl-list__item-primary-content');
+      $(".mdl-layout-title").text(status.deviceName);
+      document.title=status.deviceName;
       for (var i = 0; i < status_arr.length; i++) {
           var langSpan = switchTexts[i+3].querySelector('.lang');
           var indexSpan = switchTexts[i+3].querySelector('.socket-index');
@@ -913,6 +922,28 @@
       $index.text("");
       HttpPost("/socketNames", function (re) {
       }, index+' '+newName.trim());}
+  });
+
+   $(".edit-device-name").on("click", function () {
+    var title = $(".mdl-layout-title");
+    // 原名称
+    var oldName = title.text().trim();
+
+    // 弹窗编辑
+    var newName = prompt("请输入新的设备名称", oldName);
+    if (newName && newName.trim() !== "") {
+    if(newName.trim().includes(" ")){
+    ShowToast("名称不能包含空格");
+    return;
+    }
+    if(newName.trim().length>16){
+     ShowToast("名称不能超过16个字");
+    return;
+    }
+      title.text(newName.trim());
+
+      HttpPost("/deviceName", function (re) {
+      }, newName.trim());}
   });
 
     document.getElementById("list-switch-all").addEventListener("click", function() {
@@ -1099,7 +1130,9 @@
           }
         var status_arr = power.sockets.split(",");
         var names_arr = power.socketNames.split(",");
-        var switchTexts = document.querySelectorAll('.mdl-list__item-primary-content');    
+        var switchTexts = document.querySelectorAll('.mdl-list__item-primary-content');
+        $(".mdl-layout-title").text(power.deviceName);
+        document.title=power.deviceName;
         for (var i = 0; i < status_arr.length; i++) {
           //checkboxs[i].checked = status_arr[i] == "1";
           var langSpan = switchTexts[i+3].querySelector('.lang');
