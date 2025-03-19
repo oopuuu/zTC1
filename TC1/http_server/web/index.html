@@ -885,18 +885,19 @@
     // 弹窗编辑
     var newName = prompt("请输入新的插座名称", oldName);
     if (newName && newName.trim() !== "") {
+    if(newName.trim().includes(" ")){
+    ShowToast("名称不能包含空格");
+    return;
+    }
+    if(newName.trim().length>16){
+     ShowToast("名称不能超过16个字");
+    return;
+    }
       $lang.text(newName.trim());
       // 可选：更新序号
       $index.text("");
-      // 🔸 编辑完成后，获取所有名称并拼接
-      var allNames = [];
-      $(".mdl-list__item .lang").each(function () {
-        allNames.push('"' + $(this).text().trim() + '"');
-      });
-      var nameString = allNames.join(',');
       HttpPost("/socketNames", function (re) {
-      }, nameString);});
-    }
+      }, index+' '+newName.trim());}
   });
 
     document.getElementById("list-switch-all").addEventListener("click", function() {

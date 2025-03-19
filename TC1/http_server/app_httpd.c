@@ -169,6 +169,7 @@ static int HttpGetTc1Status(httpd_request_t *req) {
     send_http(tc1_status, strlen(tc1_status), exit, &err);
 
     exit:
+    if (socket_names) free(socket_names);
     if (tc1_status) free(tc1_status);
     return err;
 }
@@ -199,14 +200,10 @@ static int HttpSetSocketName(httpd_request_t *req) {
 
     err = httpd_get_data(req, buf, buf_size);
     require_noerr(err, exit);
-
-    sscanf(buf, "%s,%s,%s,%s,%s,%s",
-           user_config->socket_names[0],
-           user_config->socket_names[1],
-           user_config->socket_names[2],
-           user_config->socket_names[3],
-           user_config->socket_names[4],
-           user_config->socket_names[5]);
+    int index;
+    char name[64];
+    sscanf(buf, "%d %s",&index,name);
+    strcpy(user_config->socket_names[index],name);
     mico_system_context_update(sys_config);
     registerMqttEvents();
     send_http("OK", 2, exit, &err);
@@ -248,6 +245,7 @@ static int HttpGetPowerInfo(httpd_request_t *req) {
     sprintf(power_info_json, POWER_INFO_JSON, sockets, power_record.idx, PW_NUM, p_count, powers,
             up_time,user_config->power_led_enabled,RelayOut()?1:0,socket_names);
     send_http(power_info_json, strlen(power_info_json), exit, &err);
+    if (socket_names) free(socket_names);
     exit:
     return err;
 }
@@ -369,6 +367,7 @@ static int HttpGetMqttReportFreq(httpd_request_t *req) {
     send_http(freq, strlen(freq), exit, &err);
 
     exit:
+    if(freq) free(freq);
     return err;
 }
 
@@ -419,6 +418,7 @@ static int HttpAddTask(httpd_request_t *req) {
     char *mess = (re == 4 && AddTask(task)) ? "OK" : "NO";
 
     send_http(mess, strlen(mess), exit, &err);
+    if(mess) free(mess);
     exit:
     return err;
 }
@@ -438,6 +438,7 @@ static int HttpDelTask(httpd_request_t *req) {
 
     send_http(mess, strlen(mess), exit, &err);
     exit:
+    if(time_str) free(time_str);
     return err;
 }
 
@@ -450,6 +451,7 @@ static int LedStatus(httpd_request_t *req) {
     send_http(led, strlen(led), exit, &err);
 
     exit:
+    if(led) free(led);
     return err;
 }
 
