@@ -517,12 +517,12 @@ void UserMqttHassAuto(char socket_id) {
                 "\"pl_off\":\"set socket %s %d 0\","
                 "\"device\":{"
                 "\"identifiers\":[\"tc1_%s\"],"
-                "\"name\":\"TC1_%s\","
+                "\"name\":\"TC1\","
                 "\"model\":\"TC1\","
                 "\"manufacturer\":\"PHICOMM\"}}",
                 user_config->socket_names[(int)socket_id], str_mac, socket_id,str_mac, socket_id, str_mac, socket_id,
                 str_mac,
-                socket_id, str_mac, socket_id, str_mac, str_mac);
+                socket_id, str_mac, socket_id, str_mac);
         UserMqttSendTopic(topic_buf, send_buf, 1);
     }
     if (send_buf)
@@ -548,10 +548,10 @@ void UserMqttHassAutoLed(void) {
                 "\"pl_off\":\"set led %s 0\","
                 "\"device\":{"
                 "\"identifiers\":[\"tc1_%s\"],"
-                "\"name\":\"TC1_%s\","
+                "\"name\":\"TC1\","
                 "\"model\":\"TC1\","
                 "\"manufacturer\":\"PHICOMM\"}}",
-                str_mac,str_mac,str_mac, str_mac, str_mac, str_mac, str_mac);
+                str_mac,str_mac,str_mac, str_mac, str_mac, str_mac);
         UserMqttSendTopic(topic_buf, send_buf, 1);
     }
     if (send_buf)
@@ -577,10 +577,10 @@ void UserMqttHassAutoTotalSocket(void) {
                 "\"pl_off\":\"set total_socket %s 0\","
                 "\"device\":{"
                 "\"identifiers\":[\"tc1_%s\"],"
-                "\"name\":\"TC1_%s\","
+                "\"name\":\"TC1\","
                 "\"model\":\"TC1\","
                 "\"manufacturer\":\"PHICOMM\"}}",
-                str_mac, str_mac, str_mac, str_mac, str_mac, str_mac, str_mac);
+                str_mac, str_mac, str_mac, str_mac, str_mac, str_mac);
         UserMqttSendTopic(topic_buf, send_buf, 1);
     }
     if (send_buf)
@@ -606,10 +606,10 @@ void UserMqttHassAutoPower(void) {
                 "\"icon\":\"mdi:gauge\","
                 "\"value_template\":\"{{ value_json.power }}\",""\"device\":{"
                 "\"identifiers\":[\"tc1_%s\"],"
-                "\"name\":\"TC1_%s\","
+                "\"name\":\"TC1\","
                 "\"model\":\"TC1\","
                 "\"manufacturer\":\"PHICOMM\"}}",
-                str_mac,str_mac, str_mac, str_mac, str_mac);
+                str_mac,str_mac, str_mac, str_mac);
         UserMqttSendTopic(topic_buf, send_buf, 1);
         sprintf(topic_buf, "homeassistant/sensor/%s/powerConsumption/config", str_mac);
         sprintf(send_buf,
@@ -621,10 +621,10 @@ void UserMqttHassAutoPower(void) {
                 "\"icon\":\"mdi:fence-electric\","
                 "\"value_template\":\"{{ value_json.powerConsumption }}\",""\"device\":{"
                 "\"identifiers\":[\"tc1_%s\"],"
-                "\"name\":\"TC1_%s\","
+                "\"name\":\"TC1\","
                 "\"model\":\"TC1\","
                 "\"manufacturer\":\"PHICOMM\"}}",
-                str_mac, str_mac, str_mac, str_mac, str_mac);
+                str_mac, str_mac, str_mac, str_mac);
         UserMqttSendTopic(topic_buf, send_buf, 1);
 
         sprintf(topic_buf, "homeassistant/sensor/%s/powerConsumptionToday/config", str_mac);
@@ -637,10 +637,10 @@ void UserMqttHassAutoPower(void) {
                 "\"icon\":\"mdi:fence-electric\","
                 "\"value_template\":\"{{ value_json.powerConsumptionToday }}\",""\"device\":{"
                 "\"identifiers\":[\"tc1_%s\"],"
-                "\"name\":\"TC1_%s\","
+                "\"name\":\"TC1\","
                 "\"model\":\"TC1\","
                 "\"manufacturer\":\"PHICOMM\"}}",
-                str_mac,str_mac, str_mac, str_mac, str_mac);
+                str_mac,str_mac, str_mac, str_mac);
         UserMqttSendTopic(topic_buf, send_buf, 1);
 
         sprintf(topic_buf, "homeassistant/sensor/%s/powerConsumptionYesterday/config", str_mac);
@@ -653,10 +653,10 @@ void UserMqttHassAutoPower(void) {
                 "\"icon\":\"mdi:fence-electric\","
                 "\"value_template\":\"{{ value_json.powerConsumptionYesterday }}\",""\"device\":{"
                 "\"identifiers\":[\"tc1_%s\"],"
-                "\"name\":\"TC1_%s\","
+                "\"name\":\"TC1\","
                 "\"model\":\"TC1\","
                 "\"manufacturer\":\"PHICOMM\"}}",
-                str_mac,str_mac, str_mac, str_mac, str_mac);
+                str_mac,str_mac, str_mac, str_mac);
         UserMqttSendTopic(topic_buf, send_buf, 1);
     }
     if (send_buf) free(send_buf);

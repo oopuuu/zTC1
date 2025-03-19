@@ -19,9 +19,9 @@
 #define VERSION "v2.1.6"
 
 #define TYPE 1
-#define TYPE_NAME "zTC1"
+#define TYPE_NAME "TC1"
 
-#define ZTC1_NAME "zTC1-%s"
+#define ZTC1_NAME "TC1-%s"
 
 #define USER_CONFIG_VERSION 9
 #define SETTING_MQTT_STRING_LENGTH_MAX 32 //必须4字节对齐。
