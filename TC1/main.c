@@ -137,7 +137,7 @@ int application_start(void) {
     MicoGpioInitialize((mico_gpio_t) Button, INPUT_PULL_UP);
     if (!MicoGpioInputGet(Button)) {   //开机时按钮状态
         tc1_log("press ap_init");
-        ApInit(false);
+        ApInit(true);
         open_ap = true;
     }
 
