@@ -18,6 +18,7 @@ char rtc_init = 0; //sntp校时成功标志位
 uint32_t total_time = 0;
 char str_mac[16] = {0};
 int last_check_day = 0;
+int childLockEnabled = 0;
 
 system_config_t *sys_config;
 user_config_t *user_config;
@@ -48,7 +49,7 @@ void appRestoreDefault_callback(void *const user_config_data, uint32_t size) {
     int i;
     for (i = 0; i < SOCKET_NUM; i++) {
         userConfigDefault->socket_status[i] = 1;
-        snprintf(userConfigDefault->socket_names[i], SOCKET_NAME_LENGTH, "插座-%d", i+1);
+        snprintf(userConfigDefault->socket_names[i], SOCKET_NAME_LENGTH, "插座-%d", i + 1);
     }
     for (i = 0; i < MAX_TASK_NUM; i++) {
         userConfigDefault->timed_tasks[i].on_use = false;
@@ -58,15 +59,17 @@ void appRestoreDefault_callback(void *const user_config_data, uint32_t size) {
 
 void recordDailyPCount() {
     // 获取当前时间
-  mico_utc_time_t utc_time;
-  mico_time_get_utc_time(&utc_time);
-  utc_time += 28800;
-  struct tm * current_time = localtime((const time_t *) &utc_time);
+    mico_utc_time_t utc_time;
+    mico_time_get_utc_time(&utc_time);
+    utc_time += 28800;
+    struct tm *current_time = localtime((const time_t *) &utc_time);
     // 判断上次检查的时间与当前时间的日期是否不同
     if (last_check_day != 0) {
         // 如果日期发生变化（即跨天了），则进行记录
-        if (current_time->tm_mday != last_check_day) {
-    tc1_log("WARNGIN: pcount day changed! now day %d hour %d min %d ,lastCheck day %d",current_time->tm_mday,current_time->tm_hour,current_time->tm_min,last_check_day);
+        if (current_time->tm_mday != last_check_day) { tc1_log(
+                    "WARNGIN: pcount day changed! now day %d hour %d min %d ,lastCheck day %d",
+                    current_time->tm_mday, current_time->tm_hour, current_time->tm_min,
+                    last_check_day);
 
 //            tc1_log("WARNGIN: pcount day changed! ");
             // 记录数据
@@ -83,8 +86,8 @@ void recordDailyPCount() {
         } else {
 //        	tc1_log("WARNGIN: pcount day not changed , waiting for next run! ");
         }
-    }else{
-        	    tc1_log("WARNGIN: now day %d hour %d min %d ,lastCheck day %d",current_time->tm_mday,current_time->tm_hour,current_time->tm_min,last_check_day);
+    } else { tc1_log("WARNGIN: now day %d hour %d min %d ,lastCheck day %d", current_time->tm_mday,
+                     current_time->tm_hour, current_time->tm_min, last_check_day);
     }
     // 更新上次检查时间
     last_check_day = current_time->tm_mday;
@@ -145,7 +148,7 @@ int application_start(void) {
     }
     MicoSysLed(0);
 
-    childLockEnabled = (int)user_config->user[0];
+    childLockEnabled = (int) user_config->user[0];
     if (user_config->version != USER_CONFIG_VERSION) { tc1_log("WARNGIN: user params restored!");
         err = mico_system_context_restore(sys_config);
         require_noerr(err, exit);
