@@ -122,6 +122,8 @@ uint16_t key_time = 0;
 #define BUTTON_LONG_PRESS_TIME    10     //100ms*10=1s
 
 static void KeyTimeoutHandler(void *arg) {
+    if(childLockEnabled)
+        return;
     static char key_trigger, key_continue;
     //按键扫描程序
     char tmp = ~(0xfe | MicoGpioInputGet(Button));
