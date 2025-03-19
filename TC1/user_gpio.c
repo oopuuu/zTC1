@@ -2,6 +2,7 @@
 
 #include "main.h"
 #include "user_gpio.h"
+#include "user_wifi.h"
 #include "mqtt_server/user_mqtt_client.h"
 
 mico_gpio_t relay[Relay_NUM] = {Relay_0, Relay_1, Relay_2, Relay_3, Relay_4, Relay_5};
@@ -90,8 +91,8 @@ void UserRelaySetAll(char y) {
 
 static void KeyLong5sPress(void) {
     key_log("WARNGIN: wifi ap started!");
-    sys_config->micoSystemConfig.ssid[0] = 0;
-    mico_system_context_update(mico_system_context_get());
+    micoWlanSuspendStation();
+    ApInit(true);
 }
 
 static void KeyLong10sPress(void) {
