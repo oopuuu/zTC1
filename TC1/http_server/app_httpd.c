@@ -163,7 +163,7 @@ static int HttpGetTc1Status(httpd_request_t *req) {
             user_config->ap_name, user_config->ap_key, MQTT_SERVER, MQTT_SERVER_PORT,
             MQTT_SERVER_USR, MQTT_SERVER_PWD,
             VERSION, ip_status.ip, ip_status.mask, ip_status.gateway, user_config->mqtt_report_freq,
-            user_config->power_led_enabled, 0L,socket_names);
+            user_config->power_led_enabled, 0L,socket_names,childLockEnabled);
 
     OSStatus err = kNoErr;
     send_http(tc1_status, strlen(tc1_status), exit, &err);
@@ -213,6 +213,27 @@ static int HttpSetSocketName(httpd_request_t *req) {
     return err;
 }
 
+static int HttpSetChildLock(httpd_request_t *req) {
+    OSStatus err = kNoErr;
+
+    int buf_size = 32;
+    char *buf = malloc(buf_size);
+
+    err = httpd_get_data(req, buf, buf_size);
+    require_noerr(err, exit);
+    int enableLock;
+    sscanf(buf, "%d",&enableLock);
+    user_config->user[0] = enableLock;
+    childLockEnabled = enableLock;
+    mico_system_context_update(sys_config);
+    UserMqttSendChildLockState();
+    send_http("OK", 2, exit, &err);
+
+    exit:
+    if (buf) free(buf);
+    return err;
+}
+
 static int HttpGetPowerInfo(httpd_request_t *req) {
     OSStatus err = kNoErr;
     char buf[16];
@@ -243,7 +264,7 @@ static int HttpGetPowerInfo(httpd_request_t *req) {
             user_config->socket_names[4],
             user_config->socket_names[5]);
     sprintf(power_info_json, POWER_INFO_JSON, sockets, power_record.idx, PW_NUM, p_count, powers,
-            up_time,user_config->power_led_enabled,RelayOut()?1:0,socket_names,user_config->p_count_1_day_ago,user_config->p_count_2_days_ago);
+            up_time,user_config->power_led_enabled,RelayOut()?1:0,socket_names,user_config->p_count_1_day_ago,user_config->p_count_2_days_ago,childLockEnabled);
     send_http(power_info_json, strlen(power_info_json), exit, &err);
     if (socket_names) free(socket_names);
     exit:
@@ -546,6 +567,7 @@ const struct httpd_wsgi_call g_app_handlers[] = {
         {"/led",              HTTPD_HDR_DEFORT, 0,                             LedStatus,             LedSetEnabled,         NULL, NULL},
         {"/socketAll",              HTTPD_HDR_DEFORT, 0,                             NULL,             TotalSocketSetEnabled,         NULL, NULL},
         {"/socketNames",           HTTPD_HDR_DEFORT, 0, NULL,                                              HttpSetSocketName,   NULL, NULL},
+        {"/childLock",           HTTPD_HDR_DEFORT, 0, NULL,                                              HttpSetChildLock,   NULL, NULL},
 };
 
 static int g_app_handlers_no = sizeof(g_app_handlers) / sizeof(struct httpd_wsgi_call);

@@ -76,6 +76,7 @@ void UserMqttTimerFunc(void *arg) {
             case 0:
                 UserMqttHassAutoLed();
                 UserMqttHassAutoTotalSocket();
+                UserMqttHassAutoChildLock();
                 break;
             case 1:
             case 2:
@@ -264,6 +265,7 @@ void MqttClientThread(mico_thread_arg_t arg) {
 
     UserMqttSendLedState();
     UserMqttSendTotalSocketState();
+    UserMqttSendChildLockState();
 
     mico_init_timer(&timer_handle, 150, UserMqttTimerFunc, &arg);
     registerMqttEvents();
@@ -411,6 +413,14 @@ void ProcessHaCmd(char *cmd) {
             UserMqttSendSocketState(i);
         }
         UserMqttSendTotalSocketState();
+    }else if (strcmp(cmd, "set childLock") == ' ') {
+        int on;
+        sscanf(cmd, "set childLock %s %d", mac, &on);
+        if (strcmp(mac, str_mac)) return;mqtt_log("set childLock on[%d]", on);
+        user_config->user[0] = on;
+        childLockEnabled = on;
+        UserMqttSendChildLockState();
+        mico_system_context_update(sys_config);
     }
 }
 
@@ -499,6 +509,21 @@ OSStatus UserMqttSendLedState(void) {
     return oss_status;
 }
 
+OSStatus UserMqttSendChildLockState(void) {
+    char *send_buf = malloc(64);
+    char *topic_buf = malloc(64);
+    OSStatus oss_status = kUnknownErr;
+    if (send_buf != NULL && topic_buf != NULL) {
+        sprintf(topic_buf, "homeassistant/switch/%s/childLock/state", str_mac);
+        sprintf(send_buf, "set childLock %s %d", str_mac, childLockEnabled);
+        oss_status = UserMqttSendTopic(topic_buf, send_buf, 1);
+    }
+    if (send_buf) free(send_buf);
+    if (topic_buf) free(topic_buf);
+
+    return oss_status;
+}
+
 //hass mqtt鑷姩鍙戠幇鏁版嵁寮�鍏冲彂閫�
 void UserMqttHassAuto(char socket_id) {
     socket_id--;
@@ -547,6 +572,35 @@ void UserMqttHassAutoLed(void) {
                 "\"cmd_t\":\"device/ztc1/set\","
                 "\"pl_on\":\"set led %s 1\","
                 "\"pl_off\":\"set led %s 0\","
+                "\"device\":{"
+                "\"identifiers\":[\"tc1_%s\"],"
+                "\"name\":\"TC1\","
+                "\"model\":\"TC1\","
+                "\"manufacturer\":\"PHICOMM\"}}",
+                str_mac,str_mac,str_mac, str_mac, str_mac, str_mac);
+        UserMqttSendTopic(topic_buf, send_buf, 1);
+    }
+    if (send_buf)
+        free(send_buf);
+    if (topic_buf)
+        free(topic_buf);
+}
+
+void UserMqttHassAutoChildLock(void) {
+    char *send_buf = NULL;
+    char *topic_buf = NULL;
+    send_buf = (char *) malloc(600);
+    topic_buf = (char *) malloc(64);
+    if (send_buf != NULL && topic_buf != NULL) {
+        sprintf(topic_buf, "homeassistant/switch/%s/childLock/config", str_mac);
+        sprintf(send_buf,
+                "{\"name\":\"童锁\","
+                "\"uniq_id\":\"tc1_%s_child_lock\","
+                "\"object_id\":\"tc1_%s_child_lock\","
+                "\"stat_t\":\"homeassistant/switch/%s/childLock/state\","
+                "\"cmd_t\":\"device/ztc1/set\","
+                "\"pl_on\":\"set childLock %s 1\","
+                "\"pl_off\":\"set childLock %s 0\","
                 "\"device\":{"
                 "\"identifiers\":[\"tc1_%s\"],"
                 "\"name\":\"TC1\","

@@ -75,6 +75,7 @@ extern char str_mac[16];
 extern system_config_t* sys_config;
 extern user_config_t* user_config;
 extern mico_gpio_t Relay[Relay_NUM];
+extern int childLockEnabled;
 
 
 #endif

@@ -123,6 +123,18 @@
                         <ul id="socket_ul" class="demo-list-control mdl-list">
                             <li class="mdl-list__item">
                     <span class="mdl-list__item-primary-content">
+                      <span class="lang" langKey="ChildLock">启用童锁</span>
+                    </span>
+                                <span class="mdl-list__item-secondary-action">
+                      <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect"
+                             for="list-switch-child-lock">
+                        <input type="checkbox" id="list-switch-child-lock" class="mdl-switch__input"
+                               checked/>
+                      </label>
+                    </span>
+                            </li>
+                            <li class="mdl-list__item">
+                    <span class="mdl-list__item-primary-content">
                       <span class="lang" langKey="Led">电源指示灯</span>
                     </span>
                                 <span class="mdl-list__item-secondary-action">
@@ -696,7 +708,8 @@
       //主页
       Socket: {en: "Socket", cn: "插座"},
       Led:{en: "PowerLed", cn: "电源指示灯"},
-      SocketAll:{en: "Total switch", cn: "总开关"}
+      SocketAll:{en: "Total Switch", cn: "总开关"},
+      ChildLock:{en: "Child Lock", cn: "童锁"}
     }
     function ChangeLanguage(lang) {
       if (lang == "jp") {
@@ -783,15 +796,15 @@
       var names_arr = status.socketNames.split(",");
       var switchTexts = document.querySelectorAll('.mdl-list__item-primary-content');
       for (var i = 0; i < status_arr.length; i++) {
-          var langSpan = switchTexts[i+2].querySelector('.lang');
-          var indexSpan = switchTexts[i+2].querySelector('.socket-index');
+          var langSpan = switchTexts[i+3].querySelector('.lang');
+          var indexSpan = switchTexts[i+3].querySelector('.socket-index');
           if (langSpan) langSpan.textContent = names_arr[i];   // 修改插座名称
           if (indexSpan) indexSpan.textContent = ""; // 修改序号，可自定义起始数字
           //checkboxs[i].checked = status_arr[i] == "1";
           if (status_arr[i] == "1") {
-            switch_lables[i+2].MaterialSwitch.on();
+            switch_lables[i+3].MaterialSwitch.on();
           } else {
-            switch_lables[i+2].MaterialSwitch.off();
+            switch_lables[i+3].MaterialSwitch.off();
           }
         }
 
@@ -856,17 +869,17 @@
     var checkboxs = socket_ul.getElementsByClassName("mdl-switch__input");
     var switch_lables = socket_ul.getElementsByClassName("mdl-switch");
     $(".mdl-switch__input").on("click", function() {
-    if("list-switch-all" == this.id){
+    if("list-switch-all" == this.id||"list-switch-child-lock"== this.id){
     return;
     }
       var sockets_st = "";
-      for (var i = 2; i < checkboxs.length; i++) {
+      for (var i = 3; i < checkboxs.length; i++) {
         sockets_st += (checkboxs[i].checked ? "1," : "0,");
       }
       HttpPost("/socket", function (re) {
       }, sockets_st);
         HttpPost("/led", function (re) {
-      }, checkboxs[0].checked ? "1" : "0");
+      }, checkboxs[1].checked ? "1" : "0");
 
     });
 
@@ -904,7 +917,11 @@
 
     document.getElementById("list-switch-all").addEventListener("click", function() {
      HttpPost("/socketAll", function (re) {
-      }, checkboxs[1].checked ? "1" : "0");});
+      }, checkboxs[2].checked ? "1" : "0");});
+
+          document.getElementById("list-switch-child-lock").addEventListener("click", function() {
+     HttpPost("/childLock", function (re) {
+      }, checkboxs[0].checked ? "1" : "0");});
 
     //Socket-end
 
@@ -1065,29 +1082,34 @@
         var w_v_y = (17.1 * power.p_count_1_day_ago - power.p_count_2_days_ago) / 1000 / 36000;
         w_v_y = w_v_y < 0 ? 0 : w_v_t;
         w_y.innerHTML = w_v_y.toFixed(3);
-    if (power.led_enabled == 1) {
+        if (power.child_lock_enabled == 1) {
             switch_lables[0].MaterialSwitch.on();
           } else {
             switch_lables[0].MaterialSwitch.off();
           }
-              if (power.total_switch_on == 1) {
+    if (power.led_enabled == 1) {
             switch_lables[1].MaterialSwitch.on();
           } else {
             switch_lables[1].MaterialSwitch.off();
+          }
+              if (power.total_switch_on == 1) {
+            switch_lables[2].MaterialSwitch.on();
+          } else {
+            switch_lables[2].MaterialSwitch.off();
           }
         var status_arr = power.sockets.split(",");
         var names_arr = power.socketNames.split(",");
         var switchTexts = document.querySelectorAll('.mdl-list__item-primary-content');    
         for (var i = 0; i < status_arr.length; i++) {
           //checkboxs[i].checked = status_arr[i] == "1";
-          var langSpan = switchTexts[i+2].querySelector('.lang');
-          var indexSpan = switchTexts[i+2].querySelector('.socket-index');
+          var langSpan = switchTexts[i+3].querySelector('.lang');
+          var indexSpan = switchTexts[i+3].querySelector('.socket-index');
           if (langSpan) langSpan.textContent = names_arr[i];   // 修改插座名称
           if (indexSpan) indexSpan.textContent = ""; // 修改序号，可自定义起始数字
           if (status_arr[i] == "1") {
-            switch_lables[i+2].MaterialSwitch.on();
+            switch_lables[i+3].MaterialSwitch.on();
           } else {
-            switch_lables[i+2].MaterialSwitch.off();
+            switch_lables[i+3].MaterialSwitch.off();
           }
         }
 

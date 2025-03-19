@@ -65,10 +65,11 @@
 	'reportFreq':'%d',\
     'ledEnabled':%d,\
     'up_time':%ld,\
-    'socketNames':'%s'\
+    'socketNames':'%s',\
+    'child_lock_enabled':%d\
 }"
 
-#define POWER_INFO_JSON "{'sockets':'%s','idx':%d,'len':%d,'p_count':%ld,'powers':[%s],'up_time':'%s','led_enabled':%d,'total_switch_on':%d,'socketNames':'%s','p_count_1_day_ago':%ld,'p_count_2_days_ago':%ld}"
+#define POWER_INFO_JSON "{'sockets':'%s','idx':%d,'len':%d,'p_count':%ld,'powers':[%s],'up_time':'%s','led_enabled':%d,'total_switch_on':%d,'socketNames':'%s','p_count_1_day_ago':%ld,'p_count_2_days_ago':%ld,'child_lock_enabled':%d}"
 
 int AppHttpdStart(void);
 
