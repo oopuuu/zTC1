@@ -27,20 +27,20 @@
         <div class="mdl-layout__header-row">
             <span class="mdl-layout-title">TC1智能插座</span>
             <div class="mdl-layout-spacer"></div>
-            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon"
-                    id="hdrbtn">
-                <i class="material-icons">
-                    <svg>
-                        <use xlink:href="#icon-translate"/>
-                    </svg>
-                </i>
-            </button>
-            <ul class="mdl-menu mdl-js-menu mdl-js-ripple-effect mdl-menu--bottom-right"
-                for="hdrbtn">
-                <li class="mdl-menu__item" onclick="ChangeLanguage('en')">English</li>
-                <li class="mdl-menu__item" onclick="ChangeLanguage('cn')">中文</li>
-                <li class="mdl-menu__item" onclick="ChangeLanguage('jp')">日本語</li>
-            </ul>
+<!--            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button&#45;&#45;icon"-->
+<!--                    id="hdrbtn">-->
+<!--                <i class="material-icons">-->
+<!--                    <svg>-->
+<!--                        <use xlink:href="#icon-translate"/>-->
+<!--                    </svg>-->
+<!--                </i>-->
+<!--            </button>-->
+<!--            <ul class="mdl-menu mdl-js-menu mdl-js-ripple-effect mdl-menu&#45;&#45;bottom-right"-->
+<!--                for="hdrbtn">-->
+<!--                <li class="mdl-menu__item" onclick="ChangeLanguage('en')">English</li>-->
+<!--                <li class="mdl-menu__item" onclick="ChangeLanguage('cn')">中文</li>-->
+<!--                <li class="mdl-menu__item" onclick="ChangeLanguage('jp')">日本語</li>-->
+<!--            </ul>-->
             <button onclick="reboot()"
                     class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon"
                     id="rebootbtn">
@@ -270,8 +270,10 @@
                  style="height:315px;overflow-x:scroll;overflow-y:hidden;">
                 <table class="pw">
                     <tr>
-                        <td>P: <span id="p" class="success">0</span> W</td>
-                        <td>W: <span id="w" class="error">0</span> kW·h</td>
+                        <td>当前功率: <span id="p" class="success">0</span> W</td>
+                        <td>今日电量: <span id="w_t" class="error">0</span> kW·h</td>
+                        <td>昨日电量: <span id="w_y" class="error">0</span> kW·h</td>
+                        <td>总电量: <span id="w" class="error">0</span> kW·h</td>
                     </tr>
                 </table>
                 <div id="ct-chart" class="ct-chart ct-perfect-fourth"
@@ -1028,6 +1030,9 @@
     var chart_wth = 0;
     var p = document.getElementById("p");
     var w = document.getElementById("w");
+    var w_t = document.getElementById("w_t");
+    var w_y = document.getElementById("w_y");
+
     function GetPowerRecord() {
       HttpPost("/power", function (re) {
         re = re.replace(/'/g, '"');
@@ -1054,6 +1059,10 @@
 
         var w_v = (17.1 * power.p_count) / 1000 / 36000;
         w.innerHTML = w_v.toFixed(2);
+        var w_v_t = (17.1 * power.p_count_today) / 1000 / 36000;
+        w_t.innerHTML = w_v_t.toFixed(2);
+        var w_v_y = (17.1 * power.p_count_yesterday) / 1000 / 36000;
+        w_y.innerHTML = w_v_y.toFixed(2);
     if (power.led_enabled == 1) {
             switch_lables[0].MaterialSwitch.on();
           } else {
