@@ -892,9 +892,9 @@ for (var i = 0; i < actions.length; i++) {
           <input class="mdl-textfield__input" type="text" id="${rowId}-input" readonly value="${valueText}">
           <input type="hidden" id="${rowId}-value" value="${index}">
           <ul class="mdl-menu mdl-menu--bottom-left mdl-js-menu" for="${rowId}-input">
-            <li class="mdl-menu__item" data-val="-1" onclick="selectOperation('${rowId}', -1,BTN_OPERATIONS)">未设置</li>
+            <li class="mdl-menu__item" data-val="-1" onclick="selectOperation('${rowId}', -1,'${BTN_OPERATIONS[0]}')">未设置</li>
             ${BTN_OPERATIONS.map((op, idx) =>
-              `<li class="mdl-menu__item" data-val="${idx}" onclick="selectOperation('${rowId}', ${idx},BTN_OPERATIONS)">${op}</li>`
+              `<li class="mdl-menu__item" data-val="${idx}" onclick="selectOperation('${rowId}', ${idx},'${BTN_OPERATIONS[idx]}')">${op}</li>`
             ).join('')}
           </ul>
         </div>
@@ -903,8 +903,7 @@ for (var i = 0; i < actions.length; i++) {
   `;
 }
 document.getElementById("short_click_events_tb").innerHTML = tb_html;
-// 刷新 MDL 元素
-componentHandler.upgradeDom();
+
 
 
     });
@@ -1242,9 +1241,9 @@ for (var i = 0; i < actions.length; i++) {
           <input class="mdl-textfield__input" type="text" id="${rowId}-input" readonly value="${valueText}">
           <input type="hidden" id="${rowId}-value" value="${index}">
           <ul class="mdl-menu mdl-menu--bottom-left mdl-js-menu" for="${rowId}-input">
-            <li class="mdl-menu__item" data-val="-1" onclick="selectOperation('${rowId}', -1,BTN_OPERATIONS)">未设置</li>
+            <li class="mdl-menu__item" data-val="-1" onclick="selectOperation('${rowId}', -1,'${BTN_OPERATIONS[0]}')">未设置</li>
             ${BTN_OPERATIONS.map((op, idx) =>
-              `<li class="mdl-menu__item" data-val="${idx}" onclick="selectOperation('${rowId}', ${idx},BTN_OPERATIONS)">${op}</li>`
+              `<li class="mdl-menu__item" data-val="${idx}" onclick="selectOperation('${rowId}', ${idx},'${BTN_OPERATIONS[idx]}')">${op}</li>`
             ).join('')}
           </ul>
         </div>
@@ -1253,8 +1252,7 @@ for (var i = 0; i < actions.length; i++) {
   `;
 }
 document.getElementById("short_click_events_tb").innerHTML = tb_html;
-// 刷新 MDL 元素
-componentHandler.upgradeDom();
+
 
         window.setTimeout(GetPowerRecord, 3000);
       }, power_idx.toString());
@@ -1332,19 +1330,18 @@ componentHandler.upgradeDom();
         GetTimedTask();
       }, cmd);
     }
-function selectOperation(rowId, index, operations) {
+function selectOperation(rowId, index, operationText) {
+var witch = parseInt(rowId.split('-')[1]);
 if (index === -1) {
     document.getElementById(`${rowId}-input`).value = '未设置';
     document.getElementById(`${rowId}-value`).value = -1;
   } else {
-var witch = parseInt(rowId.split('-')[1]);
-  const selectedText = operations[index];
-  document.getElementById(`${rowId}-input`).value = selectedText;
+  document.getElementById(`${rowId}-input`).value = operationText;
   document.getElementById(`${rowId}-value`).value = index;
   }
-HttpDel("/shortClickEvent", function (re) {
+HttpPost("/shortClickEvent", function (re) {
         ShowToast("已设置按钮事件");
-      }, `${witch} index`);
+      }, `${witch} ${index}`);
 }
 
     function DelTimedTask(timestamp) {
