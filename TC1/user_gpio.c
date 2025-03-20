@@ -121,12 +121,6 @@ static void KeyLong10sPress(void) {
 //    mico_system_context_update(mico_system_context_get());
 }
 
-static void handleSwitchSingleSwitch(int witch) {
-
-    UserMqttSendSocketState(witch);
-    UserMqttSendTotalSocketState();
-}
-
 static void KeyShortPress(int clickCnt) {
     if (clickCnt > 10)
         return;
