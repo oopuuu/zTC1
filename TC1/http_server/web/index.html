@@ -885,7 +885,7 @@ for (var i = 0; i < actions.length; i++) {
       <td>${i > 0 ? '连续' : ''}短按${i + 1}次</td>
       <td>
         <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label getmdl-select getmdl-select__fix-height">
-          <input class="mdl-textfield__input" type="text" id="${rowId}-input" readonly value="${BTN_OPERATIONS[actions[i]]}">
+                    <input class="mdl-textfield__input" type="text" id="${rowId}-input" readonly value="${(parseInt(actions[i])<0||parseInt(actions[i])>7)?'未设置':BTN_OPERATIONS[actions[i]]}">
           <input type="hidden" id="${rowId}-value" value="${actions[i]}">
           <ul class="mdl-menu mdl-menu--bottom-left mdl-js-menu" for="${rowId}-input">
   ${BTN_OPERATIONS.map((op, idx) =>
@@ -1231,7 +1231,7 @@ for (var i = 0; i < actions.length; i++) {
       <td>${i > 0 ? '连续' : ''}短按${i + 1}次</td>
       <td>
         <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label getmdl-select getmdl-select__fix-height">
-          <input class="mdl-textfield__input" type="text" id="${rowId}-input" readonly value="${BTN_OPERATIONS[actions[i]]}">
+          <input class="mdl-textfield__input" type="text" id="${rowId}-input" readonly value="${(parseInt(actions[i])<0||parseInt(actions[i])>7)?'未设置':BTN_OPERATIONS[actions[i]]}">
           <input type="hidden" id="${rowId}-value" value="${actions[i]}">
           <ul class="mdl-menu mdl-menu--bottom-left mdl-js-menu" for="${rowId}-input">
   ${BTN_OPERATIONS.map((op, idx) =>
