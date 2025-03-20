@@ -1355,6 +1355,9 @@ HttpPost("/shortClickEvent", function (re) {
     //OTA-start
     function OtaStart() {
       var ota_url = document.getElementById("ota_url").value;
+      var protocol = window.location.protocol;
+      var baseUrl = protocol+"//"+window.location.host;
+
       HttpPost("/ota", function (re) {
         OtaStatus();
       }, ota_url);
@@ -1364,6 +1367,9 @@ HttpPost("/shortClickEvent", function (re) {
       this.MaterialProgress.setProgress(0);
     });
     function OtaStatus() {
+      var protocol = window.location.protocol;
+      var baseUrl = protocol+"//"+window.location.host;
+
       HttpGet("/ota", function (re) {
         var percent = parseInt(re);
         //console.log(re + " " + parseInt(re));
