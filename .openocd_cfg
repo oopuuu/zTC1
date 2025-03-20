@@ -1,3 +1,3 @@
-source [find D:\ProgramData\MiCoder_v1.3_Win32-64/MiCoder/OpenOCD/jlink_swd.cfg] 
-source [find D:\ProgramData\MiCoder_v1.3_Win32-64/MiCoder/OpenOCD/mw3xx.cfg] 
-source [find D:\ProgramData\MiCoder_v1.3_Win32-64/MiCoder/OpenOCD/mw3xx_gdb_jtag.cfg] 
+source [find C:\Users\ooo\Desktop\MiCoder/OpenOCD/jlink_swd.cfg] 
+source [find C:\Users\ooo\Desktop\MiCoder/OpenOCD/mw3xx.cfg] 
+source [find C:\Users\ooo\Desktop\MiCoder/OpenOCD/mw3xx_gdb_jtag.cfg] 

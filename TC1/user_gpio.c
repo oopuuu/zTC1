@@ -84,9 +84,12 @@ void UserRelaySet(unsigned char i, char on) {
     } else if (on == Relay_OFF) {
         MicoGpioOutputLow(relay[i]);
     } else if (on == Relay_TOGGLE) {
-        MicoGpioOutputTrigger(relay[i]);
+    if(user_config->socket_status[i]==Relay_OFF){
+       MicoGpioOutputHigh(relay[i]);
+    }else{
+       MicoGpioOutputLow(relay[i]);
     }
-
+   }
     user_config->socket_status[i] = on >= 0 ? on : (user_config->socket_status[i] == 0 ? 1 : 0);
 
     if (RelayOut() && user_config->power_led_enabled) {
@@ -123,16 +126,17 @@ static void KeyLong10sPress(void) {
 
 static void KeyShortPress(int clickCnt) {
     key_log("WARNGIN:Power key quick clicked %d time%s",clickCnt,clickCnt>1?"s":"");
-    if (clickCnt > 10)
+    if (clickCnt > 10||clickCnt <= 0)
         return;
     switch (user_config->user[clickCnt]) {
         case SWITCH_TOTAL_SOCKET:
+        key_log("WARNGIN:SWITCH_TOTAL_SOCKET");
             if (RelayOut()) {
                 UserRelaySetAll(0);
             } else {
                 UserRelaySetAll(1);
             }
-
+            mico_system_context_update(sys_config);
             for (int i = 0; i < SOCKET_NUM; i++) {
                 UserMqttSendSocketState(i);
             }
@@ -144,12 +148,14 @@ static void KeyShortPress(int clickCnt) {
         case SWITCH_SOCKET_4:
         case SWITCH_SOCKET_5:
         case SWITCH_SOCKET_6:
+        key_log("WARNGIN:SWITCH_SOCKET%d %s",user_config->user[clickCnt] - 1,user_config->socket_names[user_config->user[clickCnt] - 1]);
             UserRelaySet(user_config->user[clickCnt] - 1, Relay_TOGGLE);
             UserMqttSendSocketState(user_config->user[clickCnt] - 1);
             UserMqttSendTotalSocketState();
             mico_system_context_update(sys_config);
             break;
         case SWITCH_LED_ENABLE:
+        key_log("WARNGIN:SWITCH_LED_ENABLE");
             MQTT_LED_ENABLED = MQTT_LED_ENABLED == 0 ? 1 : 0;
             if (RelayOut() && MQTT_LED_ENABLED) {
                 UserLedSet(1);
@@ -172,6 +178,10 @@ uint16_t key_time = 0;
 #define BUTTON_LONG_PRESS_TIME    10     //100ms*10=1s
 
 static void ClickEndTimeoutHandler(void *arg) {
+    if(click_count<=0){
+      click_count = 0;
+      return;
+    }
     KeyShortPress(click_count);
     click_count = 0;
 }
@@ -237,7 +247,7 @@ static void KeyFallingIrqHandler(void *arg) {
 void KeyInit(void) {
     MicoGpioInitialize(Button, INPUT_PULL_UP);
     mico_rtos_init_timer(&user_key_timer, 100, KeyTimeoutHandler, NULL);
-    mico_rtos_init_timer(&click_end_timer, 300, ClickEndTimeoutHandler, NULL);
+    mico_rtos_init_timer(&click_end_timer, 400, ClickEndTimeoutHandler, NULL);
     MicoGpioEnableIRQ(Button, IRQ_TRIGGER_FALLING_EDGE, KeyFallingIrqHandler, NULL);
 
 }

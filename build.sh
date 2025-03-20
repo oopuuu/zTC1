@@ -9,15 +9,17 @@ patch=$(echo $ver | cut -d. -f3)
 patch=$((patch + 1))
 new_ver="v${major}.${minor}.${patch}"
 echo $new_ver > $version_file
+
+
 cd ./TC1/http_server
 
 python ./test.py > web_data.c
 
 cd ../..
 
-mico make clean
+mico make TC1@MK3031@moc total
 
-mico make TC1@MK3031@moc total -D__VERSION_FROM_FILE__="\"$(cat .version)\""
+cp ./build/TC1\@MK3031\@moc/binary/TC1\@MK3031\@moc.ota.bin ./build/TC1\@MK3031\@moc/binary/ota.bin
 
 cp ./build/TC1\@MK3031\@moc/binary/TC1\@MK3031\@moc.ota.bin ./build/TC1\@MK3031\@moc/binary/ota$(date +%Y%m%d%H%M%S).bin
 
