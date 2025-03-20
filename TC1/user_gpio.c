@@ -230,16 +230,19 @@ static void KeyTimeoutHandler(void *arg) {
         } else if (key_time > 100) {
             MicoSystemReboot();
         }
-        mico_rtos_stop_timer(&user_key_timer);
+        key_time = 0;  // 只重置，不要马上 stop timer
     }
 
-    // 多击判定逻辑（100ms为单位）
+// 多击判定处理
     if (waiting_click_end) {
         click_timer++;
-        if (click_timer >= 3) { // 300ms内没有新击，判定结束
+        if (click_timer >= 5) {
             KeyShortPress(click_count);
             click_count = 0;
             waiting_click_end = false;
+            click_timer = 0;
+            // ✅ 此时再 stop timer（可选）
+         mico_rtos_stop_timer(&user_key_timer);
         }
     }
 }
