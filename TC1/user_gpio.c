@@ -132,14 +132,13 @@ static void KeyShortPress(int clickCnt) {
         return;
     switch (user_config->user[clickCnt]) {
         case SWITCH_TOTAL_SOCKET:
-            char i;
             if (RelayOut()) {
                 UserRelaySetAll(0);
             } else {
                 UserRelaySetAll(1);
             }
 
-            for (i = 0; i < SOCKET_NUM; i++) {
+            for (int i = 0; i < SOCKET_NUM; i++) {
                 UserMqttSendSocketState(i);
             }
             UserMqttSendTotalSocketState();
