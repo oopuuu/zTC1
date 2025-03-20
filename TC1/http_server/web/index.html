@@ -899,7 +899,7 @@ for (var i = 0; i < actions.length; i++) {
   `;
 }
 document.getElementById("short_click_events_tb").innerHTML = tb_html;
-
+componentHandler.upgradeDom();
 
 
     });
@@ -1248,6 +1248,7 @@ for (var i = 0; i < actions.length; i++) {
   `;
 }
 document.getElementById("short_click_events_tb").innerHTML = tb_html;
+componentHandler.upgradeDom();
 
         window.setTimeout(GetPowerRecord, 3000);
       }, power_idx.toString());
