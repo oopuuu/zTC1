@@ -162,7 +162,7 @@ int application_start(void) {
         sprintf(sys_config->micoSystemConfig.name, ZTC1_NAME, str_mac + 8);
     }
 
-    tc1_log("user:%s", user_config->user);tc1_log("device name:%s",
+    tc1_log("device name:%s",
                                                   sys_config->micoSystemConfig.name);tc1_log(
             "mqtt_ip:%s", user_config->mqtt_ip);tc1_log("mqtt_port:%d",
                                                         user_config->mqtt_port);tc1_log(
