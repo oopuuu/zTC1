@@ -149,6 +149,7 @@ static int HttpGetAssets(httpd_request_t *req) {
 
 static int HttpGetTc1Status(httpd_request_t *req) {
     char *sockets = GetSocketStatus();
+    char *short_click_config = GetShortClickConfig();
     char *tc1_status = malloc(1024);
     char *socket_names = malloc(512);
     sprintf(socket_names, "%s,%s,%s,%s,%s,%s",
@@ -163,7 +164,8 @@ static int HttpGetTc1Status(httpd_request_t *req) {
             user_config->ap_name, user_config->ap_key, MQTT_SERVER, MQTT_SERVER_PORT,
             MQTT_SERVER_USR, MQTT_SERVER_PWD,
             VERSION, ip_status.ip, ip_status.mask, ip_status.gateway, user_config->mqtt_report_freq,
-            user_config->power_led_enabled, 0L,socket_names,childLockEnabled,sys_config->micoSystemConfig.name);
+            user_config->power_led_enabled, 0L, socket_names, childLockEnabled,
+            sys_config->micoSystemConfig.name, short_click_config);
 
     OSStatus err = kNoErr;
     send_http(tc1_status, strlen(tc1_status), exit, &err);
@@ -202,10 +204,31 @@ static int HttpSetSocketName(httpd_request_t *req) {
     require_noerr(err, exit);
     int index;
     char name[64];
-    sscanf(buf, "%d %s",&index,name);
-    strcpy(user_config->socket_names[index],name);
+    sscanf(buf, "%d %s", &index, name);
+    strcpy(user_config->socket_names[index], name);
     mico_system_context_update(sys_config);
     registerMqttEvents();
+    send_http("OK", 2, exit, &err);
+
+    exit:
+    if (buf) free(buf);
+    return err;
+}
+
+static int HttpSetShortClickEvent(httpd_request_t *req) {
+    OSStatus err = kNoErr;
+
+    int buf_size = 10;
+    char *buf = malloc(buf_size);
+
+    err = httpd_get_data(req, buf, buf_size);
+    require_noerr(err, exit);
+    int index;
+    int func;
+    sscanf(buf, "%d %d", &index, &func);
+    user_config->user[index + 1] = func;
+    mico_system_context_update(sys_config);
+
     send_http("OK", 2, exit, &err);
 
     exit:
@@ -222,8 +245,8 @@ static int HttpSetDeviceName(httpd_request_t *req) {
     err = httpd_get_data(req, buf, buf_size);
     require_noerr(err, exit);
     char name[64];
-    sscanf(buf, "%s",name);
-    strcpy(sys_config->micoSystemConfig.name,name);
+    sscanf(buf, "%s", name);
+    strcpy(sys_config->micoSystemConfig.name, name);
     mico_system_context_update(sys_config);
     registerMqttEvents();
     send_http("OK", 2, exit, &err);
@@ -242,7 +265,7 @@ static int HttpSetChildLock(httpd_request_t *req) {
     err = httpd_get_data(req, buf, buf_size);
     require_noerr(err, exit);
     int enableLock;
-    sscanf(buf, "%d",&enableLock);
+    sscanf(buf, "%d", &enableLock);
     user_config->user[0] = enableLock;
     childLockEnabled = enableLock;
     mico_system_context_update(sys_config);
@@ -275,6 +298,7 @@ static int HttpGetPowerInfo(httpd_request_t *req) {
 
     char *powers = GetPowerRecord(idx);
     char *sockets = GetSocketStatus();
+    char *short_click_config = GetShortClickConfig();
     char *socket_names = malloc(512);
     sprintf(socket_names, "%s,%s,%s,%s,%s,%s",
             user_config->socket_names[0],
@@ -284,7 +308,9 @@ static int HttpGetPowerInfo(httpd_request_t *req) {
             user_config->socket_names[4],
             user_config->socket_names[5]);
     sprintf(power_info_json, POWER_INFO_JSON, sockets, power_record.idx, PW_NUM, p_count, powers,
-            up_time,user_config->power_led_enabled,RelayOut()?1:0,socket_names,user_config->p_count_1_day_ago,user_config->p_count_2_days_ago,childLockEnabled,sys_config->micoSystemConfig.name);
+            up_time, user_config->power_led_enabled, RelayOut() ? 1 : 0, socket_names,
+            user_config->p_count_1_day_ago, user_config->p_count_2_days_ago, childLockEnabled,
+            sys_config->micoSystemConfig.name, short_click_config);
     send_http(power_info_json, strlen(power_info_json), exit, &err);
     if (socket_names) free(socket_names);
     exit:
@@ -408,7 +434,7 @@ static int HttpGetMqttReportFreq(httpd_request_t *req) {
     send_http(freq, strlen(freq), exit, &err);
 
     exit:
-    if(freq) free(freq);
+    if (freq) free(freq);
     return err;
 }
 
@@ -459,7 +485,7 @@ static int HttpAddTask(httpd_request_t *req) {
     char *mess = (re == 4 && AddTask(task)) ? "OK" : "NO";
 
     send_http(mess, strlen(mess), exit, &err);
-    if(mess) free(mess);
+    if (mess) free(mess);
     exit:
     return err;
 }
@@ -479,7 +505,7 @@ static int HttpDelTask(httpd_request_t *req) {
 
     send_http(mess, strlen(mess), exit, &err);
     exit:
-    if(time_str) free(time_str);
+    if (time_str) free(time_str);
     return err;
 }
 
@@ -492,7 +518,7 @@ static int LedStatus(httpd_request_t *req) {
     send_http(led, strlen(led), exit, &err);
 
     exit:
-    if(led) free(led);
+    if (led) free(led);
     return err;
 }
 
@@ -521,7 +547,7 @@ static int LedSetEnabled(httpd_request_t *req) {
     return err;
 }
 
-static int TotalSocketSetEnabled(httpd_request_t *req){
+static int TotalSocketSetEnabled(httpd_request_t *req) {
     OSStatus err = kNoErr;
 
     int buf_size = 97;
@@ -585,10 +611,11 @@ const struct httpd_wsgi_call g_app_handlers[] = {
         {"/task",             HTTPD_HDR_DEFORT, APP_HTTP_FLAGS_NO_EXACT_MATCH, HttpGetTasks,          HttpAddTask,           NULL, HttpDelTask},
         {"/ota",              HTTPD_HDR_DEFORT, 0,                             Otastatus,             OtaStart,              NULL, NULL},
         {"/led",              HTTPD_HDR_DEFORT, 0,                             LedStatus,             LedSetEnabled,         NULL, NULL},
-        {"/socketAll",              HTTPD_HDR_DEFORT, 0,                             NULL,             TotalSocketSetEnabled,         NULL, NULL},
-        {"/socketNames",           HTTPD_HDR_DEFORT, 0, NULL,                                              HttpSetSocketName,   NULL, NULL},
-        {"/childLock",           HTTPD_HDR_DEFORT, 0, NULL,                                              HttpSetChildLock,   NULL, NULL},
-        {"/deviceName",           HTTPD_HDR_DEFORT, 0, NULL,                                              HttpSetDeviceName,   NULL, NULL},
+        {"/socketAll",        HTTPD_HDR_DEFORT, 0, NULL,                                              TotalSocketSetEnabled, NULL, NULL},
+        {"/socketNames",      HTTPD_HDR_DEFORT, 0, NULL,                                              HttpSetSocketName,     NULL, NULL},
+        {"/childLock",        HTTPD_HDR_DEFORT, 0, NULL,                                              HttpSetChildLock,      NULL, NULL},
+        {"/deviceName",       HTTPD_HDR_DEFORT, 0, NULL,                                              HttpSetDeviceName,     NULL, NULL},
+        {"/shortClickEvent",      HTTPD_HDR_DEFORT, 0, NULL,                                              HttpSetShortClickEvent,     NULL, NULL},
 };
 
 static int g_app_handlers_no = sizeof(g_app_handlers) / sizeof(struct httpd_wsgi_call);

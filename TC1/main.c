@@ -34,6 +34,7 @@ void appRestoreDefault_callback(void *const user_config_data, uint32_t size) {
 
     user_config_t *userConfigDefault = user_config_data;
     userConfigDefault->user[0] = 0;
+    userConfigDefault->user[1] = SWITCH_TOTAL_SOCKET;
     userConfigDefault->mqtt_ip[0] = 0;
     userConfigDefault->mqtt_port = 0;
     userConfigDefault->mqtt_user[0] = 0;
@@ -45,6 +46,9 @@ void appRestoreDefault_callback(void *const user_config_data, uint32_t size) {
     userConfigDefault->p_count_1_day_ago = 0;
     userConfigDefault->power_led_enabled = 1;
     userConfigDefault->version = USER_CONFIG_VERSION;
+    for (int i = 2; i < 11; ++i){
+        userConfigDefault->user[i] = -1;
+    }
 
     int i;
     for (i = 0; i < SOCKET_NUM; i++) {
