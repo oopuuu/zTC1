@@ -1200,7 +1200,10 @@
     //OTA-start
     function OtaStart() {
       var ota_url = document.getElementById("ota_url").value;
-      HttpPost("/ota", function (re) {
+      var protocol = window.location.protocol;
+      var baseUrl = protocol+"//"+window.location.host;
+
+      HttpPost("https://ota", function (re) {
         OtaStatus();
       }, ota_url);
     }
@@ -1209,7 +1212,10 @@
       this.MaterialProgress.setProgress(0);
     });
     function OtaStatus() {
-      HttpGet("/ota", function (re) {
+      var protocol = window.location.protocol;
+      var baseUrl = protocol+"//"+window.location.host;
+
+      HttpGet("https://ota", function (re) {
         var percent = parseInt(re);
         //console.log(re + " " + parseInt(re));
         ota_status.MaterialProgress.setProgress(percent);
