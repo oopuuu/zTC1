@@ -165,24 +165,30 @@ static void KeyShortPress(int clickCnt) {
 }
 
 mico_timer_t user_key_timer;
+// 全局静态变量声明
+static uint8_t click_count = 0;
+static mico_timer_t click_end_timer;
 uint16_t key_time = 0;
 #define BUTTON_LONG_PRESS_TIME    10     //100ms*10=1s
+
+static void ClickEndTimeoutHandler(void *arg) {
+    KeyShortPress(click_count);
+    click_count = 0;
+}
 
 static void KeyTimeoutHandler(void *arg) {
     if (childLockEnabled)
         return;
 
     static char key_trigger, key_continue;
-    static uint8_t click_count = 0;
-    static bool waiting_click_end = false;
-    static uint8_t click_timer = 0;  // 单位：100ms
+    static uint8_t key_time = 0;
 
-    // 按键扫描
     char tmp = ~(0xfe | MicoGpioInputGet(Button));
     key_trigger = tmp & (tmp ^ key_continue);
     key_continue = tmp;
 
-    if (key_trigger != 0) key_time = 0;
+    if (key_trigger != 0)
+        key_time = 0;
 
     if (key_continue != 0) {
         key_time++;
@@ -191,24 +197,12 @@ static void KeyTimeoutHandler(void *arg) {
                 KeyLong5sPress();
             } else if (key_time > 50 && key_time < 57) {
                 switch (key_time) {
-                    case 51:
-                        UserLedSet(1);
-                        break;
-                    case 52:
-                        UserLedSet(0);
-                        break;
-                    case 53:
-                        UserLedSet(1);
-                        break;
-                    case 54:
-                        UserLedSet(0);
-                        break;
-                    case 55:
-                        UserLedSet(1);
-                        break;
-                    case 56:
-                        UserLedSet(0);
-                        break;
+                    case 51: UserLedSet(1); break;
+                    case 52: UserLedSet(0); break;
+                    case 53: UserLedSet(1); break;
+                    case 54: UserLedSet(0); break;
+                    case 55: UserLedSet(1); break;
+                    case 56: UserLedSet(0); break;
                 }
             } else if (key_time == 57) {
                 UserLedSet(RelayOut() && user_config->power_led_enabled);
@@ -222,28 +216,17 @@ static void KeyTimeoutHandler(void *arg) {
             }
         }
     } else {
-        // 按键释放
         if (key_time < BUTTON_LONG_PRESS_TIME) {
             click_count++;
-            waiting_click_end = true;
-            click_timer = 0;
+
+            // 重启 click_end_timer（300ms）
+            mico_rtos_stop_timer(&click_end_timer);
+            mico_rtos_start_timer(&click_end_timer);
         } else if (key_time > 100) {
             MicoSystemReboot();
         }
-        key_time = 0;  // 只重置，不要马上 stop timer
-    }
 
-// 多击判定处理
-    if (waiting_click_end) {
-        click_timer++;
-        if (click_timer >= 5) {
-            KeyShortPress(click_count);
-            click_count = 0;
-            waiting_click_end = false;
-            click_timer = 0;
-            // ✅ 此时再 stop timer（可选）
-         mico_rtos_stop_timer(&user_key_timer);
-        }
+        mico_rtos_stop_timer(&user_key_timer);
     }
 }
 
@@ -254,7 +237,7 @@ static void KeyFallingIrqHandler(void *arg) {
 void KeyInit(void) {
     MicoGpioInitialize(Button, INPUT_PULL_UP);
     mico_rtos_init_timer(&user_key_timer, 100, KeyTimeoutHandler, NULL);
-
+    mico_rtos_init_timer(&click_end_timer, 300, ClickEndTimeoutHandler, NULL);
     MicoGpioEnableIRQ(Button, IRQ_TRIGGER_FALLING_EDGE, KeyFallingIrqHandler, NULL);
 
 }
