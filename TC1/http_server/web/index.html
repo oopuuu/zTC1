@@ -1210,46 +1210,6 @@ componentHandler.upgradeDom();
             switch_lables[i+3].MaterialSwitch.off();
           }
         }
-var actions=power.shortClicks.split(",");
-    //按键操作功能定义
-    var BTN_OPERATIONS=["切换总开关"];
-    for (var i = 0; i < names_arr.length; i++) {
-      BTN_OPERATIONS.push(`切换${names_arr[i]}`);
-    }
-    BTN_OPERATIONS.push("切换电源指示灯启用");
-var tb_html = `
-  <tr>
-    <th>按键类型</th>
-    <th>执行操作</th>
-  </tr>
-`;
-
-for (var i = 0; i < actions.length; i++) {
-  var rowId = `select-${i}`;
-  var index = parseInt(actions[i]);
-  var valueText = (isNaN(index) || index < 0 || index >= BTN_OPERATIONS.length) ? '未设置' : BTN_OPERATIONS[index];
-
-  tb_html += `
-    <tr>
-      <td>${i > 0 ? '连续' : ''}短按${i + 1}次</td>
-      <td>
-        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label getmdl-select getmdl-select__fix-height">
-          <input class="mdl-textfield__input" type="text" id="${rowId}-input" readonly value="${valueText}">
-          <input type="hidden" id="${rowId}-value" value="${index}">
-          <ul class="mdl-menu mdl-menu--bottom-left mdl-js-menu" for="${rowId}-input">
-            <li class="mdl-menu__item" data-val="-1" onclick="selectOperation('${rowId}', -1,'${BTN_OPERATIONS[0]}')">未设置</li>
-            ${BTN_OPERATIONS.map((op, idx) =>
-              `<li class="mdl-menu__item" data-val="${idx}" onclick="selectOperation('${rowId}', ${idx},'${BTN_OPERATIONS[idx]}')">${op}</li>`
-            ).join('')}
-          </ul>
-        </div>
-      </td>
-    </tr>
-  `;
-}
-document.getElementById("short_click_events_tb").innerHTML = tb_html;
-componentHandler.upgradeDom();
-
         window.setTimeout(GetPowerRecord, 3000);
       }, power_idx.toString());
     }

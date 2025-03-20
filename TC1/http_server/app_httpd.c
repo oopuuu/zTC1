@@ -457,6 +457,16 @@ static int HttpGetTasks(httpd_request_t *req) {
     return err;
 }
 
+static int HttpGetShortClickEvents(httpd_request_t *req) {
+    OSStatus err = kNoErr;
+    char *clicks = GetShortClickConfig();
+    send_http(clicks, strlen(clicks), exit, &err);
+
+    exit:
+    if (clicks) free(clicks);
+    return err;
+}
+
 static int HttpAddTask(httpd_request_t *req) {
     OSStatus err = kNoErr;
 
@@ -615,7 +625,7 @@ const struct httpd_wsgi_call g_app_handlers[] = {
         {"/socketNames",      HTTPD_HDR_DEFORT, 0, NULL,                                              HttpSetSocketName,     NULL, NULL},
         {"/childLock",        HTTPD_HDR_DEFORT, 0, NULL,                                              HttpSetChildLock,      NULL, NULL},
         {"/deviceName",       HTTPD_HDR_DEFORT, 0, NULL,                                              HttpSetDeviceName,     NULL, NULL},
-        {"/shortClickEvent",      HTTPD_HDR_DEFORT, 0, NULL,                                              HttpSetShortClickEvent,     NULL, NULL},
+        {"/shortClickEvent",      HTTPD_HDR_DEFORT, 0, HttpGetShortClickEvents,                                              HttpSetShortClickEvent,     NULL, NULL},
 };
 
 static int g_app_handlers_no = sizeof(g_app_handlers) / sizeof(struct httpd_wsgi_call);
