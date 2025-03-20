@@ -122,6 +122,7 @@ static void KeyLong10sPress(void) {
 }
 
 static void KeyShortPress(int clickCnt) {
+    key_log("WARNGIN: quick clicked %d time%s",clickCnt,clickCnt>1?"s":"");
     if (clickCnt > 10)
         return;
     switch (user_config->user[clickCnt]) {
