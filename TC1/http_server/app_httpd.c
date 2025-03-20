@@ -583,7 +583,7 @@ const struct httpd_wsgi_call g_app_handlers[] = {
         {"/mqtt/report/freq", HTTPD_HDR_DEFORT, 0,                             HttpGetMqttReportFreq, HttpSetMqttReportFreq, NULL, NULL},
         {"/log",              HTTPD_HDR_DEFORT, 0,                             HttpGetLog,       NULL,                       NULL, NULL},
         {"/task",             HTTPD_HDR_DEFORT, APP_HTTP_FLAGS_NO_EXACT_MATCH, HttpGetTasks,          HttpAddTask,           NULL, HttpDelTask},
-        {"https://ota",              HTTPD_HDR_DEFORT, 0,                             Otastatus,             OtaStart,              NULL, NULL},
+        {"/ota",              HTTPD_HDR_DEFORT, 0,                             Otastatus,             OtaStart,              NULL, NULL},
         {"/led",              HTTPD_HDR_DEFORT, 0,                             LedStatus,             LedSetEnabled,         NULL, NULL},
         {"/socketAll",              HTTPD_HDR_DEFORT, 0,                             NULL,             TotalSocketSetEnabled,         NULL, NULL},
         {"/socketNames",           HTTPD_HDR_DEFORT, 0, NULL,                                              HttpSetSocketName,   NULL, NULL},
