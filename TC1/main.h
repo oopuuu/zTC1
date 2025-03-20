@@ -35,6 +35,7 @@
 
 #define Relay_ON  1
 #define Relay_OFF 0
+#define Relay_TOGGLE -1
 
 #define Relay_0   MICO_GPIO_6
 #define Relay_1   MICO_GPIO_8
