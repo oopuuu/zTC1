@@ -878,20 +878,25 @@ var tb_html = `
   </tr>
 `;
 
+
 for (var i = 0; i < actions.length; i++) {
   var rowId = `select-${i}`;
+  var index = parseInt(actions[i]);
+  var valueText = (isNaN(index) || index < 0 || index >= BTN_OPERATIONS.length) ? '未设置' : BTN_OPERATIONS[index];
+
   tb_html += `
     <tr>
       <td>${i > 0 ? '连续' : ''}短按${i + 1}次</td>
       <td>
         <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label getmdl-select getmdl-select__fix-height">
-                    <input class="mdl-textfield__input" type="text" id="${rowId}-input" readonly value="${(parseInt(actions[i])<0||parseInt(actions[i])>7)?'未设置':BTN_OPERATIONS[actions[i]]}">
-          <input type="hidden" id="${rowId}-value" value="${actions[i]}">
+          <input class="mdl-textfield__input" type="text" id="${rowId}-input" readonly value="${valueText}">
+          <input type="hidden" id="${rowId}-value" value="${index}">
           <ul class="mdl-menu mdl-menu--bottom-left mdl-js-menu" for="${rowId}-input">
-  ${BTN_OPERATIONS.map((op, idx) =>
-    `<li class="mdl-menu__item" data-val="${idx}" onclick="selectOperation('${rowId}', ${idx}, BTN_OPERATIONS)"> ${op} </li>`
-  ).join('')}
-</ul>
+            <li class="mdl-menu__item" data-val="-1" onclick="selectOperation('${rowId}', -1,BTN_OPERATIONS)">未设置</li>
+            ${BTN_OPERATIONS.map((op, idx) =>
+              `<li class="mdl-menu__item" data-val="${idx}" onclick="selectOperation('${rowId}', ${idx},BTN_OPERATIONS)">${op}</li>`
+            ).join('')}
+          </ul>
         </div>
       </td>
     </tr>
@@ -1226,18 +1231,22 @@ var tb_html = `
 
 for (var i = 0; i < actions.length; i++) {
   var rowId = `select-${i}`;
+  var index = parseInt(actions[i]);
+  var valueText = (isNaN(index) || index < 0 || index >= BTN_OPERATIONS.length) ? '未设置' : BTN_OPERATIONS[index];
+
   tb_html += `
     <tr>
       <td>${i > 0 ? '连续' : ''}短按${i + 1}次</td>
       <td>
         <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label getmdl-select getmdl-select__fix-height">
-          <input class="mdl-textfield__input" type="text" id="${rowId}-input" readonly value="${(parseInt(actions[i])<0||parseInt(actions[i])>7)?'未设置':BTN_OPERATIONS[actions[i]]}">
-          <input type="hidden" id="${rowId}-value" value="${actions[i]}">
+          <input class="mdl-textfield__input" type="text" id="${rowId}-input" readonly value="${valueText}">
+          <input type="hidden" id="${rowId}-value" value="${index}">
           <ul class="mdl-menu mdl-menu--bottom-left mdl-js-menu" for="${rowId}-input">
-  ${BTN_OPERATIONS.map((op, idx) =>
-    `<li class="mdl-menu__item" data-val="${idx}" onclick="selectOperation('${rowId}', ${idx}, BTN_OPERATIONS)"> ${op} </li>`
-  ).join('')}
-</ul>
+            <li class="mdl-menu__item" data-val="-1" onclick="selectOperation('${rowId}', -1,BTN_OPERATIONS)">未设置</li>
+            ${BTN_OPERATIONS.map((op, idx) =>
+              `<li class="mdl-menu__item" data-val="${idx}" onclick="selectOperation('${rowId}', ${idx},BTN_OPERATIONS)">${op}</li>`
+            ).join('')}
+          </ul>
         </div>
       </td>
     </tr>
@@ -1324,10 +1333,15 @@ componentHandler.upgradeDom();
       }, cmd);
     }
 function selectOperation(rowId, index, operations) {
+if (index === -1) {
+    document.getElementById(`${rowId}-input`).value = '未设置';
+    document.getElementById(`${rowId}-value`).value = -1;
+  } else {
 var witch = parseInt(rowId.split('-')[1]);
   const selectedText = operations[index];
   document.getElementById(`${rowId}-input`).value = selectedText;
   document.getElementById(`${rowId}-value`).value = index;
+  }
 HttpDel("/shortClickEvent", function (re) {
         ShowToast("已设置按钮事件");
       }, `${witch} index`);

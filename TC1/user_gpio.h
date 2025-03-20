@@ -17,7 +17,7 @@ extern char socket_status[32];
 
 void UserLedSet(char x);
 void KeyInit(void);
-void UserRelaySet(unsigned char x,unsigned char y);
+void UserRelaySet(unsigned char x, char y);
 void UserRelaySetAll(char y);
 bool RelayOut(void);
 char* GetSocketStatus();
