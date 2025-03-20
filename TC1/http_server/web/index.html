@@ -296,10 +296,6 @@
                                 <th>按键类型</th>
                                 <th>执行操作</th>
                             </tr>
-                            <tr>
-                                <td>连续短按1次</td>
-                                <td><a>总开关</a></td>
-                            </tr>
                         </table>
 
                 </div>
@@ -903,6 +899,12 @@ for (var i = 0; i < actions.length; i++) {
   `;
 }
 document.getElementById("short_click_events_tb").innerHTML = tb_html;
+// 手动将所有 .mdl-menu 挪到 body 下
+document.querySelectorAll('.mdl-menu').forEach(menu => {
+  if (menu.parentElement !== document.body) {
+    document.body.appendChild(menu);
+  }
+});
 
 
 
@@ -1252,7 +1254,11 @@ for (var i = 0; i < actions.length; i++) {
   `;
 }
 document.getElementById("short_click_events_tb").innerHTML = tb_html;
-
+document.querySelectorAll('.mdl-menu').forEach(menu => {
+  if (menu.parentElement !== document.body) {
+    document.body.appendChild(menu);
+  }
+});
 
         window.setTimeout(GetPowerRecord, 3000);
       }, power_idx.toString());
