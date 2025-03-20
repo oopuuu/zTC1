@@ -176,6 +176,7 @@ static OSStatus MqttMsgPublish(Client *c, const char *topic, char qos, char reta
 }
 
 void registerMqttEvents(void) {
+    timer_status = 0;
     mico_start_timer(&timer_handle);
 }
 
