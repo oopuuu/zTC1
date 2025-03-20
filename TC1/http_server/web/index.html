@@ -818,6 +818,47 @@
     var mqtt_pwd;
     var mqtt_freq;
 
+    $("#st-date").html((new Date()).Format("yyyy-MM-dd"));
+
+    //Menu-start
+    var chart_par = document.getElementById("ct-chart-par");
+    chart_par.scrollTo(chart_par.scrollWidth, 0);
+
+    var ssid_slt = document.getElementById("ssid_sel_list");
+
+    var rescan_timer;
+
+    function ShowPage(id) {
+      $(".page").hide();
+      $(".page"+id).show();
+      $(".is-small-screen >> .mdl-layout__drawer-button").click()
+
+      chart_par.scrollTo(chart_par.scrollWidth, 0);
+
+      $(".mdl-navigation__link").removeClass("mdl-nav-active");
+      $(".mdl-navigation__link:eq("+(id-1)+")").addClass("mdl-nav-active");
+
+      if(id == 2) {
+        Rescan();
+        $("#custom_password")[0].parentElement.MaterialTextfield.change(info_wifi_password);
+        $("#mqtt_addr")[0].parentElement.MaterialTextfield.change(mqtt_addr);
+        $("#mqtt_port")[0].parentElement.MaterialTextfield.change(mqtt_port);
+        $("#mqtt_usr")[0].parentElement.MaterialTextfield.change(mqtt_usr);
+        $("#mqtt_pwd")[0].parentElement.MaterialTextfield.change(mqtt_pwd);
+        $("#mqtt_freq")[0].parentElement.MaterialTextfield.change(mqtt_freq);
+      } else {
+        window.clearTimeout(rescan_timer);
+      }
+    }
+    ShowPage(1);
+    //Menu-end
+
+    //Socket-start
+    var socket_ul = document.getElementById("socket_ul");
+    var checkboxs = socket_ul.getElementsByClassName("mdl-switch__input");
+    var switch_lables = socket_ul.getElementsByClassName("mdl-switch");
+
+
     HttpGet("/status", function (re) {
       var status = JSON.parse(re);
       var status_arr = status.sockets.split(",");
@@ -903,45 +944,7 @@ componentHandler.upgradeDom();
 
 
     });
-    $("#st-date").html((new Date()).Format("yyyy-MM-dd"));
 
-    //Menu-start
-    var chart_par = document.getElementById("ct-chart-par");
-    chart_par.scrollTo(chart_par.scrollWidth, 0);
-
-    var ssid_slt = document.getElementById("ssid_sel_list");
-
-    var rescan_timer;
-
-    function ShowPage(id) {
-      $(".page").hide();
-      $(".page"+id).show();
-      $(".is-small-screen >> .mdl-layout__drawer-button").click()
-
-      chart_par.scrollTo(chart_par.scrollWidth, 0);
-
-      $(".mdl-navigation__link").removeClass("mdl-nav-active");
-      $(".mdl-navigation__link:eq("+(id-1)+")").addClass("mdl-nav-active");
-
-      if(id == 2) {
-        Rescan();
-        $("#custom_password")[0].parentElement.MaterialTextfield.change(info_wifi_password);
-        $("#mqtt_addr")[0].parentElement.MaterialTextfield.change(mqtt_addr);
-        $("#mqtt_port")[0].parentElement.MaterialTextfield.change(mqtt_port);
-        $("#mqtt_usr")[0].parentElement.MaterialTextfield.change(mqtt_usr);
-        $("#mqtt_pwd")[0].parentElement.MaterialTextfield.change(mqtt_pwd);
-        $("#mqtt_freq")[0].parentElement.MaterialTextfield.change(mqtt_freq);
-      } else {
-        window.clearTimeout(rescan_timer);
-      }
-    }
-    ShowPage(1);
-    //Menu-end
-
-    //Socket-start
-    var socket_ul = document.getElementById("socket_ul");
-    var checkboxs = socket_ul.getElementsByClassName("mdl-switch__input");
-    var switch_lables = socket_ul.getElementsByClassName("mdl-switch");
     $(".mdl-switch__input").on("click", function() {
     if("list-switch-all" == this.id||"list-switch-child-lock"== this.id){
     return;
