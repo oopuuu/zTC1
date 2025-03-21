@@ -996,7 +996,7 @@ $('#btn_action_selector').append(
         .text(BTN_OPERATIONS[i])
     );
   }
-
+getmdlSelect.init(".getmdl-select");
 
 var tb_html = `
   <tr>
@@ -1015,9 +1015,9 @@ for (var i = 0; i < actions.length; i++) {
   var valueText = (isNaN(operations[0]) || operations[0] < 0 || operations[0] >= BTN_OPERATIONS.length) ? '未设置' : BTN_OPERATIONS[operations[0]];
   tb_html += `
     <tr>
-      <td>${times > 0 ? '连续' : ''}短按${times}次</td>
+      <td>${times > 1 ? '连续' : ''}短按${times}次</td>
       <td>${valueText}</td>
-      <td><a>删除</a></td>
+      <td><a href='javascript:deleteButtonEvent(${times},0);'>删除</a></td>
     </tr>
   `;
   }
@@ -1028,7 +1028,7 @@ for (var i = 0; i < actions.length; i++) {
     <tr>
       <td>长按${times}秒</td>
       <td>${valueText}</td>
-      <td><a>删除</a></td>
+      <td><a href='javascript:deleteButtonEvent(${times},1);'>删除</a></td>
     </tr>
   `;
   }
@@ -1398,6 +1398,7 @@ componentHandler.upgradeDom();
         .text(i)
     );
   }
+  getmdlSelect.init(".getmdl-select");
 });
    function addButtonEvent() {
 
@@ -1410,6 +1411,13 @@ componentHandler.upgradeDom();
         ShowToast("已添加按钮事件");
         }
       }, `${times_or_seconds} ${event} ${longPress}`);
+    }
+    function deleteButtonEvent(times_or_seconds ,longPress){
+    HttpPost("/buttonEvents", function (re) {
+        if (re == "OK") {
+        ShowToast("已删除按钮事件");
+        }
+      }, `${times_or_seconds} -1 ${longPress}`);
     }
 function selectOperation(rowId, index, operationText) {
 var witch = parseInt(rowId.split('-')[1]);
