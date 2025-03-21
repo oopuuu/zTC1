@@ -226,11 +226,11 @@ static int HttpSetButtonEvent(httpd_request_t *req) {
     int index;
     int func;
     int longPress;
-    sscanf(buf, "%d %d %d", &index, &func &longPress);
-    if(longPress){
-        set_key_map(index, get_short_func(index), func==-1?NO_FUNCTION:func);
-    }else{
-        set_key_map(index,func==-1?NO_FUNCTION:func, get_long_func(index));
+    sscanf(buf, "%d %d %d", &index, &func, &longPress);
+    if (longPress) {
+        set_key_map(index, get_short_func(index), func == -1 ? NO_FUNCTION : func);
+    } else {
+        set_key_map(index, func == -1 ? NO_FUNCTION : func, get_long_func(index));
     }
     mico_system_context_update(sys_config);
 
@@ -630,7 +630,7 @@ const struct httpd_wsgi_call g_app_handlers[] = {
         {"/socketNames",      HTTPD_HDR_DEFORT, 0, NULL,                                              HttpSetSocketName,     NULL, NULL},
         {"/childLock",        HTTPD_HDR_DEFORT, 0, NULL,                                              HttpSetChildLock,      NULL, NULL},
         {"/deviceName",       HTTPD_HDR_DEFORT, 0, NULL,                                              HttpSetDeviceName,     NULL, NULL},
-        {"/buttonEvents",      HTTPD_HDR_DEFORT, 0, HttpGetButtonEvents,                                              HttpSetButtonEvent,     NULL, NULL},
+        {"/buttonEvents",     HTTPD_HDR_DEFORT, 0,                             HttpGetButtonEvents,   HttpSetButtonEvent,    NULL, NULL},
 };
 
 static int g_app_handlers_no = sizeof(g_app_handlers) / sizeof(struct httpd_wsgi_call);
