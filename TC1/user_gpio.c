@@ -164,8 +164,8 @@ static void KeyEventHandler(int num, boolean longPress) {
             num > 1 ? (longPress ? "seconds" : "times") : (longPress ? "second" : "time"));
     if (num > 30 || num <= 0)
         return;
-    int function = !longPress ? get_short_func(user_config->user[clickCnt]) : get_long_func(
-            user_config->user[clickCnt]);key_log("WARNGIN:%s", get_func_name(function));
+    int function = !longPress ? get_short_func(user_config->user[num]) : get_long_func(
+            user_config->user[num]);key_log("WARNGIN:%s", get_func_name(function));
     switch (function) {
         case SWITCH_ALL_SOCKETS:
             if (RelayOut()) {
@@ -185,8 +185,8 @@ static void KeyEventHandler(int num, boolean longPress) {
         case SWITCH_SOCKET_4:
         case SWITCH_SOCKET_5:
         case SWITCH_SOCKET_6:
-            UserRelaySet(user_config->user[clickCnt] - 1, Relay_TOGGLE);
-            UserMqttSendSocketState(user_config->user[clickCnt] - 1);
+            UserRelaySet(user_config->user[num] - 1, Relay_TOGGLE);
+            UserMqttSendSocketState(user_config->user[num] - 1);
             UserMqttSendTotalSocketState();
             mico_system_context_update(sys_config);
             break;
