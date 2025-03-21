@@ -8,6 +8,7 @@
 mico_gpio_t relay[Relay_NUM] = {Relay_0, Relay_1, Relay_2, Relay_3, Relay_4, Relay_5};
 char socket_status[32] = {0};
 char short_click_config[32] = {0};
+char long_click_config[32] = {0};
 
 void UserLedSet(char x) {
     if (x == -1)
@@ -28,6 +29,55 @@ bool RelayOut(void) {
     return false;
 }
 
+const char *get_func_name(char func_code) {
+    static char buffer[32];
+    switch (func_code) {
+        case SWITCH_ALL_SOCKETS:
+            return "Toggle All Sockets";
+        case SWITCH_SOCKET_1:
+        case SWITCH_SOCKET_2:
+        case SWITCH_SOCKET_3:
+        case SWITCH_SOCKET_4:
+        case SWITCH_SOCKET_5:
+        case SWITCH_SOCKET_6:
+            sprintf(buffer, "Toggle Socket %d %s", func_code - 1,
+                    user_config->socket_names[func_code - 1]);
+            return buffer;
+        case SWITCH_LED_ENABLE:
+            return "Toggle LED";
+        case REBOOT_SYSTEM:
+            return "Reboot";
+        case CONFIG_WIFI:
+            return "WiFi Config";
+        case RESET_SYSTEM:
+            return "Factory Reset";
+        case -1:
+        case NO_FUNCTION:
+            return "Unassigned";
+        default:
+            return "Unknown";
+    }
+}
+
+/// 针对电源按钮的点击事件
+/// \param index 判断短按（连击）时，代表连击次数，判断长按时代表长按秒数
+/// \param short_func 功能码 在user_gpio.h中定义了
+/// \param long_func 功能码 在user_gpio.h中定义了
+void set_key_map(int index, char short_func, char long_func) {
+    user_config->user[index] = ((long_func & 0x0F) << 4) | (short_func & 0x0F);
+}
+
+char get_short_func(char val) {
+    char func = val & 0x0F;
+    return (func == NO_FUNCTION) ? -1 : func;  // -1 表示未配置
+}
+
+char get_long_func(char val) {
+    char func = (val >> 4) & 0x0F;
+    return (func == NO_FUNCTION) ? -1 : func;  // -1 表示未配置
+}
+
+
 char *GetSocketStatus() {
     sprintf(socket_status, "%d,%d,%d,%d,%d,%d",
             user_config->socket_status[0],
@@ -41,16 +91,16 @@ char *GetSocketStatus() {
 
 char *GetShortClickConfig() {
     sprintf(short_click_config, "%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",
-            user_config->user[1],
-            user_config->user[2],
-            user_config->user[3],
-            user_config->user[4],
-            user_config->user[5],
-            user_config->user[6],
-            user_config->user[7],
-            user_config->user[8],
-            user_config->user[9],
-            user_config->user[10]);
+            get_short_func(user_config->user[1]),
+            get_short_func(user_config->user[2]),
+            get_short_func(user_config->user[3]),
+            get_short_func(user_config->user[4]),
+            get_short_func(user_config->user[5]),
+            get_short_func(user_config->user[6]),
+            get_short_func(user_config->user[7]),
+            get_short_func(user_config->user[8]),
+            get_short_func(user_config->user[9]),
+            get_short_func(user_config->user[10]));
     return short_click_config;
 }
 
@@ -84,12 +134,12 @@ void UserRelaySet(unsigned char i, char on) {
     } else if (on == Relay_OFF) {
         MicoGpioOutputLow(relay[i]);
     } else if (on == Relay_TOGGLE) {
-    if(user_config->socket_status[i]==Relay_OFF){
-       MicoGpioOutputHigh(relay[i]);
-    }else{
-       MicoGpioOutputLow(relay[i]);
+        if (user_config->socket_status[i] == Relay_OFF) {
+            MicoGpioOutputHigh(relay[i]);
+        } else {
+            MicoGpioOutputLow(relay[i]);
+        }
     }
-   }
     user_config->socket_status[i] = on >= 0 ? on : (user_config->socket_status[i] == 0 ? 1 : 0);
 
     if (RelayOut() && user_config->power_led_enabled) {
@@ -109,28 +159,15 @@ void UserRelaySetAll(char y) {
     for (i = 0; i < SOCKET_NUM; i++)
         UserRelaySet(i, y);
 }
-
-static void KeyLong5sPress(void) {
-    key_log("WARNGIN: wifi ap started!");
-    micoWlanSuspendStation();
-    ApInit(true);
-}
-
-static void KeyLong10sPress(void) {
-    key_log("WARNGIN: user params restored!");
-    mico_system_context_restore(sys_config);
-//    appRestoreDefault_callback(user_config, sizeof(user_config_t));
-//    sys_config->micoSystemConfig.ssid[0] = 0;
-//    mico_system_context_update(mico_system_context_get());
-}
-
-static void KeyShortPress(int clickCnt) {
-    key_log("WARNGIN:Power key quick clicked %d time%s",clickCnt,clickCnt>1?"s":"");
-    if (clickCnt > 10||clickCnt <= 0)
+static void KeyEventHandler(int num, boolean longPress) {
+    key_log("WARNGIN:Power key %s %d %s", !longPress ? "quick clicked" : "longPressed", num,
+            num > 1 ? (longPress ? "seconds" : "times") : (longPress ? "second" : "time"));
+    if (num > 30 || num <= 0)
         return;
-    switch (user_config->user[clickCnt]) {
-        case SWITCH_TOTAL_SOCKET:
-        key_log("WARNGIN:SWITCH_TOTAL_SOCKET");
+    int function = !longPress ? get_short_func(user_config->user[clickCnt]) : get_long_func(
+            user_config->user[clickCnt]);key_log("WARNGIN:%s", get_func_name(function));
+    switch (function) {
+        case SWITCH_ALL_SOCKETS:
             if (RelayOut()) {
                 UserRelaySetAll(0);
             } else {
@@ -148,14 +185,12 @@ static void KeyShortPress(int clickCnt) {
         case SWITCH_SOCKET_4:
         case SWITCH_SOCKET_5:
         case SWITCH_SOCKET_6:
-        key_log("WARNGIN:SWITCH_SOCKET%d %s",user_config->user[clickCnt] - 1,user_config->socket_names[user_config->user[clickCnt] - 1]);
             UserRelaySet(user_config->user[clickCnt] - 1, Relay_TOGGLE);
             UserMqttSendSocketState(user_config->user[clickCnt] - 1);
             UserMqttSendTotalSocketState();
             mico_system_context_update(sys_config);
             break;
         case SWITCH_LED_ENABLE:
-        key_log("WARNGIN:SWITCH_LED_ENABLE");
             MQTT_LED_ENABLED = MQTT_LED_ENABLED == 0 ? 1 : 0;
             if (RelayOut() && MQTT_LED_ENABLED) {
                 UserLedSet(1);
@@ -164,6 +199,20 @@ static void KeyShortPress(int clickCnt) {
             }
             UserMqttSendLedState();
             mico_system_context_update(sys_config);
+            break;
+        case REBOOT_SYSTEM:
+            MicoSystemReboot();
+            break;
+        case CONFIG_WIFI:
+            StartLedBlink(3);
+            micoWlanSuspendStation();
+            ApInit(true);
+            break;
+        case RESET_SYSTEM:
+            StartLedBlink(8);
+            mico_system_context_restore(sys_config);
+            mico_rtos_thread_sleep(1);
+            MicoSystemReboot();
             break;
         default:
             break;
@@ -175,14 +224,56 @@ mico_timer_t user_key_timer;
 static uint8_t click_count = 0;
 static mico_timer_t click_end_timer;
 uint16_t key_time = 0;
-#define BUTTON_LONG_PRESS_TIME    10     //100ms*10=1s
 
-static void ClickEndTimeoutHandler(void *arg) {
-    if(click_count<=0){
-      click_count = 0;
-      return;
+static mico_timer_t led_blink_timer;
+static bool timer_initialized = false;
+
+static uint8_t total_blinks = 0;
+static uint8_t blink_counter = 0;
+static bool led_state = false;
+#define BUTTON_LONG_PRESS_TIME    10     //100ms*10=1s
+// 定时器回调
+static void _led_blink_timer_handler(void *arg)
+{
+    if (blink_counter >= total_blinks) {
+        UserLedSet(0);  // 闪烁完成，灭灯
+        mico_stop_timer(&led_blink_timer);
+        mico_deinit_timer(&led_blink_timer);
+        timer_initialized = false;
+        return;
     }
-    KeyShortPress(click_count);
+
+    led_state = !led_state;
+    UserLedSet(led_state ? 1 : 0);
+    blink_counter++;
+}
+
+// 安全重入的启动函数
+void StartLedBlink(uint8_t times)
+{
+    if (times == 0) return;
+
+    // 如果之前已启动，先停止并清理
+    if (timer_initialized) {
+        mico_stop_timer(&led_blink_timer);
+        mico_deinit_timer(&led_blink_timer);
+        timer_initialized = false;
+    }
+
+    total_blinks = times * 2;
+    blink_counter = 0;
+    led_state = false;
+
+    mico_init_timer(&led_blink_timer, 100, _led_blink_timer_handler, NULL);
+    mico_start_timer(&led_blink_timer);
+    timer_initialized = true;
+}
+static void ClickEndTimeoutHandler(void *arg) {
+    if (click_count <= 0) {
+        click_count = 0;
+        return;
+    }
+    KeyEventHandler(click_count,false);
     click_count = 0;
 }
 
@@ -202,29 +293,41 @@ static void KeyTimeoutHandler(void *arg) {
 
     if (key_continue != 0) {
         key_time++;
-        if (key_time > BUTTON_LONG_PRESS_TIME) {
-            if (key_time == 50) {
-                KeyLong5sPress();
-            } else if (key_time > 50 && key_time < 57) {
-                switch (key_time) {
-                    case 51: UserLedSet(1); break;
-                    case 52: UserLedSet(0); break;
-                    case 53: UserLedSet(1); break;
-                    case 54: UserLedSet(0); break;
-                    case 55: UserLedSet(1); break;
-                    case 56: UserLedSet(0); break;
-                }
-            } else if (key_time == 57) {
-                UserLedSet(RelayOut() && user_config->power_led_enabled);
-            } else if (key_time == 100) {
-                KeyLong10sPress();
-            } else if (key_time == 102) {
-                UserLedSet(1);
-            } else if (key_time == 103) {
-                UserLedSet(0);
-                key_time = 101;
-            }
-        }
+//        if (key_time > BUTTON_LONG_PRESS_TIME) {
+//            if (key_time == 50) {
+//                KeyLong5sPress();
+//            } else if (key_time > 50 && key_time < 57) {
+//                switch (key_time) {
+//                    case 51:
+//                        UserLedSet(1);
+//                        break;
+//                    case 52:
+//                        UserLedSet(0);
+//                        break;
+//                    case 53:
+//                        UserLedSet(1);
+//                        break;
+//                    case 54:
+//                        UserLedSet(0);
+//                        break;
+//                    case 55:
+//                        UserLedSet(1);
+//                        break;
+//                    case 56:
+//                        UserLedSet(0);
+//                        break;
+//                }
+//            } else if (key_time == 57) {
+//                UserLedSet(RelayOut() && user_config->power_led_enabled);
+//            } else if (key_time == 100) {
+//                KeyLong10sPress();
+//            } else if (key_time == 102) {
+//                UserLedSet(1);
+//            } else if (key_time == 103) {
+//                UserLedSet(0);
+//                key_time = 101;
+//            }
+//        }
     } else {
         if (key_time < BUTTON_LONG_PRESS_TIME) {
             click_count++;
@@ -232,8 +335,8 @@ static void KeyTimeoutHandler(void *arg) {
             // 重启 click_end_timer（300ms）
             mico_rtos_stop_timer(&click_end_timer);
             mico_rtos_start_timer(&click_end_timer);
-        } else if (key_time > 100) {
-            MicoSystemReboot();
+        } else {
+            KeyEventHandler(key_time/10,true);
         }
 
         mico_rtos_stop_timer(&user_key_timer);

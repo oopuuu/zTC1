@@ -34,7 +34,6 @@ void appRestoreDefault_callback(void *const user_config_data, uint32_t size) {
 
     user_config_t *userConfigDefault = user_config_data;
     userConfigDefault->user[0] = 0;
-    userConfigDefault->user[1] = SWITCH_TOTAL_SOCKET;
     userConfigDefault->mqtt_ip[0] = 0;
     userConfigDefault->mqtt_port = 0;
     userConfigDefault->mqtt_user[0] = 0;
@@ -46,8 +45,16 @@ void appRestoreDefault_callback(void *const user_config_data, uint32_t size) {
     userConfigDefault->p_count_1_day_ago = 0;
     userConfigDefault->power_led_enabled = 1;
     userConfigDefault->version = USER_CONFIG_VERSION;
-    for (int i = 2; i < 11; ++i){
-        userConfigDefault->user[i] = -1;
+    set_key_map(1, SWITCH_ALL_SOCKETS, NO_FUNCTION);
+    for (int i = 2; i < 32; ++i) {
+        int longFunc = NO_FUNCTION;
+        //出厂设置，长按5秒开启配网模式，长按10秒恢复出厂设置
+        if (i == 5) {
+            longFunc = CONFIG_WIFI;
+        } else if (i == 10) {
+            longFunc = RESET_SYSTEM;
+        }
+        set_key_map(i, NO_FUNCTION, longFunc);
     }
 
     int i;
@@ -163,7 +170,7 @@ int application_start(void) {
     }
 
     tc1_log("device name:%s",
-                                                  sys_config->micoSystemConfig.name);tc1_log(
+            sys_config->micoSystemConfig.name);tc1_log(
             "mqtt_ip:%s", user_config->mqtt_ip);tc1_log("mqtt_port:%d",
                                                         user_config->mqtt_port);tc1_log(
             "mqtt_user:%s", user_config->mqtt_user);

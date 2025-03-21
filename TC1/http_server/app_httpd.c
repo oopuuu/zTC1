@@ -226,7 +226,7 @@ static int HttpSetShortClickEvent(httpd_request_t *req) {
     int index;
     int func;
     sscanf(buf, "%d %d", &index, &func);
-    user_config->user[index + 1] = func;
+    set_key_map(index + 1,func, get_long_func(index + 1));
     mico_system_context_update(sys_config);
 
     send_http("OK", 2, exit, &err);
