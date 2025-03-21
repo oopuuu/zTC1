@@ -227,11 +227,12 @@ static int HttpSetButtonEvent(httpd_request_t *req) {
     int func;
     int longPress;
     sscanf(buf, "%d %d %d", &index, &func, &longPress);
-    if (longPress) {
-        set_key_map(index, get_short_func(index), func == -1 ? NO_FUNCTION : func);
+    if (longPress == 1) {
+        set_key_map(index, get_short_func(user_config->user[index]), func == -1 ? NO_FUNCTION : func);
     } else {
-        set_key_map(index, func == -1 ? NO_FUNCTION : func, get_long_func(index));
+        set_key_map(index, func == -1 ? NO_FUNCTION : func, get_long_func(user_config->user[index]));
     }
+    key_log("WARNGIN:set KEY func %d %d %d", index,get_short_func(user_config->user[index]),get_long_func(user_config->user[index]));
     mico_system_context_update(sys_config);
 
     send_http("OK", 2, exit, &err);
@@ -468,7 +469,6 @@ static int HttpGetButtonEvents(httpd_request_t *req) {
     send_http(clicks, strlen(clicks), exit, &err);
 
     exit:
-    if (clicks) free(clicks);
     return err;
 }
 

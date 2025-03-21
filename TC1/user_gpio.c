@@ -97,6 +97,7 @@ char *GetButtonClickConfig() {
     for (int i = 1; i <= 30; i++) {
         char short_func = get_short_func(user_config->user[i]);
         char long_func  = get_long_func(user_config->user[i]);
+//    key_log("WARNGIN:KEY func %d %d %d", i,short_func,long_func);
 
         snprintf(temp, sizeof(temp), "{'%d':[%d,%d]}%s", i, short_func, long_func, (i != 30) ? "," : "");
         len += snprintf(btn_click_config + len, max_len - len, "%s", temp);
@@ -189,8 +190,8 @@ static void KeyEventHandler(int num, boolean longPress) {
         case SWITCH_SOCKET_4:
         case SWITCH_SOCKET_5:
         case SWITCH_SOCKET_6:
-            UserRelaySet(user_config->user[num] - 1, Relay_TOGGLE);
-            UserMqttSendSocketState(user_config->user[num] - 1);
+            UserRelaySet(function - 1, Relay_TOGGLE);
+            UserMqttSendSocketState(function - 1);
             UserMqttSendTotalSocketState();
             mico_system_context_update(sys_config);
             break;
