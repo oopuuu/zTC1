@@ -98,7 +98,7 @@ char *GetButtonClickConfig() {
         char short_func = get_short_func(user_config->user[i]);
         char long_func  = get_long_func(user_config->user[i]);
 
-        snprintf(temp, sizeof(temp), "{\"%d\":[%d,%d]}%s", i, short_func, long_func, (i != 30) ? "," : "");
+        snprintf(temp, sizeof(temp), "{'%d':[%d,%d]}%s", i, short_func, long_func, (i != 30) ? "," : "");
         len += snprintf(btn_click_config + len, max_len - len, "%s", temp);
 
         if (len >= max_len - 1) break;
