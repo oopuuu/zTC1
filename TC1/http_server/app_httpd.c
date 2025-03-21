@@ -149,7 +149,7 @@ static int HttpGetAssets(httpd_request_t *req) {
 
 static int HttpGetTc1Status(httpd_request_t *req) {
     char *sockets = GetSocketStatus();
-    char *short_click_config = GetShortClickConfig();
+    char *short_click_config = GetButtonClickConfig();
     char *tc1_status = malloc(1024);
     char *socket_names = malloc(512);
     sprintf(socket_names, "%s,%s,%s,%s,%s,%s",
@@ -215,7 +215,7 @@ static int HttpSetSocketName(httpd_request_t *req) {
     return err;
 }
 
-static int HttpSetShortClickEvent(httpd_request_t *req) {
+static int HttpSetButtonEvent(httpd_request_t *req) {
     OSStatus err = kNoErr;
 
     int buf_size = 10;
@@ -225,8 +225,13 @@ static int HttpSetShortClickEvent(httpd_request_t *req) {
     require_noerr(err, exit);
     int index;
     int func;
-    sscanf(buf, "%d %d", &index, &func);
-    set_key_map(index + 1,func, get_long_func(index + 1));
+    int longPress;
+    sscanf(buf, "%d %d %d", &index, &func &longPress);
+    if(longPress){
+        set_key_map(index, get_short_func(index), func==-1?NO_FUNCTION:func);
+    }else{
+        set_key_map(index,func==-1?NO_FUNCTION:func, get_long_func(index));
+    }
     mico_system_context_update(sys_config);
 
     send_http("OK", 2, exit, &err);
@@ -298,7 +303,7 @@ static int HttpGetPowerInfo(httpd_request_t *req) {
 
     char *powers = GetPowerRecord(idx);
     char *sockets = GetSocketStatus();
-    char *short_click_config = GetShortClickConfig();
+    char *short_click_config = GetButtonClickConfig();
     char *socket_names = malloc(512);
     sprintf(socket_names, "%s,%s,%s,%s,%s,%s",
             user_config->socket_names[0],
@@ -457,9 +462,9 @@ static int HttpGetTasks(httpd_request_t *req) {
     return err;
 }
 
-static int HttpGetShortClickEvents(httpd_request_t *req) {
+static int HttpGetButtonEvents(httpd_request_t *req) {
     OSStatus err = kNoErr;
-    char *clicks = GetShortClickConfig();
+    char *clicks = GetButtonClickConfig();
     send_http(clicks, strlen(clicks), exit, &err);
 
     exit:
@@ -625,7 +630,7 @@ const struct httpd_wsgi_call g_app_handlers[] = {
         {"/socketNames",      HTTPD_HDR_DEFORT, 0, NULL,                                              HttpSetSocketName,     NULL, NULL},
         {"/childLock",        HTTPD_HDR_DEFORT, 0, NULL,                                              HttpSetChildLock,      NULL, NULL},
         {"/deviceName",       HTTPD_HDR_DEFORT, 0, NULL,                                              HttpSetDeviceName,     NULL, NULL},
-        {"/shortClickEvent",      HTTPD_HDR_DEFORT, 0, HttpGetShortClickEvents,                                              HttpSetShortClickEvent,     NULL, NULL},
+        {"/buttonEvents",      HTTPD_HDR_DEFORT, 0, HttpGetButtonEvents,                                              HttpSetButtonEvent,     NULL, NULL},
 };
 
 static int g_app_handlers_no = sizeof(g_app_handlers) / sizeof(struct httpd_wsgi_call);

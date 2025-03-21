@@ -7,8 +7,7 @@
 
 mico_gpio_t relay[Relay_NUM] = {Relay_0, Relay_1, Relay_2, Relay_3, Relay_4, Relay_5};
 char socket_status[32] = {0};
-char short_click_config[32] = {0};
-char long_click_config[32] = {0};
+char btn_click_config[500] = {0};
 
 void UserLedSet(char x) {
     if (x == -1)
@@ -89,19 +88,24 @@ char *GetSocketStatus() {
     return socket_status;
 }
 
-char *GetShortClickConfig() {
-    sprintf(short_click_config, "%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",
-            get_short_func(user_config->user[1]),
-            get_short_func(user_config->user[2]),
-            get_short_func(user_config->user[3]),
-            get_short_func(user_config->user[4]),
-            get_short_func(user_config->user[5]),
-            get_short_func(user_config->user[6]),
-            get_short_func(user_config->user[7]),
-            get_short_func(user_config->user[8]),
-            get_short_func(user_config->user[9]),
-            get_short_func(user_config->user[10]));
-    return short_click_config;
+char *GetButtonClickConfig() {
+    char temp[32];
+    int len = 0;
+    int max_len =sizeof(btn_click_config);
+    len += snprintf(btn_click_config + len, max_len - len, "[");
+
+    for (int i = 1; i <= 30; i++) {
+        char short_func = get_short_func(user_config->user[i]);
+        char long_func  = get_long_func(user_config->user[i]);
+
+        snprintf(temp, sizeof(temp), "{\"%d\":[%d,%d]}%s", i, short_func, long_func, (i != 30) ? "," : "");
+        len += snprintf(btn_click_config + len, max_len - len, "%s", temp);
+
+        if (len >= max_len - 1) break;
+    }
+    snprintf(btn_click_config + len, max_len - len, "]");
+
+    return btn_click_config;
 }
 
 void SetSocketStatus(char *socket_status) {

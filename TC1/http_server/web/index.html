@@ -93,12 +93,20 @@
             <a class="mdl-navigation__link" href="javascript:ShowPage(4);">
                 <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">
                     <svg>
+                        <use xlink:href="#icon-access_alarm"/>
+                    </svg>
+                </i>
+                <span class="lang" langKey="TimedTask">按键自定义</span>
+            </a>
+            <a class="mdl-navigation__link" href="javascript:ShowPage(5);">
+                <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">
+                    <svg>
                         <use xlink:href="#icon-info"/>
                     </svg>
                 </i>
                 <span class="lang" langKey="SystemStatus">系统状态</span>
             </a>
-            <a class="mdl-navigation__link" href="javascript:ShowPage(5);">
+            <a class="mdl-navigation__link" href="javascript:ShowPage(6);">
                 <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">
                     <svg>
                         <use xlink:href="#icon-cloud_download"/>
@@ -106,7 +114,7 @@
                 </i>
                 <span class="lang" langKey="OTA">在线升级</span>
             </a>
-            <a class="mdl-navigation__link" href="javascript:ShowPage(6);">
+            <a class="mdl-navigation__link" href="javascript:ShowPage(7);">
                 <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">
                     <svg>
                         <use xlink:href="#icon-notes"/>
@@ -306,23 +314,6 @@
                          style="height:280px;margin-top:40px;"></div>
                 </div>
             </div>
-                </div>
-            </div>
-
-            <div class="page page1 mdl-cell mdl-cell--4-col mdl-cell--8-col-tablet mdl-grid mdl-grid--no-spacing">
-                <div class="demo-options mdl-card mdl-shadow--2dp mdl-cell mdl-cell--4-col mdl-cell--3-col-tablet mdl-cell--12-col-desktop">
-                    <div class="mdl-card__supporting-text">
-                        <div class="mdl-card__title mdl-card--expand">
-                            <h2 class="mdl-card__title-text">按键自定义</h2>
-                        </div>
-                        <table id="short_click_events_tb" class="mdl-data-table mdl-js-data-table">
-                            <tr>
-                                <th>按键类型</th>
-                                <th>执行操作</th>
-                            </tr>
-                        </table>
-
-                </div>
                 </div>
             </div>
 
@@ -543,7 +534,86 @@
             </div>
 
 
-            <div class="page page4 mdl-cell mdl-cell--12-col demo-card-event mdl-card mdl-shadow--2dp">
+            <div class="page page4 over-unset mdl-cell mdl-cell--5-col demo-card-square mdl-card mdl-shadow--2dp"
+                 style="z-index: unset;">
+                <div class="mdl-card__title mdl-card--expand">
+                    <h2 class="mdl-card__title-text">按键自定义</h2>
+                </div>
+                <table id="short_click_events_tb" class="mdl-data-table mdl-js-data-table">
+                    <tr>
+                        <th>按键类型</th>
+                        <th>执行操作</th>
+                        <th>操作</th>
+                    </tr>
+                </table>
+                </div>
+
+            <div class="page page4 over-unset mdl-cell mdl-cell--5-col demo-card-square mdl-card mdl-shadow--2dp"
+                 style="z-index: unset;">
+                <div class="mdl-card__title mdl-card--expand">
+                    <h2 class="mdl-card__title-text">添加按键操作</h2>
+                </div>
+                <div class="over-unset mdl-card__supporting-text">
+                    <form action="#">
+                        <div class="mdl-textfield mdl-js-textfield getmdl-select">
+                            <input type="text"  value=""
+                                   class="mdl-textfield__input" readonly>
+                            <input type="hidden" value="0" name="button_type" id="button_type">
+                            <i class="mdl-icon-toggle__label material-icons">
+                                <svg>
+                                    <use xlink:href="#icon-keyboard_arrow_down"/>
+                                </svg>
+                            </i>
+                            <label for="button_type" class="mdl-textfield__label">按钮触发方式</label>
+                            <ul for="button_type"
+                                class="mdl-menu mdl-menu--bottom-left mdl-js-menu">
+                                <li class="mdl-menu__item" data-val="0" data-selected='true'>
+                                    单/多击
+                                </li>
+                                <li class="mdl-menu__item" data-val="1">长按</li>
+                            </ul>
+                        </div>
+                        <div class="mdl-textfield mdl-js-textfield getmdl-select">
+                            <input type="text"  value=""
+                                   class="mdl-textfield__input" readonly>
+                            <input type="hidden" value="1" name="click_times_press_time" id="click_times_press_time">
+                            <i class="mdl-icon-toggle__label material-icons">
+                                <svg>
+                                    <use xlink:href="#icon-keyboard_arrow_down"/>
+                                </svg>
+                            </i>
+                            <label for="click_times_press_time" class="mdl-textfield__label" id="click_times_press_time_label">连击次数</label>
+                            <ul for="click_times_press_time"
+                                class="mdl-menu mdl-menu--bottom-left mdl-js-menu" id="click_times_press_time_selector">
+                            </ul>
+                        </div>
+                        <div class="mdl-textfield mdl-js-textfield getmdl-select">
+                            <input type="text"  value=""
+                                   class="mdl-textfield__input" readonly>
+                            <input type="hidden" value="-1" name="action_type" id="action_type">
+                            <i class="mdl-icon-toggle__label material-icons">
+                                <svg>
+                                    <use xlink:href="#icon-keyboard_arrow_down"/>
+                                </svg>
+                            </i>
+                            <label for="action_type" class="mdl-textfield__label">执行的操作</label>
+                            <ul for="action_type"
+                                class="mdl-menu mdl-menu--bottom-left mdl-js-menu" id="btn_action_selector">
+                            </ul>
+                        </div>
+
+                    </form>
+                </div>
+                <div class="mdl-card__actions mdl-card--border">
+                    <a href="javascript:addButtonEvent();"
+                       class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+                        添加
+                    </a>
+                </div>
+            </div>
+
+
+            <div class="page page5 mdl-cell mdl-cell--12-col demo-card-event mdl-card mdl-shadow--2dp">
                 <table class="mdl-data-table mdl-js-data-table">
                     <tr>
                         <th>版本</th>
@@ -579,7 +649,7 @@
                 </div>
             </div>
 
-            <div class="page page5 mdl-cell mdl-cell--12-col demo-card-square mdl-card mdl-shadow--2dp">
+            <div class="page page6 mdl-cell mdl-cell--12-col demo-card-square mdl-card mdl-shadow--2dp">
                 <div class="mdl-card__title mdl-card--expand">
                     <h2 class="mdl-card__title-text">在线升级</h2>
                 </div>
@@ -600,7 +670,7 @@
                 <div id="ota_status" class="mdl-progress mdl-js-progress"></div>
             </div>
 
-            <div class="page page6 mdl-cell mdl-cell--12-col demo-card-square mdl-card mdl-shadow--2dp">
+            <div class="page page7 mdl-cell mdl-cell--12-col demo-card-square mdl-card mdl-shadow--2dp">
                 <div class="mdl-card__title mdl-card--expand">
                     <h2 class="mdl-card__title-text">系统日志</h2>
                 </div>
@@ -907,43 +977,67 @@
       $("#uptime").html(status.up_time);
 
 
-      var actions=status.shortClicks.split(",");
+      var actions=status.btnClicks;
     //按键操作功能定义
     var BTN_OPERATIONS=["切换总开关"];
     for (var i = 0; i < names_arr.length; i++) {
       BTN_OPERATIONS.push(`切换${names_arr[i]}`);
     }
     BTN_OPERATIONS.push("切换电源指示灯启用");
+    BTN_OPERATIONS.push("重启系统");
+    BTN_OPERATIONS.push("重新配网");
+    BTN_OPERATIONS.push("重置系统");
+$('#btn_action_selector').append(
+      $('<li>')
+        .addClass('mdl-menu__item')
+        .attr('data-val', -1)
+        .text("未设置")
+    );
+    for (let i = 0; i <= BTN_OPERATIONS.length; i++) {
+    $('#btn_action_selector').append(
+      $('<li>')
+        .addClass('mdl-menu__item')
+        .attr('data-val', i)
+        .text(BTN_OPERATIONS[i])
+    );
+  }
+
+
 var tb_html = `
   <tr>
     <th>按键类型</th>
-    <th>执行操作</th>
+    <th>执行动作</th>
+    <th>操作</th>
   </tr>
 `;
 
 
 for (var i = 0; i < actions.length; i++) {
   var rowId = `select-${i}`;
-  var index = parseInt(actions[i]);
-  var valueText = (isNaN(index) || index < 0 || index >= BTN_OPERATIONS.length) ? '未设置' : BTN_OPERATIONS[index];
+  var times = Object.keys(actions[i])[0];
+  var operations = Object.values(actions[i])[0];
+  if(operations[0]!=-1){
+  var valueText = (isNaN(operations[0]) || operations[0] < 0 || operations[0] >= BTN_OPERATIONS.length) ? '未设置' : BTN_OPERATIONS[operations[0]];
+  tb_html += `
+    <tr>
+      <td>${times > 0 ? '连续' : ''}短按${times}次</td>
+      <td>${valueText}</td>
+      <td><a>删除</a></td>
+    </tr>
+  `;
+  }
+  if(operations[1]!=-1){
+    var valueText = (isNaN(operations[1]) || operations[1] < 0 || operations[1] >= BTN_OPERATIONS.length) ? '未设置' : BTN_OPERATIONS[operations[1]];
 
   tb_html += `
     <tr>
-      <td>${i > 0 ? '连续' : ''}短按${i + 1}次</td>
-      <td>
-        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label getmdl-select getmdl-select__fix-height">
-          <input class="mdl-textfield__input" type="text" id="${rowId}-input" readonly value="${valueText}">
-          <input type="hidden" id="${rowId}-value" value="${index}">
-          <ul class="mdl-menu mdl-menu--bottom-left mdl-js-menu" for="${rowId}-input">
-            <li class="mdl-menu__item" data-val="-1" onclick="selectOperation('${rowId}', -1,'${BTN_OPERATIONS[0]}')">未设置</li>
-            ${BTN_OPERATIONS.map((op, idx) =>
-              `<li class="mdl-menu__item" data-val="${idx}" onclick="selectOperation('${rowId}', ${idx},'${BTN_OPERATIONS[idx]}')">${op}</li>`
-            ).join('')}
-          </ul>
-        </div>
-      </td>
+      <td>长按${times}秒</td>
+      <td>${valueText}</td>
+      <td><a>删除</a></td>
     </tr>
   `;
+  }
+
 }
 document.getElementById("short_click_events_tb").innerHTML = tb_html;
 componentHandler.upgradeDom();
@@ -952,7 +1046,7 @@ componentHandler.upgradeDom();
     });
 
     $(".mdl-switch__input").on("click", function() {
-    if("list-switch-all" == this.id||"list-switch-child-lock"== this.id){
+    if("list-switch-all" == this.id||"list-switch-child-lock"== this.id||"task_on"== this.id){
     return;
     }
       var sockets_st = "";
@@ -1294,6 +1388,33 @@ componentHandler.upgradeDom();
         }
         GetTimedTask();
       }, cmd);
+    }
+
+    $('#button_type').on('input', function() {
+  var value = $(this).val();
+  $('#click_times_press_time_label').text(value == '0'?'连击次数':'长按秒数');
+});
+  $(function() {
+  for (let i = 1; i <= 30; i++) {
+    $('#click_times_press_time_selector').append(
+      $('<li>')
+        .addClass('mdl-menu__item')
+        .attr('data-val', i)
+        .text(i)
+    );
+  }
+});
+   function addButtonEvent() {
+
+      var longPress = document.getElementById("button_type").value;
+      var event = document.getElementById("action_type").checked;
+      var times_or_seconds = document.getElementById("click_times_press_time").checked;
+
+      HttpPost("/buttonEvents", function (re) {
+        if (re == "OK") {
+        ShowToast("已添加按钮事件");
+        }
+      }, `${times_or_seconds} ${event} ${longPress}`);
     }
 function selectOperation(rowId, index, operationText) {
 var witch = parseInt(rowId.split('-')[1]);

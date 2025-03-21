@@ -25,7 +25,7 @@ void UserRelaySet(unsigned char x, char y);
 void UserRelaySetAll(char y);
 bool RelayOut(void);
 char* GetSocketStatus();
-char* GetShortClickConfig();
+char* GetButtonClickConfig();
 void SetSocketStatus(char* socket_status);
 void set_key_map(int index, char short_func, char long_func);
 char get_short_func(char val);
