@@ -11,7 +11,7 @@
 <img src="doc/IMG_0863.png"><img src="doc/1.png"><img src="doc/IMG_0887.png">
 
 # HASS接入效果
-<img src="doc/IMG_0862.png">
+<img src="doc/IMG_0888.png">
 
 固件启动后, 会开启一个热点 TC1-AP-XXXXXX，连接热点后, 直接用浏览器访问: http://192.168.0.1 即可看到如上web界面.
 
