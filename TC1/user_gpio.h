@@ -16,6 +16,7 @@
 #define REBOOT_SYSTEM 8
 #define CONFIG_WIFI 9
 #define RESET_SYSTEM 10
+#define SWITCH_CHILD_LOCK_ENABLE 11
 
 extern char socket_status[32];
 
@@ -27,7 +28,7 @@ bool RelayOut(void);
 char* GetSocketStatus();
 char* GetButtonClickConfig();
 void SetSocketStatus(char* socket_status);
-void set_key_map(int index, char short_func, char long_func);
+void set_key_map(char user[],int index, char short_func, char long_func);
 char get_short_func(char val);
 char get_long_func(char val);
 void StartLedBlink(uint8_t times);

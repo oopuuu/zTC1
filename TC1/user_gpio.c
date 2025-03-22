@@ -50,6 +50,8 @@ const char *get_func_name(char func_code) {
             return "WiFi Config";
         case RESET_SYSTEM:
             return "Factory Reset";
+        case SWITCH_CHILD_LOCK_ENABLE:
+            return "Toggle ChildLick";
         case -1:
         case NO_FUNCTION:
             return "Unassigned";
@@ -62,8 +64,8 @@ const char *get_func_name(char func_code) {
 /// \param index 判断短按（连击）时，代表连击次数，判断长按时代表长按秒数
 /// \param short_func 功能码 在user_gpio.h中定义了
 /// \param long_func 功能码 在user_gpio.h中定义了
-void set_key_map(int index, char short_func, char long_func) {
-    user_config->user[index] = ((long_func & 0x0F) << 4) | (short_func & 0x0F);
+void set_key_map(char user[],int index, char short_func, char long_func) {
+    user[index] = ((long_func & 0x0F) << 4) | (short_func & 0x0F);
 }
 
 char get_short_func(char val) {
@@ -170,9 +172,12 @@ static void KeyEventHandler(int num, boolean longPress) {
     if (num > 30 || num <= 0)
         return;
     int function = !longPress ? get_short_func(user_config->user[num]) : get_long_func(
-            user_config->user[num]);key_log("WARNGIN:%s", get_func_name(function));
+            user_config->user[num]);
+            boolean showLog= childLockEnabled==0;
     switch (function) {
         case SWITCH_ALL_SOCKETS:
+         if (childLockEnabled)
+                break;
             if (RelayOut()) {
                 UserRelaySetAll(0);
             } else {
@@ -190,12 +195,16 @@ static void KeyEventHandler(int num, boolean longPress) {
         case SWITCH_SOCKET_4:
         case SWITCH_SOCKET_5:
         case SWITCH_SOCKET_6:
+        if (childLockEnabled)
+                        break;
             UserRelaySet(function - 1, Relay_TOGGLE);
             UserMqttSendSocketState(function - 1);
             UserMqttSendTotalSocketState();
             mico_system_context_update(sys_config);
             break;
         case SWITCH_LED_ENABLE:
+        if (childLockEnabled)
+                        break;
             MQTT_LED_ENABLED = MQTT_LED_ENABLED == 0 ? 1 : 0;
             if (RelayOut() && MQTT_LED_ENABLED) {
                 UserLedSet(1);
@@ -205,15 +214,28 @@ static void KeyEventHandler(int num, boolean longPress) {
             UserMqttSendLedState();
             mico_system_context_update(sys_config);
             break;
+        case SWITCH_CHILD_LOCK_ENABLE:
+            showLog=true;
+            user_config->user[0] = user_config->user[0] == 0 ? 1 : 0;
+            childLockEnabled = user_config->user[0];
+            mico_system_context_update(sys_config);
+            UserMqttSendChildLockState();
+            break;
         case REBOOT_SYSTEM:
+        if (childLockEnabled)
+                        break;
             MicoSystemReboot();
             break;
         case CONFIG_WIFI:
+        if (childLockEnabled)
+                        break;
             StartLedBlink(3);
             micoWlanSuspendStation();
             ApInit(true);
             break;
         case RESET_SYSTEM:
+        if (childLockEnabled)
+                        break;
             StartLedBlink(8);
             mico_system_context_restore(sys_config);
             mico_rtos_thread_sleep(1);
@@ -222,6 +244,7 @@ static void KeyEventHandler(int num, boolean longPress) {
         default:
             break;
     }
+    key_log("WARNGIN:%s",showLog? get_func_name(function):"child lock enabled,ignore key event !");
 }
 
 mico_timer_t user_key_timer;
@@ -283,9 +306,6 @@ static void ClickEndTimeoutHandler(void *arg) {
 }
 
 static void KeyTimeoutHandler(void *arg) {
-    if (childLockEnabled)
-        return;
-
     static char key_trigger, key_continue;
     static uint8_t key_time = 0;
 

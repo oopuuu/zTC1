@@ -45,8 +45,8 @@ void appRestoreDefault_callback(void *const user_config_data, uint32_t size) {
     userConfigDefault->p_count_1_day_ago = 0;
     userConfigDefault->power_led_enabled = 1;
     userConfigDefault->version = USER_CONFIG_VERSION;
-    set_key_map(1, SWITCH_ALL_SOCKETS, NO_FUNCTION);
-    for (int i = 2; i < 32; ++i) {
+    set_key_map(userConfigDefault->user,1, SWITCH_ALL_SOCKETS, NO_FUNCTION);
+    for (int i = 2; i < 32; i++) {
         int longFunc = NO_FUNCTION;
         //出厂设置，长按5秒开启配网模式，长按10秒恢复出厂设置
         if (i == 5) {
@@ -54,15 +54,14 @@ void appRestoreDefault_callback(void *const user_config_data, uint32_t size) {
         } else if (i == 10) {
             longFunc = RESET_SYSTEM;
         }
-        set_key_map(i, NO_FUNCTION, longFunc);
+        set_key_map(userConfigDefault->user,i, NO_FUNCTION, longFunc);
     }
 
-    int i;
-    for (i = 0; i < SOCKET_NUM; i++) {
+    for (int i = 0; i < SOCKET_NUM; i++) {
         userConfigDefault->socket_status[i] = 1;
         snprintf(userConfigDefault->socket_names[i], SOCKET_NAME_LENGTH, "插座-%d", i + 1);
     }
-    for (i = 0; i < MAX_TASK_NUM; i++) {
+    for (int i = 0; i < MAX_TASK_NUM; i++) {
         userConfigDefault->timed_tasks[i].on_use = false;
     }
     mico_system_context_update(sys_config);
