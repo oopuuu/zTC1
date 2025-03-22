@@ -49,9 +49,9 @@ void appRestoreDefault_callback(void *const user_config_data, uint32_t size) {
     for (int i = 2; i < 32; i++) {
         int longFunc = NO_FUNCTION;
         //出厂设置，长按5秒开启配网模式，长按10秒恢复出厂设置
-        if (i == 5) {
+        if (i >=5 && i< 10) {
             longFunc = CONFIG_WIFI;
-        } else if (i == 10) {
+        } else if (i >= 10 && i< 15) {
             longFunc = RESET_SYSTEM;
         }
         set_key_map(userConfigDefault->user,i, NO_FUNCTION, longFunc);
