@@ -491,15 +491,7 @@
                             </i>
                             <label for="task_skt_idx" class="mdl-textfield__label">插座</label>
                             <ul for="task_skt_idx"
-                                class="mdl-menu mdl-menu--bottom-left mdl-js-menu">
-                                <li class="mdl-menu__item" data-val="1" data-selected='true'>
-                                    插座-1
-                                </li>
-                                <li class="mdl-menu__item" data-val="2">插座-2</li>
-                                <li class="mdl-menu__item" data-val="3">插座-3</li>
-                                <li class="mdl-menu__item" data-val="4">插座-4</li>
-                                <li class="mdl-menu__item" data-val="5">插座-5</li>
-                                <li class="mdl-menu__item" data-val="6">插座-6</li>
+                                class="mdl-menu mdl-menu--bottom-left mdl-js-menu" id="sockets_list">
                             </ul>
                         </div>
                         <div class="mdl-textfield mdl-js-textfield">
@@ -796,6 +788,7 @@
       });
     }
     var BTN_OPERATIONS=["切换总开关"];
+    var names_arr = [];
     //弹框-start
     var snackbarContainer = document.querySelector('#demo-toast-example');
     function ShowToast(mess) {
@@ -908,11 +901,18 @@
     HttpGet("/status", function (re) {
       var status = JSON.parse(re);
       var status_arr = status.sockets.split(",");
-      var names_arr = status.socketNames.split(",");
+      names_arr = status.socketNames.split(",");
       var switchTexts = document.querySelectorAll('.mdl-list__item-primary-content');
       $(".mdl-layout-title").text(status.deviceName);
       document.title=status.deviceName;
       for (var i = 0; i < status_arr.length; i++) {
+      $('#sockets_list').append(
+      $('<li>')
+        .addClass('mdl-menu__item')
+        .attr('data-val', `${i+1}`)
+        .attr('data-selected', `${i==status_arr.length - 1}`)
+        .text(names_arr[i])
+    );
           var langSpan = switchTexts[i+3].querySelector('.lang');
           var indexSpan = switchTexts[i+3].querySelector('.socket-index');
           if (langSpan) langSpan.textContent = names_arr[i];   // 修改插座名称
@@ -972,6 +972,7 @@
 getmdlSelect.init(".getmdl-select");
 
 refreshButtonEvents(status.btnClicks);
+GetTimedTask();
     });
 
 
@@ -1273,7 +1274,7 @@ componentHandler.upgradeDom();
             switch_lables[2].MaterialSwitch.off();
           }
         var status_arr = power.sockets.split(",");
-        var names_arr = power.socketNames.split(",");
+        names_arr = power.socketNames.split(",");
         var switchTexts = document.querySelectorAll('.mdl-list__item-primary-content');
         $(".mdl-layout-title").text(power.deviceName);
         document.title=power.deviceName;
@@ -1324,16 +1325,37 @@ componentHandler.upgradeDom();
           tb_html += "\
           <tr>\
             <td>" + tasks[i].prs_time + "</td>\
-            <td>" + tasks[i].socket_idx + "</td>\
-            <td>" + tasks[i].on + "</td>\
-            <td>" + tasks[i].weekday + "</td>\
-            <td><a href='javascript:DelTimedTask(" + tasks[i].timestamp + ");'>Delete</a></td>\
+            <td>" + names_arr[tasks[i].socket_idx-1] + "</td>\
+            <td>" + (tasks[i].on == 1?"开":"关") + "</td>\
+            <td>" + getLoopText(tasks[i].weekday) + "</td>\
+            <td><a href='javascript:DelTimedTask(" + tasks[i].timestamp + ");'>删除</a></td>\
           </tr>";
         }
         document.getElementById("timed_task_tb").innerHTML = tb_html;
       });
     }
-    GetTimedTask();
+    function getLoopText(i){
+    switch(i){
+    case 0:
+    return '不循环';
+    case 1:
+    return '每周一';
+    case 2:
+    return '每周二';
+    case 3:
+    return '每周三';
+    case 4:
+    return '每周四';
+    case 5:
+    return '每周五';
+    case 6:
+    return '每周六';
+    case 7:
+    return '每周日';
+        case 8:
+    return '每天';
+    }
+    }
 
     var task_date = document.getElementById("task_date");
     var task_time = document.getElementById("task_time");

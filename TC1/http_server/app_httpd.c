@@ -500,7 +500,7 @@ static int HttpAddTask(httpd_request_t *req) {
     char *mess = (re == 4 && AddTask(task)) ? "OK" : "NO";
 
     send_http(mess, strlen(mess), exit, &err);
-    if (mess) free(mess);
+
     exit:
     return err;
 }
@@ -520,7 +520,6 @@ static int HttpDelTask(httpd_request_t *req) {
 
     send_http(mess, strlen(mess), exit, &err);
     exit:
-    if (time_str) free(time_str);
     return err;
 }
 
