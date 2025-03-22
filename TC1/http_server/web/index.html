@@ -20,6 +20,12 @@
     <meta name="msapplication-TileColor" content="#3372DF">
     <link rel="shortcut icon" href="http://yuntong.icu/tc1/images/favicon.png">
     <link rel="stylesheet" href="assets/css_pack.css">
+    <style>
+        .mdl-menu__container {
+            max-height: 300px !important;
+            overflow-y: auto !important;
+        }
+    </style>
 </head>
 <body>
 <div class="demo-layout mdl-layout mdl-js-layout mdl-layout--fixed-drawer mdl-layout--fixed-header">
@@ -88,7 +94,7 @@
             <a class="mdl-navigation__link" href="javascript:ShowPage(4);">
                 <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">
                     <svg>
-                        <use xlink:href="#icon-settings"/>
+                        <use xlink:href="#icon-click"/>
                     </svg>
                 </i>
                 <span class="lang" langKey="TimedTask">按键自定义</span>
@@ -571,7 +577,7 @@
                             </i>
                             <label for="click_times_press_time" class="mdl-textfield__label" id="click_times_press_time_label">连击次数</label>
                             <ul for="click_times_press_time"
-                                class="mdl-menu mdl-menu--bottom-left mdl-js-menu" id="click_times_press_time_selector">
+                                class="mdl-menu mdl-menu--bottom-left mdl-js-menu" id="click_times_press_time_selector" style="">
                             </ul>
                         </div>
                         <div class="mdl-textfield mdl-js-textfield getmdl-select">
@@ -695,6 +701,10 @@
         <g id="icon-edit">
             <path d="M5,3C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V12H19V19H5V5H12V3H5M17.78,4C17.61,4 17.43,4.07 17.3,4.2L16.08,5.41L18.58,7.91L19.8,6.7C20.06,6.44 20.06,6 19.8,5.75L18.25,4.2C18.12,4.07 17.95,4 17.78,4M15.37,6.12L8,13.5V16H10.5L17.87,8.62L15.37,6.12Z" />
             <path d="M0 0h24v24H0z" fill="none"/>
+        </g>
+        <g id ="icon-click">
+            <path d="M0 0h24v24H0z" fill="none"/>
+            <path d="M13 5C15.21 5 17 6.79 17 9C17 10.5 16.2 11.77 15 12.46V11.24C15.61 10.69 16 9.89 16 9C16 7.34 14.66 6 13 6S10 7.34 10 9C10 9.89 10.39 10.69 11 11.24V12.46C9.8 11.77 9 10.5 9 9C9 6.79 10.79 5 13 5M20 20.5C19.97 21.32 19.32 21.97 18.5 22H13C12.62 22 12.26 21.85 12 21.57L8 17.37L8.74 16.6C8.93 16.39 9.2 16.28 9.5 16.28H9.7L12 18V9C12 8.45 12.45 8 13 8S14 8.45 14 9V13.47L15.21 13.6L19.15 15.79C19.68 16.03 20 16.56 20 17.14V20.5M20 2H4C2.9 2 2 2.9 2 4V12C2 13.11 2.9 14 4 14H8V12L4 12L4 4H20L20 12H18V14H20V13.96L20.04 14C21.13 14 22 13.09 22 12V4C22 2.9 21.11 2 20 2Z" />
         </g>
         <g id="icon-translate">
             <path d="M0 0h24v24H0z" fill="none"/>
@@ -978,11 +988,14 @@ GetTimedTask();
 
     function refreshButtonEvents(actions){
 var tb_html = `
+<thead>
   <tr>
     <th>按键类型</th>
     <th>执行动作</th>
     <th>操作</th>
   </tr>
+  </thead>
+  <tbody>
 `;
 
 var cnt=0;
@@ -1018,6 +1031,8 @@ for (var i = 0; i < actions.length; i++) {
 if (cnt == 0) {
           tb_html += "<tr><td colspan='5'>没有自定义按键动作</td></tr>";
         }
+         tb_html+="\
+        </tbody>";
 document.getElementById("short_click_events_tb").innerHTML = tb_html;
 componentHandler.upgradeDom();
     }
@@ -1309,13 +1324,14 @@ componentHandler.upgradeDom();
     function GetTimedTask() {
       HttpGet("/task", function (re) {
         var tb_html = "\
-        <tr>\
+        <thead><tr>\
           <th>时间</th>\
           <th>插座</th>\
           <th>开关</th>\
           <th>循环</th>\
           <th>操作</th>\
-        </tr>";
+        </tr></thead>\
+        <tbody>";
         console.log(re);
         var tasks = JSON.parse(re);
         if (tasks.length == 0) {
@@ -1331,6 +1347,8 @@ componentHandler.upgradeDom();
             <td><a href='javascript:DelTimedTask(" + tasks[i].timestamp + ");'>删除</a></td>\
           </tr>";
         }
+        tb_html+="\
+        </tbody>";
         document.getElementById("timed_task_tb").innerHTML = tb_html;
       });
     }
