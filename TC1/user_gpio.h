@@ -31,6 +31,7 @@ void SetSocketStatus(char* socket_status);
 void set_key_map(char user[],int index, char short_func, char long_func);
 char get_short_func(char val);
 char get_long_func(char val);
+char *get_func_name(char func_code);
 void StartLedBlink(uint8_t times);
 
 #endif

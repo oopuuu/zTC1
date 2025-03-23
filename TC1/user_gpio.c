@@ -28,7 +28,7 @@ bool RelayOut(void) {
     return false;
 }
 
-const char *get_func_name(char func_code) {
+char* get_func_name(char func_code) {
     static char buffer[32];
     switch (func_code) {
         case SWITCH_ALL_SOCKETS:

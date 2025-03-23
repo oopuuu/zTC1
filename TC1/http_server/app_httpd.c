@@ -476,8 +476,8 @@ static int HttpAddTask(httpd_request_t *req) {
     OSStatus err = kNoErr;
 
     //1577369623 4 0
-    char buf[16] = {0};
-    err = httpd_get_data(req, buf, 16);
+    char buf[20] = {0};
+    err = httpd_get_data(req, buf, 20);
     require_noerr(err, exit);
 
     pTimedTask task = NewTask();
@@ -486,14 +486,12 @@ static int HttpAddTask(httpd_request_t *req) {
         send_http(mess, strlen(mess), exit, &err);
         return err;
     }
-    int re = sscanf(buf, "%ld %d %d %d", &task->prs_time, &task->socket_idx, &task->on,
+    int re = sscanf(buf, "%ld %d %d %d", &task->prs_time, &task->operation, &task->on,
                     &task->weekday);http_log("AddTask buf[%s] re[%d] (%ld %d %d %d)",
-                                             buf, re, task->prs_time, task->socket_idx, task->on,
+                                             buf, re, task->prs_time, task->operation, task->on,
                                              task->weekday);
-    task->socket_idx--;
     if (task->prs_time < 1577428136 || task->prs_time > 9577428136
-        || task->socket_idx < 0 || task->socket_idx > 5
-        || (task->on != 0 && task->on != 1)) { http_log("AddTask Error!");
+        || task->operation < 0 || task->operation > 11) { http_log("AddTask Error!");
         re = 0;
     }
 

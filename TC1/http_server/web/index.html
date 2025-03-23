@@ -495,9 +495,9 @@
                                     <use xlink:href="#icon-keyboard_arrow_down"/>
                                 </svg>
                             </i>
-                            <label for="task_skt_idx" class="mdl-textfield__label">插座</label>
+                            <label for="task_skt_idx" class="mdl-textfield__label">操作</label>
                             <ul for="task_skt_idx"
-                                class="mdl-menu mdl-menu--bottom-left mdl-js-menu" id="sockets_list">
+                                class="mdl-menu mdl-menu--bottom-left mdl-js-menu" id="operations_list">
                             </ul>
                         </div>
                         <div class="mdl-textfield mdl-js-textfield">
@@ -916,13 +916,6 @@
       $(".mdl-layout-title").text(status.deviceName);
       document.title=status.deviceName;
       for (var i = 0; i < status_arr.length; i++) {
-      $('#sockets_list').append(
-      $('<li>')
-        .addClass('mdl-menu__item')
-        .attr('data-val', `${i+1}`)
-        .attr('data-selected', `${i==status_arr.length - 1}`)
-        .text(names_arr[i])
-    );
           var langSpan = switchTexts[i+3].querySelector('.lang');
           var indexSpan = switchTexts[i+3].querySelector('.socket-index');
           if (langSpan) langSpan.textContent = names_arr[i];   // 修改插座名称
@@ -972,6 +965,13 @@
         .text("未设置")
     );
     for (let i = 0; i < BTN_OPERATIONS.length; i++) {
+    $('#operations_list').append(
+      $('<li>')
+        .addClass('mdl-menu__item')
+        .attr('data-val', `${i}`)
+        .attr('data-selected', `false`)
+        .text(BTN_OPERATIONS[i].replaceAll('切换','设置'))
+    );
     $('#btn_action_selector').append(
       $('<li>')
         .addClass('mdl-menu__item')
@@ -1341,8 +1341,8 @@ componentHandler.upgradeDom();
           tb_html += "\
           <tr>\
             <td>" + tasks[i].prs_time + "</td>\
-            <td>" + names_arr[tasks[i].socket_idx-1] + "</td>\
-            <td>" + (tasks[i].on == 1?"开":"关") + "</td>\
+            <td>" + BTN_OPERATIONS[tasks[i].operation].replaceAll('切换','设置') + "</td>\
+            <td>" + ((tasks[i].operation==11||tasks[i].operation<8)?(tasks[i].on == 1?"开":"关"):"-") + "</td>\
             <td>" + getLoopText(tasks[i].weekday) + "</td>\
             <td><a href='javascript:DelTimedTask(" + tasks[i].timestamp + ");'>删除</a></td>\
           </tr>";
@@ -1393,10 +1393,7 @@ componentHandler.upgradeDom();
       //prs_time = prs_time + parseInt(sec);
       on = on ? "1" : "0";
       var cmd = prs_time + " " + idx + " " + on + " " + wkd;
-      if (cmd.length != 16) {
-        alert("CMD ERROR!");
-        return
-      }
+
       HttpPost("/task", function (re) {
         if (re != "OK") {
           alert(re);

@@ -6,8 +6,10 @@
 
 #include"main.h"
 #include"user_gpio.h"
+#include "mqtt_server/user_mqtt_client.h"
 #include"timed_task/timed_task.h"
 #include"http_server/web_log.h"
+#include "user_wifi.h"
 
 int day_sec = 86400;
 
@@ -142,9 +144,61 @@ bool DelTask(int time)
 
 void ProcessTask()
 {
-    task_log("process task time[%ld] socket_idx[%d] on[%d]",
-        user_config->task_top->prs_time, user_config->task_top->socket_idx, user_config->task_top->on);
-    UserRelaySet(user_config->task_top->socket_idx, user_config->task_top->on);
+    task_log("process task time[%ld] operation[%s] on[%d]",
+        user_config->task_top->prs_time, get_func_name(user_config->task_top->operation), user_config->task_top->on);
+    switch (user_config->task_top->operation) {
+            case SWITCH_ALL_SOCKETS:
+                UserRelaySetAll(user_config->task_top->on);
+                mico_system_context_update(sys_config);
+                for (int i = 0; i < SOCKET_NUM; i++) {
+                    UserMqttSendSocketState(i);
+                }
+                UserMqttSendTotalSocketState();
+                break;
+            case SWITCH_SOCKET_1:
+            case SWITCH_SOCKET_2:
+            case SWITCH_SOCKET_3:
+            case SWITCH_SOCKET_4:
+            case SWITCH_SOCKET_5:
+            case SWITCH_SOCKET_6:
+                UserRelaySet(user_config->task_top->operation - 1, user_config->task_top->on);
+                UserMqttSendSocketState(user_config->task_top->operation - 1);
+                UserMqttSendTotalSocketState();
+                mico_system_context_update(sys_config);
+                break;
+            case SWITCH_LED_ENABLE:
+
+                if (RelayOut() && user_config->task_top->on) {
+                    UserLedSet(1);
+                } else {
+                    UserLedSet(0);
+                }
+                UserMqttSendLedState();
+                mico_system_context_update(sys_config);
+                break;
+            case SWITCH_CHILD_LOCK_ENABLE:
+                user_config->user[0] = user_config->task_top->on;
+                childLockEnabled = user_config->user[0];
+                mico_system_context_update(sys_config);
+                UserMqttSendChildLockState();
+                break;
+            case REBOOT_SYSTEM:
+                MicoSystemReboot();
+                break;
+            case CONFIG_WIFI:
+
+                micoWlanSuspendStation();
+                ApInit(true);
+                break;
+            case RESET_SYSTEM:
+
+                mico_system_context_restore(sys_config);
+                mico_rtos_thread_sleep(1);
+                MicoSystemReboot();
+                break;
+            default:
+                break;
+        }
     DelFirstTask();
 }
 
@@ -164,8 +218,8 @@ char* GetTaskStr()
         tm_info = localtime(&prs_time);
         strftime(buffer, 26, "%m-%d %H:%M", tm_info);
 
-        sprintf(tmp_str, "{'timestamp':%ld,'prs_time':'%s','socket_idx':%d,'on':%d,'weekday':%d},",
-            tmp_tsk->prs_time, buffer, tmp_tsk->socket_idx+1, tmp_tsk->on, tmp_tsk->weekday);
+        sprintf(tmp_str, "{'timestamp':%ld,'prs_time':'%s','operation':%d,'on':%d,'weekday':%d},",
+            tmp_tsk->prs_time, buffer, tmp_tsk->operation, tmp_tsk->on, tmp_tsk->weekday);
         tmp_str += strlen(tmp_str);
         tmp_tsk = tmp_tsk->next;
     }
