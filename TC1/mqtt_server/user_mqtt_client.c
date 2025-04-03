@@ -683,6 +683,22 @@ void UserMqttHassAutoPower(void) {
                 str_mac, str_mac, str_mac, str_mac,sys_config->micoSystemConfig.name);
         UserMqttSendTopic(topic_buf, send_buf, 1);
 
+
+        sprintf(topic_buf, "homeassistant/sensor/%s/startupTime/config", str_mac);
+        sprintf(send_buf,
+                "{\"name\":\"运行时间\","
+                "\"uniq_id\":\"tc1_%s_sut\","
+                "\"object_id\":\"tc1_%s_sut\","
+                "\"state_topic\":\"homeassistant/sensor/%s/startupTime/state\","
+                "\"icon\":\"mdi:clock-time-three-outline\","
+                "\"value_template\":\"{{ value_json.startupTime }}\",""\"device\":{"
+                "\"identifiers\":[\"tc1_%s\"],"
+                "\"name\":\"%s\","
+                "\"model\":\"TC1\","
+                "\"manufacturer\":\"PHICOMM\"}}",
+                str_mac, str_mac, str_mac, str_mac,sys_config->micoSystemConfig.name);
+        UserMqttSendTopic(topic_buf, send_buf, 1);
+
         sprintf(topic_buf, "homeassistant/sensor/%s/powerConsumptionToday/config", str_mac);
         sprintf(send_buf,
                 "{\"name\":\"今日耗电量\","
@@ -729,6 +745,21 @@ void UserMqttHassPower(void) {
 
     sprintf(topic_buf, "homeassistant/sensor/%s/powerConsumption/state", str_mac);
     sprintf(send_buf, "{\"powerConsumption\":\"%.3f\"}", (17.1 * p_count) / 1000 / 36000);
+    UserMqttSendTopic(topic_buf, send_buf, 0);
+
+    //计算系统运行时间
+    char up_time[16] = "00:00:00";
+    mico_time_t past_ms = 0;
+    mico_time_get_time(&past_ms);
+    int past = past_ms / 1000;
+    int d = past / 3600 / 24;
+    int h = past / 3600 % 24;
+    int m = past / 60 % 60;
+    int s = past % 60;
+    sprintf(up_time, "%d - %02d:%02d:%02d", d, h, m, s);
+
+    sprintf(topic_buf, "homeassistant/sensor/%s/startupTime/state", str_mac);
+    sprintf(send_buf, "{\"startupTime\":\"%s\"}", up_time);
     UserMqttSendTopic(topic_buf, send_buf, 0);
 
 //    tc1_log("p_count %ld, p_count_1_day_ago %ld ,p_count_2_days_ago %ld, result %ld",p_count,user_config->p_count_1_day_ago,user_config->p_count_2_days_ago,((p_count-user_config->p_count_1_day_ago)<0?0:(p_count-user_config->p_count_1_day_ago)));
