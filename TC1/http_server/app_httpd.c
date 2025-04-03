@@ -54,6 +54,11 @@ static bool is_handlers_registered;
 const struct httpd_wsgi_call g_app_handlers[];
 char power_info_json[1952] = {0};
 char up_time[16] = "00:00:00";
+#define OTA_BUFFER_SIZE 1024  // 每次写入的缓存大小
+
+static CRC16_Context crc_context;
+static uint32_t ota_offset = 0;
+static int ota_file_size = 0;
 
 /*
 void GetPraFromUrl(char* url, char* pra, char* val)
@@ -236,6 +241,45 @@ static int HttpSetButtonEvent(httpd_request_t *req) {
     mico_system_context_update(sys_config);
 
     send_http("OK", 2, exit, &err);
+
+    exit:
+    if (buf) free(buf);
+    return err;
+}
+
+
+static int HttpSetOTAFile(httpd_request_t *req) {
+    OSStatus err = kNoErr;
+
+    char buffer[OTA_BUFFER_SIZE];
+    uint32_t recv_len;
+
+    if (req->type != HTTPD_REQ_TYPE_POST) {
+        send_http("405 Method Not Allowed", 23, exit, &err);
+    }
+    /* 初始化 OTA */
+    CRC16_Init(&crc_context);
+    ota_offset = 0;
+
+    /* 逐块接收并写入 Flash */
+    while ((recv_len = httpd_get_data(req, buffer, OTA_BUFFER_SIZE)) > 0) {
+        CRC16_Update(&crc_context, buffer, recv_len);
+        MicoFlashWrite(MICO_PARTITION_OTA_TEMP, &ota_offset, buffer, recv_len);
+    }
+
+    /* 计算 CRC */
+    uint16_t crc16;
+    CRC16_Final(&crc_context, &crc16);
+
+    /* 切换到新固件 */
+    OSStatus err = mico_ota_switch_to_new_fw(ota_file_size, crc16);
+    if (err == kNoErr) {
+        httpd_send(res, "200 OK: OTA Update Success! Rebooting...\n", 40);
+        /* 软重启 */
+        mico_system_power_perform(mico_system_context_get(), eState_Software_Reset);
+    } else {
+        send_http("500 Internal Server Error: OTA Update Failed!\n", 50, exit, &err);
+    }
 
     exit:
     if (buf) free(buf);
@@ -628,6 +672,7 @@ const struct httpd_wsgi_call g_app_handlers[] = {
         {"/childLock",        HTTPD_HDR_DEFORT, 0, NULL,                                              HttpSetChildLock,      NULL, NULL},
         {"/deviceName",       HTTPD_HDR_DEFORT, 0, NULL,                                              HttpSetDeviceName,     NULL, NULL},
         {"/buttonEvents",     HTTPD_HDR_DEFORT, 0,                             HttpGetButtonEvents,   HttpSetButtonEvent,    NULL, NULL},
+        {"/ota/fileUpload",     HTTPD_HDR_DEFORT, 0,                             NULL,   HttpSetOTAFile,    NULL, NULL},
 };
 
 static int g_app_handlers_no = sizeof(g_app_handlers) / sizeof(struct httpd_wsgi_call);

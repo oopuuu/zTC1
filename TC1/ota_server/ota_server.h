@@ -32,7 +32,7 @@
 #define __ota_server_H
 
 #define OTA_DEBUG     (1)
-#define OTA_USE_HTTPS (0)
+#define OTA_USE_HTTPS (1)
 
 #define OTA_MD5_LENTH 32
 #define OTA_SEND_HEAD_SIZE 256
