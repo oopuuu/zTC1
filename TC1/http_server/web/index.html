@@ -113,7 +113,7 @@
                         <use xlink:href="#icon-cloud_download"/>
                     </svg>
                 </i>
-                <span class="lang" langKey="OTA">在线升级</span>
+                <span class="lang" langKey="OTA">固件升级</span>
             </a>
             <a class="mdl-navigation__link" href="javascript:ShowPage(7);">
                 <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">
@@ -671,7 +671,6 @@
                     <form id="otaForm" action="/ota/fileUpload" method="post" enctype="multipart/form-data">
                         <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
                             <input class="mdl-textfield__input" type="file" id="ota_file" name="ota_file">
-                            <label class="mdl-textfield__label" for="ota_file">选择 OTA 文件</label>
                         </div>
                     </form>
                 </div>
@@ -796,7 +795,7 @@
       Config: {en: "Config", cn: "设置"},
       TimedTask: {en: "Timed Task", cn: "定时任务"},
       SystemStatus: {en: "System Status", cn: "系统状态"},
-      OTA: {en: "OTA", cn: "在线升级"},
+      OTA: {en: "OTA", cn: "固件升级"},
       SystemLog: {en: "System Log", cn: "系统日志"},
       About: {en: "About", cn: "关于"},
       //主页
@@ -1259,6 +1258,7 @@ componentHandler.upgradeDom();
     var w = document.getElementById("w");
     var w_t = document.getElementById("w_t");
     var w_y = document.getElementById("w_y");
+    var powerTimerId;
 
     function GetPowerRecord() {
       HttpPost("/power", function (re) {
@@ -1324,7 +1324,7 @@ componentHandler.upgradeDom();
             switch_lables[i+3].MaterialSwitch.off();
           }
         }
-        window.setTimeout(GetPowerRecord, 3000);
+      powerTimerId=  window.setTimeout(GetPowerRecord, 3000);
       }, power_idx.toString());
     }
     $(document).ready(function(){
@@ -1510,18 +1510,19 @@ HttpPost("/shortClickEvent", function (re) {
     }
 
     function OtaFileUpload() {
+    alert("假的假的是假的，忽略");
+    return;
     var fileInput = document.getElementById("ota_file");
     if (fileInput.files.length === 0) {
         alert("请选择要上传的 OTA 文件");
         return;
     }
-
-    var formData = new FormData();
-    formData.append("ota_file", fileInput.files[0]);
-
-    HttpPost("/ota/fileUpload", function(response) {
-        alert("OTA 上传结果: " + response);
-    }, formData);
+clearTimeout(powerTimerId);
+fetch("/ota/fileUpload", {
+  method: "POST",
+  headers: { "Content-Type": "application/octet-stream" },
+  body: fileInput.files[0]
+}).then(r => r.text()).then(alert).catch(alert);
     }
 
     var ota_status = document.querySelector('#ota_status');

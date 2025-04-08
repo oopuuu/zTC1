@@ -52,13 +52,9 @@
 static bool is_http_init;
 static bool is_handlers_registered;
 const struct httpd_wsgi_call g_app_handlers[];
-char power_info_json[1952] = {0};
+char power_info_json[2560] = {0};
 char up_time[16] = "00:00:00";
 #define OTA_BUFFER_SIZE 1024  // 每次写入的缓存大小
-
-static CRC16_Context crc_context;
-static uint32_t ota_offset = 0;
-static int ota_file_size = 0;
 
 /*
 void GetPraFromUrl(char* url, char* pra, char* val)
@@ -155,7 +151,7 @@ static int HttpGetAssets(httpd_request_t *req) {
 static int HttpGetTc1Status(httpd_request_t *req) {
     char *sockets = GetSocketStatus();
     char *short_click_config = GetButtonClickConfig();
-    char *tc1_status = malloc(1024);
+    char *tc1_status = malloc(2048);
     char *socket_names = malloc(512);
     sprintf(socket_names, "%s,%s,%s,%s,%s,%s",
             user_config->socket_names[0],
@@ -246,43 +242,59 @@ static int HttpSetButtonEvent(httpd_request_t *req) {
     if (buf) free(buf);
     return err;
 }
-
+#define OTA_BUFFER_SIZE 1024
 
 static int HttpSetOTAFile(httpd_request_t *req) {
     OSStatus err = kNoErr;
+    uint32_t total = 0, ota_offset = 0;
+    char *buffer = malloc(OTA_BUFFER_SIZE);
+    if (!buffer) return kGeneralErr;
 
-    char buffer[OTA_BUFFER_SIZE];
-    uint32_t recv_len;
+//    mico_logic_partition_t* ota_partition = MicoFlashGetInfo(MICO_PARTITION_OTA_TEMP);
+//    MicoFlashErase(MICO_PARTITION_OTA_TEMP, 0x0, ota_partition->partition_length);
 
-    if (req->type != HTTPD_REQ_TYPE_POST) {
-        send_http("405 Method Not Allowed", 23, exit, &err);
-    }
-    /* 初始化 OTA */
+    CRC16_Context crc_context;
     CRC16_Init(&crc_context);
-    ota_offset = 0;
 
-    /* 逐块接收并写入 Flash */
-    while ((recv_len = httpd_get_data(req, buffer, OTA_BUFFER_SIZE)) > 0) {
-        CRC16_Update(&crc_context, buffer, recv_len);
-        MicoFlashWrite(MICO_PARTITION_OTA_TEMP, &ota_offset, buffer, recv_len);
+    tc1_log("開始接收 OTA 數據...");
+    struct timeval timeout = {60, 0}; // 60秒
+    setsockopt(req->sock, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
+int remaining = -1;
+    while (remaining!=0) {
+    int readSize = remaining>OTA_BUFFER_SIZE?OTA_BUFFER_SIZE:(remaining>0?remaining:OTA_BUFFER_SIZE);
+        remaining = httpd_get_data(req, buffer, readSize);
+        if (remaining < 0) {
+            err = kConnectionErr;
+            tc1_log("httpd_get_data 失敗");
+            goto exit;
+            break;
+        }
+
+        CRC16_Update(&crc_context, buffer, readSize);
+
+//        err = MicoFlashWrite(MICO_PARTITION_OTA_TEMP, &crc_context->offset, (uint8_t *)buffer, readSize);
+//        require_noerr_quiet(err, exit);
+        total+=readSize;
+        mico_thread_msleep(10);
     }
 
-    /* 计算 CRC */
     uint16_t crc16;
     CRC16_Final(&crc_context, &crc16);
+    char response[64];
 
-    /* 切换到新固件 */
-    OSStatus err = mico_ota_switch_to_new_fw(ota_file_size, crc16);
-    if (err == kNoErr) {
-        httpd_send(res, "200 OK: OTA Update Success! Rebooting...\n", 40);
-        /* 软重启 */
-        mico_system_power_perform(mico_system_context_get(), eState_Software_Reset);
-    } else {
-        send_http("500 Internal Server Error: OTA Update Failed!\n", 50, exit, &err);
-    }
+    snprintf(response, sizeof(response), "OK, total: %ld bytes, CRC: 0x%04X", total, crc16);
+    send_http(response, strlen(response), exit, &err);
+    return 0;
 
-    exit:
-    if (buf) free(buf);
+    err = mico_ota_switch_to_new_fw(ota_offset, crc16);
+    require_noerr(err, exit);
+
+    tc1_log("OTA 完成，重啟系統");
+    mico_system_power_perform(mico_system_context_get(), eState_Software_Reset);
+
+exit:
+    if (buffer) free(buffer);
+    tc1_log("OTA 結束，狀態: %d", err);
     return err;
 }
 
