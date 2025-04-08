@@ -58,173 +58,203 @@ static httpd_request_t httpd_req;
 int httpd_send_chunk_begin(int conn, int size)
 {
 
-	int err;
-	char buf[CHUNK_SIZE_DIGITS];
-	int i;
-	int digit;
-	int begin = 1;
+    int err;
+    char buf[CHUNK_SIZE_DIGITS];
+    int i;
+    int digit;
+    int begin = 1;
 
-	for (i = CHUNK_SIZE_DIGITS - 1; i >= 0; i--) {
-		digit = size & 0xf;
-		if (!begin && !size) {
-			i++;
-			break;
-		}
-		buf[i] = (digit > 9) ? digit - 0xA + 'a' : digit + '0';
-		size = size >> 4;
-		begin = 0;
-	}
-	err = httpd_send(conn, &buf[i], CHUNK_SIZE_DIGITS - i);
-	if (err != kNoErr) {
-		return err;
-	}
+    for (i = CHUNK_SIZE_DIGITS - 1; i >= 0; i--) {
+        digit = size & 0xf;
+        if (!begin && !size) {
+            i++;
+            break;
+        }
+        buf[i] = (digit > 9) ? digit - 0xA + 'a' : digit + '0';
+        size = size >> 4;
+        begin = 0;
+    }
+    err = httpd_send(conn, &buf[i], CHUNK_SIZE_DIGITS - i);
+    if (err != kNoErr) {
+        return err;
+    }
 
-	err = httpd_send_crlf(conn);
+    err = httpd_send_crlf(conn);
 
-	return err;
+    return err;
 }
 
 /* Send the last chunk which is simply an ascii "0\r\n\r\n"
  */
 int httpd_send_last_chunk(int conn)
 {
-	int err;
+    int err;
 
-	err = httpd_send(conn, http_last_chunk,
-			    sizeof(http_last_chunk) - 1);
+    err = httpd_send(conn, http_last_chunk,
+                     sizeof(http_last_chunk) - 1);
 
-	if (err != kNoErr) {
-		httpd_d("Send last chunk failed");
-	}
+    if (err != kNoErr) {
+        httpd_d("Send last chunk failed");
+    }
 
-	return err;
+    return err;
 }
 
 /* Send one chunk of data of a given size
  */
 int httpd_send_chunk(int conn, const char *buf, int len)
 {
-	int err;
+    int err;
 
-	if (len) {
-		/* Send chunk begin header */
-		err = httpd_send_chunk_begin(conn, len);
-		if (err != kNoErr)
-			return err;
-		/* Send our data */
-		err = httpd_send(conn, buf, len);
-		if (err != kNoErr)
-			return err;
-		/* Send chunk end indicator */
-		err = httpd_send_crlf(conn);
-		if (err != kNoErr)
-			return err;
-	} else {
-		/* Length is 0, last chunk */
-		err = httpd_send(conn, http_last_chunk,
-				   sizeof(http_last_chunk) - 1);
-		if (err != kNoErr)
-			return err;
-	}
+    if (len) {
+        /* Send chunk begin header */
+        err = httpd_send_chunk_begin(conn, len);
+        if (err != kNoErr)
+            return err;
+        /* Send our data */
+        err = httpd_send(conn, buf, len);
+        if (err != kNoErr)
+            return err;
+        /* Send chunk end indicator */
+        err = httpd_send_crlf(conn);
+        if (err != kNoErr)
+            return err;
+    } else {
+        /* Length is 0, last chunk */
+        err = httpd_send(conn, http_last_chunk,
+                         sizeof(http_last_chunk) - 1);
+        if (err != kNoErr)
+            return err;
+    }
 
-	return err;
+    return err;
 }
 
 /*Helper function to send a buffer over a connection.
  */
 int httpd_send(int conn, const char *buf, int len)
 {
-	int num;
-	do {
+    int num;
+    struct timeval t;
+    fd_set writefds;
+
+    t.tv_sec = 0;
+    t.tv_usec = 200*1000;
+
+    do {
 #ifdef CONFIG_ENABLE_HTTPS
-		if (httpd_is_https_active())
+        if (httpd_is_https_active())
 			num = tls_send(httpd_tls_handle, buf, len);
 		else
 #endif /* ENABLE_HTTPS */
-			num = send(conn, buf, len, 0);
-		if (num < 0) {
-			httpd_d("send() failed: %d" ,conn);
-			return -kInProgressErr;
-		}
-		len -= num;
-		buf += num;
-	} while (len > 0);
+        FD_ZERO( &writefds );
+        FD_SET( conn, &writefds );
+
+        select( conn + 1, NULL, &writefds, NULL, &t );
+        if( FD_ISSET( conn, &writefds) )
+        {
+            num = send(conn, buf, len, 0);
+            if (num < 0) {
+                httpd_d("send() failed: %d" ,conn);
+                return -kInProgressErr;
+            }
+            len -= num;
+            buf += num;
+        }
+    } while (len > 0);
 
 
-	return kNoErr;
+    return kNoErr;
 }
 
 int httpd_recv(int fd, void *buf, size_t n, int flags)
 {
+    int len = 0;
+    struct timeval t;
+    fd_set readfds;
+
+    FD_ZERO( &readfds );
+    FD_SET( fd, &readfds );
+
+    t.tv_sec = 0;
+    t.tv_usec = 200*1000;
+
 #ifdef CONFIG_ENABLE_HTTPS
-	if (httpd_is_https_active())
+    if (httpd_is_https_active())
 		return tls_recv(httpd_tls_handle, buf, n);
 	else
 #endif /* ENABLE_HTTPS */
-		return recv(fd, buf, n, flags);
+    return recv(fd, buf, n, flags);
+    select( fd + 1, &readfds, NULL, NULL, &t );
+
+    if( FD_ISSET( fd, &readfds) )
+    {
+        len =  recv( fd, buf, n, flags );
+    }
+    return len;
 }
 
 int httpd_send_hdr_from_code(int sock, int stat_code,
-			     enum http_content_type content_type)
+                             enum http_content_type content_type)
 {
-	const char *str;
-	unsigned int str_len;
-	/*
-	 * Set the HTTP Response Status 200 OK, 404 NOT FOUND etc.
-	 * Also set the Transfer-Encoding to chunked.
-	 */
-	switch (stat_code) {
-	case -WM_E_HTTPD_HANDLER_404:
-		str = http_header_404;
-		str_len = strlen(http_header_404);
-		break;
-	case -WM_E_HTTPD_HANDLER_400:
-		str = http_header_400;
-		str_len = strlen(http_header_400);
-		break;
-	case -WM_E_HTTPD_HANDLER_500:
-		str = http_header_500;
-		str_len = strlen(http_header_500);
-		break;
-	default:
-		/* The handler doesn't want an HTTP error code, but would return
-		 * 200 OK with an error in the response */
-		str = http_header_200;
-		str_len = strlen(http_header_200);
-		break;
-	}
+    const char *str;
+    unsigned int str_len;
+    /*
+     * Set the HTTP Response Status 200 OK, 404 NOT FOUND etc.
+     * Also set the Transfer-Encoding to chunked.
+     */
+    switch (stat_code) {
+        case -WM_E_HTTPD_HANDLER_404:
+            str = http_header_404;
+            str_len = strlen(http_header_404);
+            break;
+        case -WM_E_HTTPD_HANDLER_400:
+            str = http_header_400;
+            str_len = strlen(http_header_400);
+            break;
+        case -WM_E_HTTPD_HANDLER_500:
+            str = http_header_500;
+            str_len = strlen(http_header_500);
+            break;
+        default:
+            /* The handler doesn't want an HTTP error code, but would return
+             * 200 OK with an error in the response */
+            str = http_header_200;
+            str_len = strlen(http_header_200);
+            break;
+    }
 
-	if (httpd_send(sock, str, str_len) != kNoErr) {
-		return -kInProgressErr;
-	}
+    if (httpd_send(sock, str, str_len) != kNoErr) {
+        return -kInProgressErr;
+    }
 
-	/* Send the Content-Type */
-	switch (content_type) {
-	case HTTP_CONTENT_JSON:
-		str = http_content_type_json_nocache;
-		str_len = sizeof(http_content_type_json_nocache) - 1;
-		break;
-	case HTTP_CONTENT_XML:
-		str = http_content_type_xml_nocache;
-		str_len = sizeof(http_content_type_xml_nocache) - 1;
-		break;
-	case HTTP_CONTENT_HTML:
-		str = http_content_type_html;
-		str_len = sizeof(http_content_type_html) - 1;
-		break;
-	case HTTP_CONTENT_JPEG:
-		str = http_content_type_jpg;
-		str_len = sizeof(http_content_type_jpg) - 1;
-		break;
-	default:
-		str = http_content_type_plain;
-		str_len = sizeof(http_content_type_plain) - 1;
-		break;
-	}
-	if (httpd_send(sock, str, str_len) != kNoErr) {
-		return -kInProgressErr;
-	}
-	return kNoErr;
+    /* Send the Content-Type */
+    switch (content_type) {
+        case HTTP_CONTENT_JSON:
+            str = http_content_type_json_nocache;
+            str_len = sizeof(http_content_type_json_nocache) - 1;
+            break;
+        case HTTP_CONTENT_XML:
+            str = http_content_type_xml_nocache;
+            str_len = sizeof(http_content_type_xml_nocache) - 1;
+            break;
+        case HTTP_CONTENT_HTML:
+            str = http_content_type_html;
+            str_len = sizeof(http_content_type_html) - 1;
+            break;
+        case HTTP_CONTENT_JPEG:
+            str = http_content_type_jpg;
+            str_len = sizeof(http_content_type_jpg) - 1;
+            break;
+        default:
+            str = http_content_type_plain;
+            str_len = sizeof(http_content_type_plain) - 1;
+            break;
+    }
+    if (httpd_send(sock, str, str_len) != kNoErr) {
+        return -kInProgressErr;
+    }
+    return kNoErr;
 }
 
 
@@ -234,62 +264,62 @@ static char httpd_error[HTTPD_MAX_ERROR_STRING + 1];
 void httpd_set_error(const char *fmt, ...)
 {
     va_list argp;
-  
+
     va_start(argp, fmt);
     vsnprintf(httpd_error, HTTPD_MAX_ERROR_STRING + 1, fmt, argp);
     va_end(argp);
-  
-	httpd_d("http set err");
+
+    httpd_d("http set err");
 }
 
 /* Helper function to send an error.
  */
 int httpd_send_error(int conn, int http_error)
 {
-	int err = 0;
+    int err = 0;
 
-	switch (http_error) {
-	case HTTP_404:
-		err = httpd_send(conn, http_header_404,
-				 strlen(http_header_404));
-		break;
-	case HTTP_500:
-		err = httpd_send(conn, http_header_500,
-				 strlen(http_header_500));
-		break;
+    switch (http_error) {
+        case HTTP_404:
+            err = httpd_send(conn, http_header_404,
+                             strlen(http_header_404));
+            break;
+        case HTTP_500:
+            err = httpd_send(conn, http_header_500,
+                             strlen(http_header_500));
+            break;
 
-	case HTTP_505:
-		err = httpd_send(conn, http_header_505,
-				 strlen(http_header_505));
-		break;
-	}
+        case HTTP_505:
+            err = httpd_send(conn, http_header_505,
+                             strlen(http_header_505));
+            break;
+    }
 
-	if (err != kNoErr) {
-		return err;
-	}
+    if (err != kNoErr) {
+        return err;
+    }
 
-	err = httpd_send(conn, http_header_type_chunked,
-			strlen(http_header_type_chunked));
-	if (err != kNoErr) {
-		return err;
-	}
+    err = httpd_send(conn, http_header_type_chunked,
+                     strlen(http_header_type_chunked));
+    if (err != kNoErr) {
+        return err;
+    }
 
-	err = httpd_send(conn, http_content_type_plain,
-			 sizeof(http_content_type_plain) - 1);
-	if (err != kNoErr) {
-		return err;
-	}
+    err = httpd_send(conn, http_content_type_plain,
+                     sizeof(http_content_type_plain) - 1);
+    if (err != kNoErr) {
+        return err;
+    }
 
-	err = httpd_send_crlf(conn);
-	if (err != kNoErr) {
-		return err;
-	}
+    err = httpd_send_crlf(conn);
+    if (err != kNoErr) {
+        return err;
+    }
 
-	err = httpd_send_chunk(conn, httpd_error, strlen(httpd_error));
-	if (err != kNoErr) {
-		return err;
-	}
-	return httpd_send_last_chunk(conn);
+    err = httpd_send_chunk(conn, httpd_error, strlen(httpd_error));
+    if (err != kNoErr) {
+        return err;
+    }
+    return httpd_send_last_chunk(conn);
 }
 
 
@@ -299,28 +329,28 @@ int httpd_send_error(int conn, int http_error)
  * data after that.
  */
 void httpd_purge_socket_data(httpd_request_t *req, char *msg_in,
-			     int msg_in_len, int conn)
+                             int msg_in_len, int conn)
 {
-	int status = httpd_parse_hdr_tags(req, conn, msg_in, msg_in_len);
-	if (status != kNoErr) {
-		/* We were unsuccessful in purging the socket.*/
-		httpd_d("Unable to purge socket: %d", status);
-		return;
-	}
+    int status = httpd_parse_hdr_tags(req, conn, msg_in, msg_in_len);
+    if (status != kNoErr) {
+        /* We were unsuccessful in purging the socket.*/
+        httpd_d("Unable to purge socket: %d", status);
+        return;
+    }
 
-	unsigned data_remaining = req->body_nbytes;
+    unsigned data_remaining = req->body_nbytes;
 
-	while (data_remaining) {
-		unsigned to_read = msg_in_len >= data_remaining ?
-			data_remaining : msg_in_len;
-		int actually_read = httpd_recv(conn, msg_in, to_read, 0);
-		if (actually_read < 0) {
-			httpd_d("Unable to read content."
-				"Was purging socket data");
-			return;
-		}
-		data_remaining -= actually_read;
-	}
+    while (data_remaining) {
+        unsigned to_read = msg_in_len >= data_remaining ?
+                           data_remaining : msg_in_len;
+        int actually_read = httpd_recv(conn, msg_in, to_read, 0);
+        if (actually_read < 0) {
+            httpd_d("Unable to read content."
+                    "Was purging socket data");
+            return;
+        }
+        data_remaining -= actually_read;
+    }
 }
 
 /* Handle an incoming message (request) from the client. This is the
@@ -328,72 +358,72 @@ void httpd_purge_socket_data(httpd_request_t *req, char *msg_in,
  */
 int httpd_handle_message(int conn)
 {
-	int err;
-	int req_line_len;
-	char msg_in[128];
+    int err;
+    int req_line_len;
+    char msg_in[128];
 
-	/* clear out the httpd_req structure */
-	memset(&httpd_req, 0x00, sizeof(httpd_req));
+    /* clear out the httpd_req structure */
+    memset(&httpd_req, 0x00, sizeof(httpd_req));
 
-	httpd_req.sock = conn;
+    httpd_req.sock = conn;
 
-	/* Read the first line of the HTTP header */
-	req_line_len = htsys_getln_soc(conn, msg_in, sizeof(msg_in));
-	if (req_line_len == 0)
-		return HTTPD_DONE;
+    /* Read the first line of the HTTP header */
+    req_line_len = htsys_getln_soc(conn, msg_in, sizeof(msg_in));
+    if (req_line_len == 0)
+        return HTTPD_DONE;
 
-	if (req_line_len < 0) {
-		httpd_d("Could not read from socket");
-		return -kInProgressErr;
-	}
+    if (req_line_len < 0) {
+        httpd_d("Could not read from socket");
+        return -kInProgressErr;
+    }
 
-	/* Parse the first line of the header */
-	err = httpd_parse_hdr_main(msg_in, &httpd_req);
-	if (err == -WM_E_HTTPD_NOTSUPP)
-		/* Send 505 HTTP Version not supported */
-		return httpd_send_error(conn, HTTP_505);
-	else if (err != kNoErr) {
-		/* Send 500 Internal Server Error */
-		return httpd_send_error(conn, HTTP_500);
-	}
+    /* Parse the first line of the header */
+    err = httpd_parse_hdr_main(msg_in, &httpd_req);
+    if (err == -WM_E_HTTPD_NOTSUPP)
+        /* Send 505 HTTP Version not supported */
+        return httpd_send_error(conn, HTTP_505);
+    else if (err != kNoErr) {
+        /* Send 500 Internal Server Error */
+        return httpd_send_error(conn, HTTP_500);
+    }
 
-	/* set a generic error that can be overridden by the wsgi handling. */
-	httpd_d("Presetting");
+    /* set a generic error that can be overridden by the wsgi handling. */
+    httpd_d("Presetting");
 
-	/* Web Services Gateway Interface branch point:
-	 * At this point we have the request type (httpd_req.type) and the path
-	 * (httpd_req.filename) and all the headers waiting to be read from
-	 * the socket.
-	 *
-	 * The call bellow will iterate through all the url patterns and
-	 * invoke the handlers that match the request type and pattern.  If
-	 * request type and url patern match, invoke the handler.
-	 */
-	err = httpd_wsgi(&httpd_req);
+    /* Web Services Gateway Interface branch point:
+     * At this point we have the request type (httpd_req.type) and the path
+     * (httpd_req.filename) and all the headers waiting to be read from
+     * the socket.
+     *
+     * The call bellow will iterate through all the url patterns and
+     * invoke the handlers that match the request type and pattern.  If
+     * request type and url patern match, invoke the handler.
+     */
+    err = httpd_wsgi(&httpd_req);
 
-	if (err == HTTPD_DONE) {
-		httpd_d("Done processing request.");
-		return kNoErr;
-	} else if (err == -WM_E_HTTPD_NO_HANDLER) {
-		httpd_d("No handler for the given URL %s was found",
-			httpd_req.filename);
-		/*
-		 * We have not yet read the complete data from the current
-		 * request, from the socket. We are in an error state and
-		 * we wish to cancel this HTTP transaction. We sent
-		 * appropriate message to the client and read (flush) out
-		 * all the pending data in the socket. We let the client
-		 * close the socket for us, if necessary.
-		 */
-		httpd_purge_socket_data(&httpd_req, msg_in,
-				sizeof(msg_in), conn);
-		httpd_set_error("File %s not_found", httpd_req.filename);
-		httpd_send_error(conn, HTTP_404);
-		return kNoErr;
-	} else {
-		httpd_d("WSGI handler failed.");
-		/* Send 500 Internal Server Error */
-		return httpd_send_error(conn, HTTP_500);
-	}
+    if (err == HTTPD_DONE) {
+        httpd_d("Done processing request.");
+        return kNoErr;
+    } else if (err == -WM_E_HTTPD_NO_HANDLER) {
+        httpd_d("No handler for the given URL %s was found",
+                httpd_req.filename);
+        /*
+         * We have not yet read the complete data from the current
+         * request, from the socket. We are in an error state and
+         * we wish to cancel this HTTP transaction. We sent
+         * appropriate message to the client and read (flush) out
+         * all the pending data in the socket. We let the client
+         * close the socket for us, if necessary.
+         */
+        httpd_purge_socket_data(&httpd_req, msg_in,
+                                sizeof(msg_in), conn);
+        httpd_set_error("File %s not_found", httpd_req.filename);
+        httpd_send_error(conn, HTTP_404);
+        return kNoErr;
+    } else {
+        httpd_d("WSGI handler failed.");
+        /* Send 500 Internal Server Error */
+        return httpd_send_error(conn, HTTP_500);
+    }
 
 }

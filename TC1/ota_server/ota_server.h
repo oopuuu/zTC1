@@ -49,8 +49,8 @@ typedef enum _OTA_STATE_E{
 }OTA_STATE_E;
 
 typedef enum _HTTP_SECURITY_E{
-  HTTP_SECURITY_HTTP,
-  HTTP_SECURITY_HTTPS
+    HTTP_SECURITY_HTTP,
+    HTTP_SECURITY_HTTPS
 } HTTP_SECURITY_E;
 
 typedef enum _OTA_CONTROL_E{
@@ -87,11 +87,11 @@ typedef struct _ota_check_t{
 typedef void (*ota_server_cb_fn) (OTA_STATE_E state, float progress);
 
 typedef struct _ota_server_context_t{
-  download_url_t      download_url;
-  download_state_t    download_state;
-  ota_check_t         ota_check;
-  OTA_CONTROL_E       ota_control;
-  ota_server_cb_fn    ota_server_cb;
+    download_url_t      download_url;
+    download_state_t    download_state;
+    ota_check_t         ota_check;
+    OTA_CONTROL_E       ota_control;
+    ota_server_cb_fn    ota_server_cb;
 } ota_server_context_t;
 
 
@@ -109,34 +109,34 @@ typedef struct _ota_server_context_t{
   * @return   kNoErr        : on success.
   * @return   kGeneralErr   : if an error occurred
   */
-OSStatus OtaServerStart(char *url, char *md5, ota_server_cb_fn call_back);
+OSStatus ota_server_start( char *url, char *md5, ota_server_cb_fn call_back );
 
 
 /** @brief    Get OTA server state
  *
  *  @return   OTA_CONTROL_E  : state
  */
-OTA_CONTROL_E OtaServerStateGet(void);
+OTA_CONTROL_E ota_server_state_get( void );
 
 
 /** @brief    Pause OTA server daemons
  *
  *  @return   No
  */
-void OtaServerPause(void);
+void ota_server_pause( void );
 
 
 /** @brief    Continue OTA server daemons
  *
  *  @return   No
  */
-void OtaServerContinue(void);
+void ota_server_continue( void );
 
 
 /** @brief    Stop OTA server daemons
  *
  *  @return   No
  */
-void OtaServerStop(void);
+void ota_server_stop( void );
 
 #endif

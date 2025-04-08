@@ -56,21 +56,21 @@ static OSStatus onReceivedData( struct _HTTPHeader_t * httpHeader,
 
 static void hex2str(uint8_t *hex, int hex_len, char *str)
 {
-  int i = 0;
-  for(i=0; i<hex_len; i++){
-    sprintf(str+i*2, "%02x", hex[i]);
-  }
+    int i = 0;
+    for(i=0; i<hex_len; i++){
+        sprintf(str+i*2, "%02x", hex[i]);
+    }
 }
 
 static void upper2lower(char *str, int len)
 {
-  int i = 0;
-  for(i=0; i<len; i++)
-  {
-    if( (*(str+i) >= 'A') &&  (*(str+i) <= 'Z') ){
-      *(str+i) += 32;
+    int i = 0;
+    for(i=0; i<len; i++)
+    {
+        if( (*(str+i) >= 'A') &&  (*(str+i) <= 'Z') ){
+            *(str+i) += 32;
+        }
     }
-  }
 }
 
 static int ota_server_send( uint8_t *data, int datalen )
@@ -104,7 +104,7 @@ static OSStatus ota_server_connect( struct sockaddr_in *addr, socklen_t addrlen 
     }
 #endif
 
-exit:
+    exit:
     return err;
 }
 
@@ -244,7 +244,7 @@ static void ota_server_thread( mico_thread_arg_t arg )
     struct in_addr in_addr;
 
     mico_logic_partition_t* ota_partition = MicoFlashGetInfo( MICO_PARTITION_OTA_TEMP );
-    
+
     ota_server_context->ota_control = OTA_CONTROL_START;
 
     hostent_content = gethostbyname( ota_server_context->download_url.host );
@@ -256,12 +256,12 @@ static void ota_server_thread( mico_thread_arg_t arg )
 
     offset = 0;
     MicoFlashErase( MICO_PARTITION_OTA_TEMP, 0x0, ota_partition->partition_length );
-    
+
     CRC16_Init( &crc_context );
     if( ota_server_context->ota_check.is_md5 == true ){
         InitMd5( &md5 );
     }
-    
+
     httpHeader = HTTPHeaderCreateWithCallback( 1024, onReceivedData, NULL, NULL );
     require_action( httpHeader, DELETE, ota_server_progress_set(OTA_FAIL) );
 
@@ -334,13 +334,13 @@ static void ota_server_thread( mico_thread_arg_t arg )
             goto DELETE;
         }
 
-    RECONNECTED:
+        RECONNECTED:
         ota_server_socket_close( );
         mico_thread_sleep(2);
         continue;
 
     }
-DELETE:
+    DELETE:
     HTTPHeaderDestory( &httpHeader );
     ota_server_socket_close( );
     if( ota_server_context != NULL ){
@@ -421,7 +421,7 @@ static OSStatus ota_server_set_url( char *url )
         strcpy( ota_server_context->download_url.url, pos );
     }
 
-exit:
+    exit:
     url_free( url_t );
     return err;
 }
@@ -461,7 +461,7 @@ OSStatus ota_server_start( char *url, char *md5, ota_server_cb_fn call_back )
     ota_server_context->ota_server_cb = call_back;
 
     err = mico_rtos_create_thread( NULL, MICO_APPLICATION_PRIORITY, "OTA", ota_server_thread, OTA_SERVER_THREAD_STACK_SIZE, 0 );
-exit:
+    exit:
     return err;
 }
 

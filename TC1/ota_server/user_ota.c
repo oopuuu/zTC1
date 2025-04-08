@@ -36,6 +36,6 @@ void UserOtaStart(char *url, char *md5)
 {
     ota_progress = 0;
     ota_log("ready to ota:%s",url);
-    OtaServerStart(url, md5, OtaServerStatusHandler);
+    ota_server_start(url, md5, OtaServerStatusHandler);
 }
 
