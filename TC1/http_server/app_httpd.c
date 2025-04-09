@@ -292,6 +292,10 @@ int remaining = -1;
     mico_system_power_perform(mico_system_context_get(), eState_Software_Reset);
 
 exit:
+    if (req->sock >= 0) {
+        close(req->sock);
+        req->sock = -1;
+    }
     if (buffer) free(buffer);
     tc1_log("OTA 結束，狀態: %d", err);
     return err;
