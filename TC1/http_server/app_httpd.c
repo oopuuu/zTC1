@@ -269,7 +269,7 @@ int remaining = -1;
             break;
         }
 
-        CRC16_Update(&crc_context, buffer, readSize);
+//        CRC16_Update(&crc_context, buffer, readSize);
 
 //        err = MicoFlashWrite(MICO_PARTITION_OTA_TEMP, &crc_context->offset, (uint8_t *)buffer, readSize);
 //        require_noerr_quiet(err, exit);
@@ -278,7 +278,7 @@ int remaining = -1;
     }
 
     uint16_t crc16;
-    CRC16_Final(&crc_context, &crc16);
+//    CRC16_Final(&crc_context, &crc16);
     char response[64];
 
     snprintf(response, sizeof(response), "OK, total: %ld bytes, CRC: 0x%04X", total, crc16);
