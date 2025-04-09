@@ -49,4 +49,6 @@ extern void UserMqttHassAutoTotalSocket(void);
 
 extern void registerMqttEvents(void);
 
+extern void UserMqttHassAutoRebootButton(void);
+
 #endif

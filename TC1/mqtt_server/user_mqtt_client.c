@@ -77,6 +77,7 @@ void UserMqttTimerFunc(void *arg) {
                 UserMqttHassAutoLed();
                 UserMqttHassAutoTotalSocket();
                 UserMqttHassAutoChildLock();
+                UserMqttHassAutoRebootButton();
                 break;
             case 1:
             case 2:
@@ -422,6 +423,8 @@ void ProcessHaCmd(char *cmd) {
         childLockEnabled = on;
         UserMqttSendChildLockState();
         mico_system_context_update(sys_config);
+    }else if (strcmp(cmd, "reboot") == 0) {
+        MicoSystemReboot();  // 立即重启设备
     }
 }
 
@@ -556,6 +559,32 @@ void UserMqttHassAuto(char socket_id) {
         free(send_buf);
     if (topic_buf)
         free(topic_buf);
+}
+
+void UserMqttHassAutoRebootButton(void) {
+    char *send_buf = NULL;
+    char *topic_buf = NULL;
+    send_buf = (char *) malloc(600);
+    topic_buf = (char *) malloc(64);
+    if (send_buf != NULL && topic_buf != NULL) {
+        // 重启按钮配置
+        sprintf(topic_buf, "homeassistant/button/%s/reboot/config", str_mac);
+        sprintf(send_buf,
+                "{\"name\":\"重启设备\","
+                "\"uniq_id\":\"tc1_%s_reboot\","
+                "\"object_id\":\"tc1_%s_reboot\","
+                "\"cmd_t\":\"device/ztc1/set\","
+                "\"pl_prs\":\"reboot\","
+                "\"device\":{"
+                "\"identifiers\":[\"tc1_%s\"],"
+                "\"name\":\"%s\","
+                "\"model\":\"TC1\","
+                "\"manufacturer\":\"PHICOMM\"}}",
+                str_mac,str_mac,str_mac, sys_config->micoSystemConfig.name);
+        UserMqttSendTopic(topic_buf, send_buf, 1);
+    }
+    if (send_buf) free(send_buf);
+    if (topic_buf) free(topic_buf);
 }
 
 void UserMqttHassAutoLed(void) {

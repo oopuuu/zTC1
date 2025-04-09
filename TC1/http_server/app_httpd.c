@@ -54,7 +54,7 @@ static bool is_handlers_registered;
 const struct httpd_wsgi_call g_app_handlers[];
 char power_info_json[2560] = {0};
 char up_time[16] = "00:00:00";
-#define OTA_BUFFER_SIZE 1024  // 每次写入的缓存大小
+#define OTA_BUFFER_SIZE 512  // 每次写入的缓存大小
 
 /*
 void GetPraFromUrl(char* url, char* pra, char* val)
@@ -242,7 +242,6 @@ static int HttpSetButtonEvent(httpd_request_t *req) {
     if (buf) free(buf);
     return err;
 }
-#define OTA_BUFFER_SIZE 1024
 
 static int HttpSetOTAFile(httpd_request_t *req) {
     OSStatus err = kNoErr;
