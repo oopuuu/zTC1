@@ -530,7 +530,7 @@ void UserMqttHassAuto(char socket_id) {
     socket_id--;
     char *send_buf = NULL;
     char *topic_buf = NULL;
-    send_buf = (char *) malloc(600);
+    send_buf = (char *) malloc(800);
     topic_buf = (char *) malloc(64);
     if (send_buf != NULL && topic_buf != NULL) {
         sprintf(topic_buf, "homeassistant/switch/%s/socket_%d/config", str_mac, socket_id);
@@ -691,6 +691,7 @@ void UserMqttHassAutoPower(void) {
                 "\"object_id\":\"tc1_%s_sut\","
                 "\"state_topic\":\"homeassistant/sensor/%s/startupTime/state\","
                 "\"icon\":\"mdi:clock-time-three-outline\","
+                "\"entity_category\":\"diagnostic\","
                 "\"value_template\":\"{{ value_json.startupTime }}\",""\"device\":{"
                 "\"identifiers\":[\"tc1_%s\"],"
                 "\"name\":\"%s\","
