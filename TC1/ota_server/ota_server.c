@@ -257,7 +257,7 @@ static void OtaServerThread(mico_thread_arg_t arg)
         InitMd5(&md5);
     }
     
-    httpHeader = HTTPHeaderCreateWithCallback(1024, OnReceivedData, NULL, NULL);
+    httpHeader = HTTPHeaderCreateWithCallback(512, OnReceivedData, NULL, NULL);
     require_action(httpHeader, DELETE, OtaServerProgressSet(OTA_FAIL));
 
     while (1)

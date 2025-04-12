@@ -103,17 +103,6 @@ static int HttpGetIndexPage(httpd_request_t *req) {
     return err;
 }
 
-static int HttpGetDemoPage(httpd_request_t *req) {
-    OSStatus err = kNoErr;
-    err = httpd_send_all_header(req, HTTP_RES_200, sizeof(web_index_html), HTTP_CONTENT_HTML_ZIP);
-    require_noerr_action(err, exit, http_log("ERROR: Unable to send http demo headers."));
-
-    err = httpd_send_body(req->sock, web_index_html, sizeof(web_index_html));
-    require_noerr_action(err, exit, http_log("ERROR: Unable to send http demo body."));
-    exit:
-    return err;
-}
-
 static int HttpGetAssets(httpd_request_t *req) {
     OSStatus err = kNoErr;
 
@@ -150,7 +139,7 @@ static int HttpGetAssets(httpd_request_t *req) {
 static int HttpGetTc1Status(httpd_request_t *req) {
     char *sockets = GetSocketStatus();
     char *short_click_config = GetButtonClickConfig();
-    char *tc1_status = malloc(1024);
+    char *tc1_status = malloc(1500);
     char *socket_names = malloc(512);
     sprintf(socket_names, "%s,%s,%s,%s,%s,%s",
             user_config->socket_names[0],
@@ -608,7 +597,6 @@ static int OtaStart(httpd_request_t *req) {
 
 const struct httpd_wsgi_call g_app_handlers[] = {
         {"/",                 HTTPD_HDR_DEFORT, 0,                             HttpGetIndexPage, NULL,                       NULL, NULL},
-        {"/demo",             HTTPD_HDR_DEFORT, 0,                             HttpGetDemoPage,  NULL,                       NULL, NULL},
         {"/assets", HTTPD_HDR_ADD_SERVER |
                     HTTPD_HDR_ADD_CONN_CLOSE,   APP_HTTP_FLAGS_NO_EXACT_MATCH, HttpGetAssets,    NULL,                       NULL, NULL},
         {"/socket",           HTTPD_HDR_DEFORT, 0, NULL,                                              HttpSetSocketStatus,   NULL, NULL},

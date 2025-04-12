@@ -1305,7 +1305,7 @@ componentHandler.upgradeDom();
             switch_lables[i+3].MaterialSwitch.off();
           }
         }
-        window.setTimeout(GetPowerRecord, 3000);
+      window.powerTimeout=  window.setTimeout(GetPowerRecord, 3000);
       }, power_idx.toString());
     }
     $(document).ready(function(){
@@ -1485,6 +1485,7 @@ HttpPost("/shortClickEvent", function (re) {
       var protocol = window.location.protocol;
       var baseUrl = protocol+"//"+window.location.host;
 
+clearTimeout(window.powerTimeout);
       HttpPost("/ota", function (re) {
         OtaStatus();
       }, ota_url);
