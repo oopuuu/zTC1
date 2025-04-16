@@ -431,6 +431,9 @@ void ProcessHaCmd(char *cmd) {
 OSStatus UserMqttSendTopic(char *topic, char *arg, char retained) {
     OSStatus err = kUnknownErr;
     p_mqtt_send_msg_t p_send_msg = NULL;
+    if(mqtt_msg_send_queue == NULL){
+    return err;
+    }
 
 //  mqtt_log("======App prepare to send ![%d]======", MicoGetMemoryInfo()->free_memory);
 

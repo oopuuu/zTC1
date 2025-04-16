@@ -186,8 +186,10 @@ int application_start(void) {
         }
     }
     KeyInit();
+    if (!(MQTT_SERVER[0] < 0x20 || MQTT_SERVER[0] > 0x7f || MQTT_SERVER_PORT < 1)){
     err = UserMqttInit();
     require_noerr(err, exit);
+    }
     err = UserRtcInit();
     require_noerr(err, exit);
     PowerInit();
