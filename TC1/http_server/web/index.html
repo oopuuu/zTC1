@@ -40,20 +40,20 @@
             </button>
             <span class="mdl-layout-title">TC1智能插座</span>
             <div class="mdl-layout-spacer"></div>
-<!--            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button&#45;&#45;icon"-->
-<!--                    id="hdrbtn">-->
-<!--                <i class="material-icons">-->
-<!--                    <svg>-->
-<!--                        <use xlink:href="#icon-translate"/>-->
-<!--                    </svg>-->
-<!--                </i>-->
-<!--            </button>-->
-<!--            <ul class="mdl-menu mdl-js-menu mdl-js-ripple-effect mdl-menu&#45;&#45;bottom-right"-->
-<!--                for="hdrbtn">-->
-<!--                <li class="mdl-menu__item" onclick="ChangeLanguage('en')">English</li>-->
-<!--                <li class="mdl-menu__item" onclick="ChangeLanguage('cn')">中文</li>-->
-<!--                <li class="mdl-menu__item" onclick="ChangeLanguage('jp')">日本語</li>-->
-<!--            </ul>-->
+            <!--            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button&#45;&#45;icon"-->
+            <!--                    id="hdrbtn">-->
+            <!--                <i class="material-icons">-->
+            <!--                    <svg>-->
+            <!--                        <use xlink:href="#icon-translate"/>-->
+            <!--                    </svg>-->
+            <!--                </i>-->
+            <!--            </button>-->
+            <!--            <ul class="mdl-menu mdl-js-menu mdl-js-ripple-effect mdl-menu&#45;&#45;bottom-right"-->
+            <!--                for="hdrbtn">-->
+            <!--                <li class="mdl-menu__item" onclick="ChangeLanguage('en')">English</li>-->
+            <!--                <li class="mdl-menu__item" onclick="ChangeLanguage('cn')">中文</li>-->
+            <!--                <li class="mdl-menu__item" onclick="ChangeLanguage('jp')">日本語</li>-->
+            <!--            </ul>-->
             <button onclick="reboot()"
                     class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon"
                     id="rebootbtn">
@@ -113,7 +113,7 @@
                         <use xlink:href="#icon-cloud_download"/>
                     </svg>
                 </i>
-                <span class="lang" langKey="OTA">在线升级</span>
+                <span class="lang" langKey="OTA">固件升级</span>
             </a>
             <a class="mdl-navigation__link" href="javascript:ShowPage(7);">
                 <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">
@@ -291,30 +291,30 @@
                         </ul>
                     </div>
                 </div>
-                    </div>
+            </div>
 
             <div class="page page1 mdl-cell mdl-cell--4-col mdl-cell--8-col-tablet mdl-grid mdl-grid--no-spacing">
                 <div class="demo-options mdl-card mdl-shadow--2dp mdl-cell mdl-cell--4-col mdl-cell--3-col-tablet mdl-cell--12-col-desktop">
                     <div class="mdl-card__supporting-text">
-                <div class="mdl-card__title mdl-card--expand">
-                    <h2 class="mdl-card__title-text">功率图</h2>
-                </div>
+                        <div class="mdl-card__title mdl-card--expand">
+                            <h2 class="mdl-card__title-text">功率图</h2>
+                        </div>
 
-                <div id="ct-chart-par"
-                     class="page page1 mdl-card__supporting-text mdl-shadow--2dp"
-                     style="height:315px;overflow-x:scroll;overflow-y:hidden;">
-                    <table class="pw">
-                        <tr>
-                            <td>当前功率: <span id="p" class="success">0</span> W</td>
-                            <td>今日电量: <span id="w_t" class="error">0</span> kW·h</td>
-                            <td>昨日电量: <span id="w_y" class="error">0</span> kW·h</td>
-                            <td>总电量: <span id="w" class="error">0</span> kW·h</td>
-                        </tr>
-                    </table>
-                    <div id="ct-chart" class="ct-chart ct-perfect-fourth"
-                         style="height:280px;margin-top:40px;"></div>
-                </div>
-            </div>
+                        <div id="ct-chart-par"
+                             class="page page1 mdl-card__supporting-text mdl-shadow--2dp"
+                             style="height:315px;overflow-x:scroll;overflow-y:hidden;">
+                            <table class="pw">
+                                <tr>
+                                    <td>当前功率: <span id="p" class="success">0</span> W</td>
+                                    <td>今日电量: <span id="w_t" class="error">0</span> kW·h</td>
+                                    <td>昨日电量: <span id="w_y" class="error">0</span> kW·h</td>
+                                    <td>总电量: <span id="w" class="error">0</span> kW·h</td>
+                                </tr>
+                            </table>
+                            <div id="ct-chart" class="ct-chart ct-perfect-fourth"
+                                 style="height:280px;margin-top:40px;"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -539,7 +539,7 @@
                         <th>操作</th>
                     </tr>
                 </table>
-                </div>
+            </div>
 
             <div class="page page4 over-unset mdl-cell mdl-cell--5-col demo-card-square mdl-card mdl-shadow--2dp"
                  style="z-index: unset;">
@@ -663,6 +663,24 @@
                 <div id="ota_status" class="mdl-progress mdl-js-progress"></div>
             </div>
 
+            <div class="page page6 mdl-cell mdl-cell--12-col demo-card-square mdl-card mdl-shadow--2dp">
+                <div class="mdl-card__title mdl-card--expand">
+                    <h2 class="mdl-card__title-text">本地升级</h2>
+                </div>
+                <div class="mdl-card__supporting-text">
+                    <form id="otaForm" action="/ota/fileUpload" method="post" enctype="multipart/form-data">
+                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                            <input class="mdl-textfield__input" type="file" id="ota_file" name="ota_file">
+                        </div>
+                    </form>
+                </div>
+                <div class="mdl-card__actions mdl-card--border">
+                    <a href="javascript:OtaFileUpload();" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+                        上传 OTA 文件
+                    </a>
+                </div>
+            </div>
+
             <div class="page page7 mdl-cell mdl-cell--12-col demo-card-square mdl-card mdl-shadow--2dp">
                 <div class="mdl-card__title mdl-card--expand">
                     <h2 class="mdl-card__title-text">系统日志</h2>
@@ -777,7 +795,7 @@
       Config: {en: "Config", cn: "设置"},
       TimedTask: {en: "Timed Task", cn: "定时任务"},
       SystemStatus: {en: "System Status", cn: "系统状态"},
-      OTA: {en: "OTA", cn: "在线升级"},
+      OTA: {en: "OTA", cn: "固件升级"},
       SystemLog: {en: "System Log", cn: "系统日志"},
       About: {en: "About", cn: "关于"},
       //主页
@@ -1240,6 +1258,7 @@ componentHandler.upgradeDom();
     var w = document.getElementById("w");
     var w_t = document.getElementById("w_t");
     var w_y = document.getElementById("w_y");
+    var powerTimerId;
 
     function GetPowerRecord() {
       HttpPost("/power", function (re) {
@@ -1305,7 +1324,7 @@ componentHandler.upgradeDom();
             switch_lables[i+3].MaterialSwitch.off();
           }
         }
-      window.powerTimeout=  window.setTimeout(GetPowerRecord, 3000);
+      powerTimerId=  window.setTimeout(GetPowerRecord, 3000);
       }, power_idx.toString());
     }
     $(document).ready(function(){
@@ -1485,11 +1504,27 @@ HttpPost("/shortClickEvent", function (re) {
       var protocol = window.location.protocol;
       var baseUrl = protocol+"//"+window.location.host;
 
-clearTimeout(window.powerTimeout);
       HttpPost("/ota", function (re) {
         OtaStatus();
       }, ota_url);
     }
+
+    function OtaFileUpload() {
+    //alert("假的假的是假的，忽略");
+    //return;
+    var fileInput = document.getElementById("ota_file");
+    if (fileInput.files.length === 0) {
+        alert("请选择要上传的 OTA 文件");
+        return;
+    }
+clearTimeout(powerTimerId);
+fetch("/ota/fileUpload", {
+  method: "POST",
+  headers: { "Content-Type": "application/octet-stream" },
+  body: fileInput.files[0]
+}).then(r => r.text()).then(alert).catch(alert);
+    }
+
     var ota_status = document.querySelector('#ota_status');
     ota_status.addEventListener('mdl-componentupgraded', function() {
       this.MaterialProgress.setProgress(0);

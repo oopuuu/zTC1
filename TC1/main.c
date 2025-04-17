@@ -199,12 +199,12 @@ int application_start(void) {
 
     err = mico_rtos_create_thread(NULL, MICO_APPLICATION_PRIORITY, "p_count",
                                   (mico_thread_function_t) schedule_p_count_task,
-                                  0x2000, 0);
+                                  0x1000, 0);
     require_noerr_string(err, exit, "ERROR: Unable to start the p_count thread.");
 
     err = mico_rtos_create_thread(NULL, MICO_APPLICATION_PRIORITY, "mqtt_power_report",
                                   (mico_thread_function_t) reportMqttPowerInfoThread,
-                                  0x2000, 0);
+                                  0x1000, 0);
     require_noerr_string(err, exit, "ERROR: Unable to start the mqtt_power_report thread.");
 
 

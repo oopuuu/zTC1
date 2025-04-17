@@ -255,6 +255,64 @@ static int HttpSetButtonEvent(httpd_request_t *req) {
     return err;
 }
 
+static int HttpSetOTAFile(httpd_request_t *req) {
+    OSStatus err = kNoErr;
+    uint32_t total = 0, ota_offset = 0;
+    char *buffer = malloc(OTA_BUFFER_SIZE);
+    if (!buffer) return kGeneralErr;
+
+//    mico_logic_partition_t* ota_partition = MicoFlashGetInfo(MICO_PARTITION_OTA_TEMP);
+//    MicoFlashErase(MICO_PARTITION_OTA_TEMP, 0x0, ota_partition->partition_length);
+
+    CRC16_Context crc_context;
+    CRC16_Init(&crc_context);
+
+    tc1_log("開始接收 OTA 數據...");
+    struct timeval timeout = {60, 0}; // 60秒
+    setsockopt(req->sock, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
+int remaining = -1;
+    while (remaining!=0) {
+    int readSize = remaining>OTA_BUFFER_SIZE?OTA_BUFFER_SIZE:(remaining>0?remaining:OTA_BUFFER_SIZE);
+        remaining = httpd_get_data(req, buffer, readSize);
+        if (remaining < 0) {
+            err = kConnectionErr;
+            tc1_log("httpd_get_data 失敗");
+            goto exit;
+            break;
+        }
+
+//        CRC16_Update(&crc_context, buffer, readSize);
+
+//        err = MicoFlashWrite(MICO_PARTITION_OTA_TEMP, &crc_context->offset, (uint8_t *)buffer, readSize);
+//        require_noerr_quiet(err, exit);
+        total+=readSize;
+        mico_thread_msleep(10);
+    }
+
+    uint16_t crc16;
+//    CRC16_Final(&crc_context, &crc16);
+    char response[64];
+
+    snprintf(response, sizeof(response), "OK, total: %ld bytes, CRC: 0x%04X", total, crc16);
+    send_http(response, strlen(response), exit, &err);
+    return 0;
+
+    err = mico_ota_switch_to_new_fw(ota_offset, crc16);
+    require_noerr(err, exit);
+
+    tc1_log("OTA 完成，重啟系統");
+    mico_system_power_perform(mico_system_context_get(), eState_Software_Reset);
+
+exit:
+    if (req->sock >= 0) {
+        close(req->sock);
+        req->sock = -1;
+    }
+    if (buffer) free(buffer);
+    tc1_log("OTA 結束，狀態: %d", err);
+    return err;
+}
+
 static int HttpSetDeviceName(httpd_request_t *req) {
     OSStatus err = kNoErr;
 
