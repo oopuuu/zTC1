@@ -579,7 +579,6 @@ void UserMqttHassAutoRebootButton(void) {
                 "\"object_id\":\"tc1_%s_reboot\","
                 "\"cmd_t\":\"device/ztc1/set\","
                 "\"pl_prs\":\"reboot\","
-                "\"device_class\":\"outlet\","
                 "\"device\":{"
                 "\"identifiers\":[\"tc1_%s\"],"
                 "\"name\":\"%s\","
