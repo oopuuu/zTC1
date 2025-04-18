@@ -56,6 +56,7 @@ char power_info_json[2560] = {0};
 char up_time[16] = "00:00:00";
 #define CHUNK_SIZE 512  // 每次发送 512 字节，避免 buffer 太大
 #define OTA_BUFFER_SIZE 512
+#define MAX_OTA_SIZE 1024*1024
 
 /*
 void GetPraFromUrl(char* url, char* pra, char* val)
@@ -256,61 +257,54 @@ static int HttpSetButtonEvent(httpd_request_t *req) {
     return err;
 }
 
-static int HttpSetOTAFile(httpd_request_t *req) {
-    OSStatus err = kNoErr;
-    uint32_t total = 0, ota_offset = 0;
-    char *buffer = malloc(OTA_BUFFER_SIZE);
-    if (!buffer) return kGeneralErr;
+#define OTA_BUF_SIZE 1024
 
-//    mico_logic_partition_t* ota_partition = MicoFlashGetInfo(MICO_PARTITION_OTA_TEMP);
-//    MicoFlashErase(MICO_PARTITION_OTA_TEMP, 0x0, ota_partition->partition_length);
+static int HttpSetOTAFile(httpd_request_t *req)
+{
+    OSStatus err = kNoErr;
+    uint8_t *buffer = malloc(OTA_BUF_SIZE);
+    if (!buffer) return kNoMemoryErr;
+
+    tc1_log("[OTA] hdr_parsed=%d, remaining=%d, body_nbytes=%d",
+            req->hdr_parsed, req->remaining_bytes, req->body_nbytes);
+
+    mico_logic_partition_t* ota_partition = MicoFlashGetInfo(MICO_PARTITION_OTA_TEMP);
+    MicoFlashErase(MICO_PARTITION_OTA_TEMP, 0x0, ota_partition->partition_length);
 
     CRC16_Context crc_context;
     CRC16_Init(&crc_context);
 
-    tc1_log("開始接收 OTA 數據...");
-    struct timeval timeout = {60, 0}; // 60秒
-    setsockopt(req->sock, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
-int remaining = -1;
-    while (remaining!=0) {
-    int readSize = remaining>OTA_BUFFER_SIZE?OTA_BUFFER_SIZE:(remaining>0?remaining:OTA_BUFFER_SIZE);
-        remaining = httpd_get_data(req, buffer, readSize);
-        if (remaining < 0) {
+    uint32_t offset = 0;
+    int total = 0;
+
+    while (1) {
+        int ret = httpd_get_data(req, buffer, OTA_BUF_SIZE);
+        if (ret == 0) break;
+        if (ret < 0) {
+            tc1_log("[OTA] 读取失败 ret=%d", ret);
             err = kConnectionErr;
-            tc1_log("httpd_get_data 失敗");
             goto exit;
-            break;
         }
 
-//        CRC16_Update(&crc_context, buffer, readSize);
+        CRC16_Update(&crc_context, buffer, ret);
+        err = MicoFlashWrite(MICO_PARTITION_OTA_TEMP, &offset, buffer, ret);
+        require_noerr_quiet(err, exit);
 
-//        err = MicoFlashWrite(MICO_PARTITION_OTA_TEMP, &crc_context->offset, (uint8_t *)buffer, readSize);
-//        require_noerr_quiet(err, exit);
-        total+=readSize;
-        mico_thread_msleep(10);
+        total += ret;
     }
 
     uint16_t crc16;
-//    CRC16_Final(&crc_context, &crc16);
-    char response[64];
+    CRC16_Final(&crc_context, &crc16);
 
-    snprintf(response, sizeof(response), "OK, total: %ld bytes, CRC: 0x%04X", total, crc16);
-    send_http(response, strlen(response), exit, &err);
-    return 0;
-
-    err = mico_ota_switch_to_new_fw(ota_offset, crc16);
+    err = mico_ota_switch_to_new_fw(total, crc16);
     require_noerr(err, exit);
 
-    tc1_log("OTA 完成，重啟系統");
-    mico_system_power_perform(mico_system_context_get(), eState_Software_Reset);
+    char resp[64];
+    snprintf(resp, sizeof(resp), "OK, total: %d bytes", total);
+    send_http(resp, strlen(resp), exit, &err);
 
 exit:
-    if (req->sock >= 0) {
-        close(req->sock);
-        req->sock = -1;
-    }
     if (buffer) free(buffer);
-    tc1_log("OTA 結束，狀態: %d", err);
     return err;
 }
 

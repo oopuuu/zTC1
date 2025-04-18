@@ -1518,6 +1518,7 @@ HttpPost("/shortClickEvent", function (re) {
         return;
     }
 clearTimeout(powerTimerId);
+console.log(fileInput.files[0].size);  // 应显示 647168 左右
 fetch("/ota/fileUpload", {
   method: "POST",
   headers: { "Content-Type": "application/octet-stream" },
