@@ -50,7 +50,8 @@ httpd_state_t httpd_state;
 
 static mico_thread_t httpd_main_thread;
 
-#define http_server_thread_stack_size 0x5000
+// 0x8000 不行
+#define http_server_thread_stack_size 0x6000
 
 /* Why HTTPD_MAX_MESSAGE + 2?
  * Handlers are allowed to use HTTPD_MAX_MESSAGE bytes of this buffer.

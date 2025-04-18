@@ -67,7 +67,7 @@ OSStatus UserRtcInit(void)
     /* start rtc client */
     err = mico_rtos_create_thread(NULL, MICO_APPLICATION_PRIORITY, "rtc",
                                    (mico_thread_function_t) RtcThread,
-                                   0x1000, 0);
+                                   0x800, 0);
     require_noerr_string(err, exit, "ERROR: Unable to start the rtc thread.");
 
     if (kNoErr != err) rtc_log("ERROR1, app thread exit err: %d kNoErr[%d]", err, kNoErr);

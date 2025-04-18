@@ -187,8 +187,8 @@ int application_start(void) {
     }
     KeyInit();
     if (!(MQTT_SERVER[0] < 0x20 || MQTT_SERVER[0] > 0x7f || MQTT_SERVER_PORT < 1)){
-    err = UserMqttInit();
-    require_noerr(err, exit);
+        err = UserMqttInit();
+        require_noerr(err, exit);
     }
     err = UserRtcInit();
     require_noerr(err, exit);
@@ -199,12 +199,12 @@ int application_start(void) {
 
     err = mico_rtos_create_thread(NULL, MICO_APPLICATION_PRIORITY, "p_count",
                                   (mico_thread_function_t) schedule_p_count_task,
-                                  0x1000, 0);
+                                  0x800, 0);
     require_noerr_string(err, exit, "ERROR: Unable to start the p_count thread.");
 
     err = mico_rtos_create_thread(NULL, MICO_APPLICATION_PRIORITY, "mqtt_power_report",
                                   (mico_thread_function_t) reportMqttPowerInfoThread,
-                                  0x1000, 0);
+                                  0x800, 0);
     require_noerr_string(err, exit, "ERROR: Unable to start the mqtt_power_report thread.");
 
 
@@ -214,6 +214,7 @@ int application_start(void) {
             ProcessTask();
         }
 
+        if (now % 10 == 5) system_log("Free memory %d bytes", MicoGetMemoryInfo()->free_memory); 
         mico_thread_msleep(1000);
     }
 

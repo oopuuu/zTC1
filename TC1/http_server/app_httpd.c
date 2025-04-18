@@ -257,55 +257,90 @@ static int HttpSetButtonEvent(httpd_request_t *req) {
     return err;
 }
 
-#define OTA_BUF_SIZE 1024
+#define OTA_BUF_SIZE 5120
 
 static int HttpSetOTAFile(httpd_request_t *req)
 {
+    tc1_log("[OTA] hdr_parsed=%d, remaining=%d, body_nbytes=%d, req.chunked=%d",
+        req->hdr_parsed, req->remaining_bytes, req->body_nbytes, req->chunked);
     OSStatus err = kNoErr;
-    uint8_t *buffer = malloc(OTA_BUF_SIZE);
-    if (!buffer) return kNoMemoryErr;
 
-    tc1_log("[OTA] hdr_parsed=%d, remaining=%d, body_nbytes=%d",
-            req->hdr_parsed, req->remaining_bytes, req->body_nbytes);
+    int total = 0;
+    int ret = 0;
+
+    // req->chunked = 1;
+
+    int total1 = req->remaining_bytes;
+    char *buffer = malloc(OTA_BUF_SIZE);
+    if (!buffer) return kNoMemoryErr;
+    uint32_t offset = 0;
 
     mico_logic_partition_t* ota_partition = MicoFlashGetInfo(MICO_PARTITION_OTA_TEMP);
     MicoFlashErase(MICO_PARTITION_OTA_TEMP, 0x0, ota_partition->partition_length);
-
     CRC16_Context crc_context;
     CRC16_Init(&crc_context);
-
-    uint32_t offset = 0;
-    int total = 0;
-
+    // 尝试读取全部 POST 数据
     while (1) {
-        int ret = httpd_get_data(req, buffer, OTA_BUF_SIZE);
-        if (ret == 0) break;
-        if (ret < 0) {
-            tc1_log("[OTA] 读取失败 ret=%d", ret);
-            err = kConnectionErr;
-            goto exit;
+        ret = httpd_get_data2(req, buffer,OTA_BUF_SIZE);
+
+        // ret = httpd_recv(req->sock, buffer, 128, 0);
+        total += ret;
+        // req->remaining_bytes -= ret;
+
+        if (ret > 0) {
+            CRC16_Update(&crc_context, buffer, ret);
+            err = MicoFlashWrite(MICO_PARTITION_OTA_TEMP, &offset, (uint8_t *)buffer, ret);
+            require_noerr_quiet(err, exit);
+            tc1_log("[OTA] 本次读取 %d 字节，累计 %d 字节", ret, total);
         }
 
-        CRC16_Update(&crc_context, buffer, ret);
-        err = MicoFlashWrite(MICO_PARTITION_OTA_TEMP, &offset, buffer, ret);
-        require_noerr_quiet(err, exit);
+        if (ret == 0 || req->remaining_bytes <= 0) {
+            // 读取完毕
+            tc1_log("[OTA] 数据读取完成, 总计 %d 字节", total);
+            break;
+        } else if (ret < 0) {
+            tc1_log("[OTA] 数据读取失败, ret=%d", ret);
+            err = kConnectionErr;
+            break;
+        }
+        
+        mico_rtos_thread_msleep(100);
 
-        total += ret;
+        // tc1_log("[OTA] %x", buffer);
+        // tc1_log("[OTA] hdr_parsed=%d, remaining=%d, body_nbytes=%d",
+        // req->hdr_parsed, req->remaining_bytes, req->body_nbytes);
     }
-
+        // if (buffer) free(buffer);
     uint16_t crc16;
     CRC16_Final(&crc_context, &crc16);
 
+
     err = mico_ota_switch_to_new_fw(total, crc16);
+    tc1_log("[OTA] mico_ota_switch_to_new_fw err=%d", err);
     require_noerr(err, exit);
 
-    char resp[64];
-    snprintf(resp, sizeof(resp), "OK, total: %d bytes", total);
+    char resp[128];
+    snprintf(resp, sizeof(resp), "OK, total: %d bytes, req %d  %d", total, req->body_nbytes, total1);
     send_http(resp, strlen(resp), exit, &err);
 
+    mico_system_power_perform(mico_system_context_get(), eState_Software_Reset);
 exit:
     if (buffer) free(buffer);
+    tc1_log("[OTA] buffer");
+    tc1_log("[OTA] bbbbbbbbbbbbbbbbbbbb");
     return err;
+
+    // ota_file_req = req;
+
+    // OSStatus err = kNoErr;
+    // err = mico_rtos_create_thread(NULL, MICO_APPLICATION_PRIORITY, "OtaFileThread", OtaFileThread, 0x1000, 0);
+    // char buf[16] = {0};
+    // sprintf(buf, "%d", sizeof(ota_file_req));
+    // send_http(buf, strlen(buf), exit, &err);
+
+    // exit:
+    // if (buf) free(buf);
+    // return err;
 }
 
 static int HttpSetDeviceName(httpd_request_t *req) {
