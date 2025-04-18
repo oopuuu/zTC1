@@ -53,6 +53,7 @@ mico_queue_t mqtt_msg_send_queue = NULL;
 
 Client c;  // mqtt client object
 Network n;  // socket network for mqtt client
+volatile bool mqtt_thread_should_exit = false;
 
 static mico_worker_thread_t mqtt_client_worker_thread; /* Worker thread to manage send/recv events */
 //static mico_timed_event_t mqtt_client_send_event;
@@ -96,6 +97,18 @@ void UserMqttTimerFunc(void *arg) {
         }
         timer_status++;
     }
+}
+
+OSStatus UserMqttDeInit(void) {
+    OSStatus err = kNoErr;
+
+    // 1. 请求线程退出
+    mqtt_thread_should_exit = true;
+
+exit:
+    if (kNoErr != err)
+        mqtt_log("ERROR: UserMqttDeInit exit err: %d", err);
+    return err;
 }
 
 /* Application entrance */
@@ -204,14 +217,14 @@ void MqttClientThread(mico_thread_arg_t arg) {
     msg_send_event_fd = mico_create_event_fd(mqtt_msg_send_queue);
     require_action(msg_send_event_fd >= 0, exit,
                    mqtt_log("ERROR: create msg send queue event fd failed!!!"));
-
+    mqtt_thread_should_exit = false;
     MQTT_start:
 
     isconnect = false;
     /* 1. create network connection */
     ssl_settings.ssl_enable = false;
     LinkStatusTypeDef LinkStatus;
-    while (1) {
+    while (!mqtt_thread_should_exit) {
         isconnect = false;
         mico_rtos_thread_sleep(3);
         if (MQTT_SERVER[0] < 0x20 || MQTT_SERVER[0] > 0x7f || MQTT_SERVER_PORT < 1)
@@ -272,7 +285,7 @@ void MqttClientThread(mico_thread_arg_t arg) {
     mico_init_timer(&timer_handle, 150, UserMqttTimerFunc, &arg);
     registerMqttEvents();
     /* 5. client loop for recv msg && keepalive */
-    while (1) {
+    while (!mqtt_thread_should_exit) {
         isconnect = true;
         no_mqtt_msg_exchange = true;
         FD_ZERO(&readfds);
@@ -329,10 +342,12 @@ mqtt_log("Disconnect MQTT client, and reconnect after 5s, reason: mqtt_rc = %d, 
     mico_rtos_thread_sleep(5);
     goto MQTT_start;
 
-    exit:
-    isconnect = false;mqtt_log("EXIT: MQTT client exit with err = %d.", err);
+exit:
+    isconnect = false;
+    mqtt_log("EXIT: MQTT client exit with err = %d.", err);
     UserMqttClientRelease(&c, &n);
-    mico_rtos_delete_thread(NULL);
+    mico_rtos_delete_thread(NULL); // 自删
+    return;
 }
 
 // callback, msg received from mqtt server

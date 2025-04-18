@@ -326,8 +326,6 @@ static int HttpSetOTAFile(httpd_request_t *req)
     mico_system_power_perform(mico_system_context_get(), eState_Software_Reset);
 exit:
     if (buffer) free(buffer);
-    tc1_log("[OTA] buffer");
-    tc1_log("[OTA] bbbbbbbbbbbbbbbbbbbb");
     return err;
 
     // ota_file_req = req;

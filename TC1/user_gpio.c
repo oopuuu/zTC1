@@ -239,6 +239,7 @@ static void KeyEventHandler(int num, boolean longPress) {
         if (childLockEnabled)
                         break;
             StartLedBlink(3);
+            UserMqttDeInit();
             micoWlanSuspendStation();
             ApInit(true);
             break;

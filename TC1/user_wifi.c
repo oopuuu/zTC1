@@ -4,6 +4,7 @@
 #include "mico_socket.h"
 #include "user_gpio.h"
 #include "http_server/web_log.h"
+#include "mqtt_server/user_mqtt_client.h"
 
 char wifi_status = WIFI_STATE_NOCONNECT;
 
@@ -122,6 +123,9 @@ static void WifiLedTimerCallback(void* arg)
             UserLedSet(-1);
             break;
         case WIFI_STATE_CONNECTED:
+            if (!(MQTT_SERVER[0] < 0x20 || MQTT_SERVER[0] > 0x7f || MQTT_SERVER_PORT < 1)){
+                UserMqttInit();
+            }
             UserLedSet(0);
             mico_rtos_stop_timer(&wifi_led_timer);
             if (RelayOut()&&user_config->power_led_enabled)

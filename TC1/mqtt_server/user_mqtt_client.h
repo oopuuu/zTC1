@@ -22,6 +22,7 @@
 #define MQTT_LED_ENABLED  user_config->power_led_enabled
 
 extern OSStatus UserMqttInit(void);
+extern OSStatus UserMqttDeInit(void);
 
 extern OSStatus UserMqttSend(char *arg);
 
