@@ -36,6 +36,11 @@
 #include <http-strings.h>
 #include "stdlib.h"
 
+#include <ctype.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include "mico.h"
 #include "httpd_priv.h"
 #include "app_httpd.h"
@@ -430,19 +435,62 @@ static int HttpGetWifiConfig(httpd_request_t *req) {
     return err;
 }
 
+
+// 单个十六进制字符转数字（安全）
+static int hex_char_to_int(char c) {
+    if ('0' <= c && c <= '9') return c - '0';
+    if ('a' <= c && c <= 'f') return c - 'a' + 10;
+    if ('A' <= c && c <= 'F') return c - 'A' + 10;
+    return -1;
+}
+
+// 健壮版 URL 解码函数
+void url_decode(const char *src, char *dest, size_t max_len) {
+    size_t i = 0;
+    while (*src && i < max_len - 1) {
+        if (*src == '%') {
+            if (isxdigit((unsigned char)src[1]) && isxdigit((unsigned char)src[2])) {
+                int high = hex_char_to_int(src[1]);
+                int low = hex_char_to_int(src[2]);
+                if (high >= 0 && low >= 0) {
+                    dest[i++] = (char)((high << 4) | low);
+                    src += 3;
+                    continue;
+                }
+            }
+            // 非法编码，跳过 %
+            src++;
+        } else if (*src == '+') {
+            dest[i++] = ' ';
+            src++;
+        } else {
+            dest[i++] = *src++;
+        }
+    }
+    dest[i] = '\0';
+}
+
 static int HttpSetWifiConfig(httpd_request_t *req) {
     OSStatus err = kNoErr;
 
-    int buf_size = 97;
-    char *buf = malloc(buf_size);
-    int mode = -1;
-    char *wifi_ssid = malloc(32);
-    char *wifi_key = malloc(32);
+  char *buf = malloc(256);
+  char *ssid_enc = malloc(128);
+  char *key_enc = malloc(128);
+  char *wifi_ssid = malloc(128);
+  char *wifi_key = malloc(128);
+  int mode = -1;
 
-    err = httpd_get_data(req, buf, buf_size);
+
+
+    err = httpd_get_data(req, buf, 256);
     require_noerr(err, exit);
-
-    sscanf(buf, "%d %s %s", &mode, wifi_ssid, wifi_key);
+  // 假设 httpd_get_data(req, buf, 256);
+//  tc1_log("wifi config %s",buf);
+  sscanf(buf, "%d %s %s", &mode, ssid_enc, key_enc);
+//  tc1_log("wifi config %s %s",ssid_enc,key_enc);
+  url_decode(ssid_enc, wifi_ssid,128);
+  url_decode(key_enc, wifi_key,128);
+//  tc1_log("wifi config decode %s %s",wifi_ssid,wifi_key);
     if (mode == 1) {
         WifiConnect(wifi_ssid, wifi_key);
     } else {

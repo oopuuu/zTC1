@@ -1235,15 +1235,15 @@ componentHandler.upgradeDom();
       var mode = $("#custom_station").prop("checked") ? 1 : 0;
       var ssid = $("#custom_ssid").val();
       var passwd = $("#custom_password").val();
-      if (ContainQM(ssid) || ContainQM(passwd)) {
-        alert(qm_mess);
-        return;
-      }
+      //if (ContainQM(ssid) || ContainQM(passwd)) {
+      //  alert(qm_mess);
+      //  return;
+      //}
       if (passwd.length < 8) {
         alert(le_mess);
         return;
       }
-      var params = mode + " " + ssid + " " + passwd;
+      var params = mode + " " + encodeURIComponent(ssid) + " " + encodeURIComponent(passwd);
       HttpPost("/wifi/config", function (re) {
         ShowToast(re);
       }, params);
