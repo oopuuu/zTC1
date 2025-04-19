@@ -105,9 +105,6 @@ OSStatus UserMqttDeInit(void) {
     // 1. 请求线程退出
     mqtt_thread_should_exit = true;
 
-exit:
-    if (kNoErr != err)
-        mqtt_log("ERROR: UserMqttDeInit exit err: %d", err);
     return err;
 }
 
@@ -790,7 +787,7 @@ void UserMqttHassAutoPower(void) {
 char topic_buf[128] = {0};
 char send_buf[128] = {0};
 
-void UserMqttHassPower(void) {
+extern void UserMqttHassPower(void) {
     sprintf(topic_buf, "homeassistant/sensor/%s/power/state", str_mac);
     sprintf(send_buf, "{\"power\":\"%.3f\"}", real_time_power / 10);
     UserMqttSendTopic(topic_buf, send_buf, 0);

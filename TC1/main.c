@@ -208,8 +208,6 @@ int application_start(void) {
         if (user_config->task_top && now >= user_config->task_top->prs_time) {
             ProcessTask();
         }
-
-        if (now % 10 == 5) system_log("Free memory %d bytes", MicoGetMemoryInfo()->free_memory); 
         mico_thread_msleep(1000);
     }
 
