@@ -39,7 +39,7 @@ char* GetLogRecord()
         if (!log_record.logs[i%LOG_NUM]) continue;
         sprintf(tmp, "%s\n", log_record.logs[i%LOG_NUM]);
         if(i == log_record.idx){
-        sprintf(tmp, "FreeMem %d bytes\n", MicoGetMemoryInfo()->free_memory);
+        sprintf(tmp, "%s\nFreeMem %d bytes\n",log_record.logs[i%LOG_NUM],MicoGetMemoryInfo()->free_memory);
         }
     }
     return log_record_str;

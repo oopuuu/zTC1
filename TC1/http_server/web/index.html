@@ -1519,7 +1519,7 @@ document.getElementById("submit-ota-link").disabled = true;
     //return;
     var fileInput = document.getElementById("ota_file");
     if (fileInput.files.length === 0) {
-        Toast("请选择要上传的 OTA 文件");
+        ShowToast("请选择要上传的 OTA 文件");
         return;
     }
 clearTimeout(powerTimerId);
