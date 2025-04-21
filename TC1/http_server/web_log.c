@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
+#include "mico.h"
+
 
 #include"http_server/web_log.h"
 
@@ -36,6 +38,9 @@ char* GetLogRecord()
         tmp += strlen(tmp);
         if (!log_record.logs[i%LOG_NUM]) continue;
         sprintf(tmp, "%s\n", log_record.logs[i%LOG_NUM]);
+        if(i == log_record.idx){
+        sprintf(tmp, "FreeMem %d bytes\n", MicoGetMemoryInfo()->free_memory);
+        }
     }
     return log_record_str;
 }
