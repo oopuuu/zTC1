@@ -34,7 +34,8 @@ $(NAME)_SOURCES := main.c\
 				   user_power.c\
 				   timed_task/timed_task.c\
 				   http_server/web_log.c\
-				   http_server/app_httpd.c
+				   http_server/app_httpd.c\
+				   udp_server/udp_server.c
 				   
 $(NAME)_COMPONENTS := protocols/SNTP\
 					protocols/mqtt\
