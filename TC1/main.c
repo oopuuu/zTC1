@@ -190,7 +190,10 @@ int application_start(void) {
     require_noerr(err, exit);
     PowerInit();
     AppHttpdStart(); // start http server thread
-    udp_server_start();
+//    udp_server_start();
+//if (!(MQTT_SERVER[0] < 0x20 || MQTT_SERVER[0] > 0x7f || MQTT_SERVER_PORT < 1)){
+//      UserMqttInit();
+//            }
     UserLedSet(user_config->power_led_enabled);
 
     err = mico_rtos_create_thread(NULL, MICO_APPLICATION_PRIORITY, "p_count",

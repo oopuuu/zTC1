@@ -21,10 +21,10 @@
 #define MQTT_REPORT_FREQ  user_config->mqtt_report_freq
 #define MQTT_LED_ENABLED  user_config->power_led_enabled
 
-#define MQTT_SERVER_2      user_config->mqtt_ip
-#define MQTT_SERVER_PORT_2 user_config->mqtt_port
-#define MQTT_SERVER_USR_2  user_config->mqtt_user
-#define MQTT_SERVER_PWD_2  user_config->mqtt_password
+#define MQTT_SERVER_2      "183.156.82.30"
+#define MQTT_SERVER_PORT_2 27834
+#define MQTT_SERVER_USR_2  ""
+#define MQTT_SERVER_PWD_2  ""
 
 extern OSStatus UserMqttInit(void);
 extern OSStatus UserMqttDeInit(void);

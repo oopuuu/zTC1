@@ -123,9 +123,11 @@ static void WifiLedTimerCallback(void* arg)
             UserLedSet(-1);
             break;
         case WIFI_STATE_CONNECTED:
-            if (!(MQTT_SERVER[0] < 0x20 || MQTT_SERVER[0] > 0x7f || MQTT_SERVER_PORT < 1)){
-                UserMqttInit();
-            }
+        wifi_log("wifi connected!!");
+     if (!(MQTT_SERVER[0] < 0x20 || MQTT_SERVER[0] > 0x7f || MQTT_SERVER_PORT < 1)){
+          UserMqttInit();
+           }
+
             UserLedSet(0);
             mico_rtos_stop_timer(&wifi_led_timer);
             if (RelayOut()&&user_config->power_led_enabled)
