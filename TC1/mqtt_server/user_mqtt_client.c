@@ -108,10 +108,23 @@ OSStatus UserMqttDeInit(void) {
     return err;
 }
 
+void clear_mqtt_msg_send_queue(void) {
+if(mqtt_msg_send_queue == NULL){
+return;
+}
+    void *msg = NULL;
+    while (mico_rtos_is_queue_empty(&mqtt_msg_send_queue) == false) {
+        if (mico_rtos_pop_from_queue(&mqtt_msg_send_queue, &msg, 0) == kNoErr) {
+            if (msg) free(msg);  // 释放消息内存，避免泄漏
+        }
+    }
+}
+
 /* Application entrance */
 OSStatus UserMqttInit(void) {
     OSStatus err = kNoErr;
-
+if(mqtt_msg_send_queue != NULL)
+    return err;
     sprintf(topic_set, MQTT_CLIENT_SUB_TOPIC1);
     sprintf(topic_state, MQTT_CLIENT_PUB_TOPIC, str_mac);
     //TODO size:0x800
@@ -146,13 +159,32 @@ OSStatus UserMqttInit(void) {
 static OSStatus UserMqttClientRelease(Client *c, Network *n) {
     OSStatus err = kNoErr;
 
-    if (c->isconnected) MQTTDisconnect(c);
+    if (c == NULL || n == NULL) return kParamErr;
 
-    n->disconnect(n);  // close connection
+    if (c->isconnected) {
+        MQTTDisconnect(c);
+        c->isconnected = 0;
+    }
 
-    if (MQTT_SUCCESS != MQTTClientDeinit(c)) { mqtt_log("MQTTClientDeinit failed!");
+    if (c->buf) {
+        free(c->buf);
+        c->buf = NULL;
+    }
+
+    if (c->readbuf) {
+        free(c->readbuf);
+        c->readbuf = NULL;
+    }
+
+    if (n->disconnect) {
+        n->disconnect(n);
+    }
+
+    if (MQTT_SUCCESS != MQTTClientDeinit(c)) {
+        mqtt_log("MQTTClientDeinit failed!");
         err = kDeletedErr;
     }
+
     return err;
 }
 
@@ -187,7 +219,7 @@ static OSStatus MqttMsgPublish(Client *c, const char *topic, char qos, char reta
 }
 
 void registerMqttEvents(void) {
-if(timer_status ! =0){
+if(timer_status !=0){
     mico_stop_timer(&timer_handle);
     }
     timer_status = 0;
@@ -243,7 +275,8 @@ void MqttClientThread(mico_thread_arg_t arg) {
         if (rc == MQTT_SUCCESS) break;
 
         //mqtt_log("ERROR: MQTT network connect err=%d, reconnect after 3s...", rc);
-    }mqtt_log("MQTT network connect success!");
+    }
+    mqtt_log("MQTT network connect success!");
 
     /* 2. init mqtt client */
     //c.heartbeat_retry_max = 2;
@@ -264,7 +297,7 @@ void MqttClientThread(mico_thread_arg_t arg) {
     rc = MQTTConnect(&c, &connectData);
     require_noerr_string(rc, MQTT_reconnect, "ERROR: MQTT client connect err.");
 
-    mqtt_log("MQTT client connect success!");
+    mqtt_log("MQTT client connect success, result: %d ", rc);
 
     UserLedSet(RelayOut() && user_config->power_led_enabled);
 
@@ -312,13 +345,12 @@ void MqttClientThread(mico_thread_arg_t arg) {
                 err = MqttMsgPublish(&c, p_send_msg->topic, p_send_msg->qos, p_send_msg->retained,
                                      (const unsigned char *) p_send_msg->data,
                                      p_send_msg->datalen);
-
+                free(p_send_msg);
+                p_send_msg = NULL;
                 require_noerr_string(err, MQTT_reconnect, "ERROR: MQTT publish data err");
 
                 //mqtt_log("MQTT publish data success! send_topic=[%s], msg=[%ld].", p_send_msg->topic, p_send_msg->datalen);
                 no_mqtt_msg_exchange = false;
-                free(p_send_msg);
-                p_send_msg = NULL;
             }
         }
 
@@ -334,7 +366,7 @@ void MqttClientThread(mico_thread_arg_t arg) {
 mqtt_log("Disconnect MQTT client, and reconnect after 5s, reason: mqtt_rc = %d, err = %d", rc, err);
 
     timer_status = 100;
-
+    clear_mqtt_msg_send_queue();
     UserMqttClientRelease(&c, &n);
     isconnect = false;
     UserLedSet(-1);
