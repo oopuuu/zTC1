@@ -187,6 +187,9 @@ static OSStatus MqttMsgPublish(Client *c, const char *topic, char qos, char reta
 }
 
 void registerMqttEvents(void) {
+if(timer_status ! =0){
+    mico_stop_timer(&timer_handle);
+    }
     timer_status = 0;
     mico_start_timer(&timer_handle);
 }
@@ -212,6 +215,8 @@ void MqttClientThread(mico_thread_arg_t arg) {
 
     /* create msg send queue event fd */
     msg_send_event_fd = mico_create_event_fd(mqtt_msg_send_queue);
+    mico_init_timer(&timer_handle, 150, UserMqttTimerFunc, &arg);
+
     require_action(msg_send_event_fd >= 0, exit,
                    mqtt_log("ERROR: create msg send queue event fd failed!!!"));
     mqtt_thread_should_exit = false;
@@ -279,7 +284,6 @@ void MqttClientThread(mico_thread_arg_t arg) {
     UserMqttSendTotalSocketState();
     UserMqttSendChildLockState();
 
-    mico_init_timer(&timer_handle, 150, UserMqttTimerFunc, &arg);
     registerMqttEvents();
     /* 5. client loop for recv msg && keepalive */
     while (!mqtt_thread_should_exit) {
