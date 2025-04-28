@@ -471,7 +471,9 @@ void ProcessHaCmd(char *cmd) {
         childLockEnabled = on;
         UserMqttSendChildLockState();
         mico_system_context_update(sys_config);
-    }else if (strcmp(cmd, "reboot") == 0) {
+    }else if (strcmp(cmd, "reboot") == ' ') {
+        sscanf(cmd, "reboot %s", mac);
+        if (strcmp(mac, str_mac)) return;
         MicoSystemReboot();  // 立即重启设备
     }
 }
@@ -626,13 +628,13 @@ void UserMqttHassAutoRebootButton(void) {
                 "\"uniq_id\":\"tc1_%s_reboot\","
                 "\"object_id\":\"tc1_%s_reboot\","
                 "\"cmd_t\":\"device/ztc1/set\","
-                "\"pl_prs\":\"reboot\","
+                "\"pl_prs\":\"reboot %s\","
                 "\"device\":{"
                 "\"identifiers\":[\"tc1_%s\"],"
                 "\"name\":\"%s\","
                 "\"model\":\"TC1\","
                 "\"manufacturer\":\"PHICOMM\"}}",
-                str_mac,str_mac,str_mac, sys_config->micoSystemConfig.name);
+                str_mac,str_mac,str_mac,str_mac, sys_config->micoSystemConfig.name);
         UserMqttSendTopic(topic_buf, send_buf, 1);
     }
     if (send_buf) free(send_buf);
