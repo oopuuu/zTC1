@@ -36,6 +36,11 @@
 #include <http-strings.h>
 #include "stdlib.h"
 
+#include <ctype.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include "mico.h"
 #include "httpd_priv.h"
 #include "app_httpd.h"
@@ -54,7 +59,9 @@ static bool is_handlers_registered;
 const struct httpd_wsgi_call g_app_handlers[];
 char power_info_json[2560] = {0};
 char up_time[16] = "00:00:00";
-#define OTA_BUFFER_SIZE 512  // 每次写入的缓存大小
+#define CHUNK_SIZE 512  // 每次发送 512 字节，避免 buffer 太大
+#define OTA_BUFFER_SIZE 512
+#define MAX_OTA_SIZE 1024*1024
 
 /*
 void GetPraFromUrl(char* url, char* pra, char* val)
@@ -91,27 +98,30 @@ void GetPraFromUrl(char* url, char* pra, char* val)
 }
 */
 
-static int HttpGetIndexPage(httpd_request_t *req) {
+
+static OSStatus send_in_chunks(int sock, const uint8_t *data, int total_len) {
     OSStatus err = kNoErr;
-
-    err = httpd_send_all_header(req, HTTP_RES_200, sizeof(web_index_html), HTTP_CONTENT_HTML_ZIP);
-    require_noerr_action(err, exit, http_log("ERROR: Unable to send http index headers."));
-
-    err = httpd_send_body(req->sock, web_index_html, sizeof(web_index_html));
-    require_noerr_action(err, exit, http_log("ERROR: Unable to send http index body."));
-
-    exit:
+    for (int offset = 0; offset < total_len; offset += CHUNK_SIZE) {
+        int chunk_len = (total_len - offset > CHUNK_SIZE) ? CHUNK_SIZE : (total_len - offset);
+        err = httpd_send_body(sock, data + offset, chunk_len);
+        require_noerr_action(err, exit, http_log("ERROR: Send chunk failed at offset %d", offset));
+    }
+exit:
     return err;
 }
 
-static int HttpGetDemoPage(httpd_request_t *req) {
+static int HttpGetIndexPage(httpd_request_t *req) {
     OSStatus err = kNoErr;
-    err = httpd_send_all_header(req, HTTP_RES_200, sizeof(web_index_html), HTTP_CONTENT_HTML_ZIP);
-    require_noerr_action(err, exit, http_log("ERROR: Unable to send http demo headers."));
+    int total_sz = sizeof(web_index_html);
 
-    err = httpd_send_body(req->sock, web_index_html, sizeof(web_index_html));
-    require_noerr_action(err, exit, http_log("ERROR: Unable to send http demo body."));
-    exit:
+
+    err = httpd_send_all_header(req, HTTP_RES_200, total_sz, HTTP_CONTENT_HTML_ZIP);
+    require_noerr_action(err, exit, http_log("ERROR: Unable to send index headers."));
+
+    err = send_in_chunks(req->sock, web_index_html, total_sz);
+    require_noerr_action(err, exit, http_log("ERROR: Unable to send index body."));
+
+exit:
     return err;
 }
 
@@ -119,14 +129,15 @@ static int HttpGetAssets(httpd_request_t *req) {
     OSStatus err = kNoErr;
 
     char *file_name = strstr(req->filename, "/assets/");
-    if (!file_name) { http_log("HttpGetAssets url[%s] err", req->filename);
+    if (!file_name) {
+        http_log("HttpGetAssets url[%s] err", req->filename);
         return err;
     }
-    //http_log("HttpGetAssets url[%s] file_name[%s]", req->filename, file_name);
 
     int total_sz = 0;
     const unsigned char *file_data = NULL;
     const char *content_type = HTTP_CONTENT_JS_ZIP;
+
     if (strcmp(file_name + 8, "js_pack.js") == 0) {
         total_sz = sizeof(js_pack);
         file_data = js_pack;
@@ -134,24 +145,32 @@ static int HttpGetAssets(httpd_request_t *req) {
         total_sz = sizeof(css_pack);
         file_data = css_pack;
         content_type = HTTP_CONTENT_CSS_ZIP;
+    } else if (strcmp(file_name + 8, "index.html") == 0) {
+        total_sz = sizeof(web_index_html);
+        file_data = web_index_html;
+        content_type = HTTP_CONTENT_HTML_ZIP;
     }
 
-    if (total_sz == 0) return err;
+    if (total_sz == 0 || file_data == NULL) {
+        http_log("File not found: %s", req->filename);
+        return err;
+    }
+
 
     err = httpd_send_all_header(req, HTTP_RES_200, total_sz, content_type);
-    require_noerr_action(err, exit, http_log("ERROR: Unable to send http assets headers."));
+    require_noerr_action(err, exit, http_log("ERROR: Unable to send asset headers."));
 
-    err = httpd_send_body(req->sock, file_data, total_sz);
-    require_noerr_action(err, exit, http_log("ERROR: Unable to send http assets body."));
+    err = send_in_chunks(req->sock, file_data, total_sz);
+    require_noerr_action(err, exit, http_log("ERROR: Unable to send asset body."));
 
-    exit:
+exit:
     return err;
 }
 
 static int HttpGetTc1Status(httpd_request_t *req) {
     char *sockets = GetSocketStatus();
     char *short_click_config = GetButtonClickConfig();
-    char *tc1_status = malloc(2048);
+    char *tc1_status = malloc(1500);
     char *socket_names = malloc(512);
     sprintf(socket_names, "%s,%s,%s,%s,%s,%s",
             user_config->socket_names[0],
@@ -243,62 +262,88 @@ static int HttpSetButtonEvent(httpd_request_t *req) {
     return err;
 }
 
-static int HttpSetOTAFile(httpd_request_t *req) {
+#define OTA_BUF_SIZE 5120
+
+static int HttpSetOTAFile(httpd_request_t *req)
+{
+    tc1_log("[OTA] hdr_parsed=%d, remaining=%d, body_nbytes=%d, req.chunked=%d",
+        req->hdr_parsed, req->remaining_bytes, req->body_nbytes, req->chunked);
     OSStatus err = kNoErr;
-    uint32_t total = 0, ota_offset = 0;
-    char *buffer = malloc(OTA_BUFFER_SIZE);
-    if (!buffer) return kGeneralErr;
 
-//    mico_logic_partition_t* ota_partition = MicoFlashGetInfo(MICO_PARTITION_OTA_TEMP);
-//    MicoFlashErase(MICO_PARTITION_OTA_TEMP, 0x0, ota_partition->partition_length);
+    int total = 0;
+    int ret = 0;
 
+    // req->chunked = 1;
+
+    int total1 = req->remaining_bytes;
+    char *buffer = malloc(OTA_BUF_SIZE);
+    if (!buffer) return kNoMemoryErr;
+    uint32_t offset = 0;
+
+    mico_logic_partition_t* ota_partition = MicoFlashGetInfo(MICO_PARTITION_OTA_TEMP);
+    MicoFlashErase(MICO_PARTITION_OTA_TEMP, 0x0, ota_partition->partition_length);
     CRC16_Context crc_context;
     CRC16_Init(&crc_context);
+    // 尝试读取全部 POST 数据
+    while (1) {
+        ret = httpd_get_data2(req, buffer,OTA_BUF_SIZE);
 
-    tc1_log("開始接收 OTA 數據...");
-    struct timeval timeout = {60, 0}; // 60秒
-    setsockopt(req->sock, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
-int remaining = -1;
-    while (remaining!=0) {
-    int readSize = remaining>OTA_BUFFER_SIZE?OTA_BUFFER_SIZE:(remaining>0?remaining:OTA_BUFFER_SIZE);
-        remaining = httpd_get_data(req, buffer, readSize);
-        if (remaining < 0) {
-            err = kConnectionErr;
-            tc1_log("httpd_get_data 失敗");
-            goto exit;
-            break;
+        // ret = httpd_recv(req->sock, buffer, 128, 0);
+        total += ret;
+        // req->remaining_bytes -= ret;
+
+        if (ret > 0) {
+            CRC16_Update(&crc_context, buffer, ret);
+            err = MicoFlashWrite(MICO_PARTITION_OTA_TEMP, &offset, (uint8_t *)buffer, ret);
+            require_noerr_quiet(err, exit);
+            tc1_log("[OTA] 本次读取 %d 字节，累计 %d 字节", ret, total);
         }
 
-//        CRC16_Update(&crc_context, buffer, readSize);
+        if (ret == 0 || req->remaining_bytes <= 0) {
+            // 读取完毕
+            tc1_log("[OTA] 数据读取完成, 总计 %d 字节", total);
+            break;
+        } else if (ret < 0) {
+            tc1_log("[OTA] 数据读取失败, ret=%d", ret);
+            err = kConnectionErr;
+            break;
+        }
+        
+        mico_rtos_thread_msleep(100);
 
-//        err = MicoFlashWrite(MICO_PARTITION_OTA_TEMP, &crc_context->offset, (uint8_t *)buffer, readSize);
-//        require_noerr_quiet(err, exit);
-        total+=readSize;
-        mico_thread_msleep(10);
+        // tc1_log("[OTA] %x", buffer);
+        // tc1_log("[OTA] hdr_parsed=%d, remaining=%d, body_nbytes=%d",
+        // req->hdr_parsed, req->remaining_bytes, req->body_nbytes);
     }
-
+        // if (buffer) free(buffer);
     uint16_t crc16;
-//    CRC16_Final(&crc_context, &crc16);
-    char response[64];
+    CRC16_Final(&crc_context, &crc16);
 
-    snprintf(response, sizeof(response), "OK, total: %ld bytes, CRC: 0x%04X", total, crc16);
-    send_http(response, strlen(response), exit, &err);
-    return 0;
 
-    err = mico_ota_switch_to_new_fw(ota_offset, crc16);
+    err = mico_ota_switch_to_new_fw(total, crc16);
+    tc1_log("[OTA] mico_ota_switch_to_new_fw err=%d", err);
     require_noerr(err, exit);
 
-    tc1_log("OTA 完成，重啟系統");
-    mico_system_power_perform(mico_system_context_get(), eState_Software_Reset);
+    char resp[128];
+    snprintf(resp, sizeof(resp), "OK, total: %d bytes, req %d  %d", total, req->body_nbytes, total1);
+    send_http(resp, strlen(resp), exit, &err);
 
+    mico_system_power_perform(mico_system_context_get(), eState_Software_Reset);
 exit:
-    if (req->sock >= 0) {
-        close(req->sock);
-        req->sock = -1;
-    }
     if (buffer) free(buffer);
-    tc1_log("OTA 結束，狀態: %d", err);
     return err;
+
+    // ota_file_req = req;
+
+    // OSStatus err = kNoErr;
+    // err = mico_rtos_create_thread(NULL, MICO_APPLICATION_PRIORITY, "OtaFileThread", OtaFileThread, 0x1000, 0);
+    // char buf[16] = {0};
+    // sprintf(buf, "%d", sizeof(ota_file_req));
+    // send_http(buf, strlen(buf), exit, &err);
+
+    // exit:
+    // if (buf) free(buf);
+    // return err;
 }
 
 static int HttpSetDeviceName(httpd_request_t *req) {
@@ -390,19 +435,62 @@ static int HttpGetWifiConfig(httpd_request_t *req) {
     return err;
 }
 
+
+// 单个十六进制字符转数字（安全）
+static int hex_char_to_int(char c) {
+    if ('0' <= c && c <= '9') return c - '0';
+    if ('a' <= c && c <= 'f') return c - 'a' + 10;
+    if ('A' <= c && c <= 'F') return c - 'A' + 10;
+    return -1;
+}
+
+// 健壮版 URL 解码函数
+void url_decode(const char *src, char *dest, size_t max_len) {
+    size_t i = 0;
+    while (*src && i < max_len - 1) {
+        if (*src == '%') {
+            if (isxdigit((unsigned char)src[1]) && isxdigit((unsigned char)src[2])) {
+                int high = hex_char_to_int(src[1]);
+                int low = hex_char_to_int(src[2]);
+                if (high >= 0 && low >= 0) {
+                    dest[i++] = (char)((high << 4) | low);
+                    src += 3;
+                    continue;
+                }
+            }
+            // 非法编码，跳过 %
+            src++;
+        } else if (*src == '+') {
+            dest[i++] = ' ';
+            src++;
+        } else {
+            dest[i++] = *src++;
+        }
+    }
+    dest[i] = '\0';
+}
+
 static int HttpSetWifiConfig(httpd_request_t *req) {
     OSStatus err = kNoErr;
 
-    int buf_size = 97;
-    char *buf = malloc(buf_size);
-    int mode = -1;
-    char *wifi_ssid = malloc(32);
-    char *wifi_key = malloc(32);
+  char *buf = malloc(256);
+  char *ssid_enc = malloc(128);
+  char *key_enc = malloc(128);
+  char *wifi_ssid = malloc(128);
+  char *wifi_key = malloc(128);
+  int mode = -1;
 
-    err = httpd_get_data(req, buf, buf_size);
+
+
+    err = httpd_get_data(req, buf, 256);
     require_noerr(err, exit);
-
-    sscanf(buf, "%d %s %s", &mode, wifi_ssid, wifi_key);
+  // 假设 httpd_get_data(req, buf, 256);
+//  tc1_log("wifi config %s",buf);
+  sscanf(buf, "%d %s %s", &mode, ssid_enc, key_enc);
+//  tc1_log("wifi config %s %s",ssid_enc,key_enc);
+  url_decode(ssid_enc, wifi_ssid,128);
+  url_decode(key_enc, wifi_key,128);
+//  tc1_log("wifi config decode %s %s",wifi_ssid,wifi_key);
     if (mode == 1) {
         WifiConnect(wifi_ssid, wifi_key);
     } else {
@@ -462,7 +550,10 @@ static int HttpSetMqttConfig(httpd_request_t *req) {
 
     sscanf(buf, "%s %d %s %s", MQTT_SERVER, &MQTT_SERVER_PORT, MQTT_SERVER_USR, MQTT_SERVER_PWD);
     mico_system_context_update(sys_config);
-
+    if (!(MQTT_SERVER[0] < 0x20 || MQTT_SERVER[0] > 0x7f || MQTT_SERVER_PORT < 1)){
+    err = UserMqttInit();
+    require_noerr(err, exit);
+    }
     send_http("OK", 2, exit, &err);
 
     exit:
@@ -667,7 +758,6 @@ static int OtaStart(httpd_request_t *req) {
 
 const struct httpd_wsgi_call g_app_handlers[] = {
         {"/",                 HTTPD_HDR_DEFORT, 0,                             HttpGetIndexPage, NULL,                       NULL, NULL},
-        {"/demo",             HTTPD_HDR_DEFORT, 0,                             HttpGetDemoPage,  NULL,                       NULL, NULL},
         {"/assets", HTTPD_HDR_ADD_SERVER |
                     HTTPD_HDR_ADD_CONN_CLOSE,   APP_HTTP_FLAGS_NO_EXACT_MATCH, HttpGetAssets,    NULL,                       NULL, NULL},
         {"/socket",           HTTPD_HDR_DEFORT, 0, NULL,                                              HttpSetSocketStatus,   NULL, NULL},

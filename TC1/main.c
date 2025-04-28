@@ -10,7 +10,6 @@
 #include "user_wifi.h"
 #include "time_server/user_rtc.h"
 #include "user_power.h"
-#include "mqtt_server/user_mqtt_client.h"
 #include "http_server/app_httpd.h"
 #include "timed_task/timed_task.h"
 
@@ -186,8 +185,6 @@ int application_start(void) {
         }
     }
     KeyInit();
-    err = UserMqttInit();
-    require_noerr(err, exit);
     err = UserRtcInit();
     require_noerr(err, exit);
     PowerInit();
@@ -197,12 +194,12 @@ int application_start(void) {
 
     err = mico_rtos_create_thread(NULL, MICO_APPLICATION_PRIORITY, "p_count",
                                   (mico_thread_function_t) schedule_p_count_task,
-                                  0x2000, 0);
+                                  0x800, 0);
     require_noerr_string(err, exit, "ERROR: Unable to start the p_count thread.");
 
     err = mico_rtos_create_thread(NULL, MICO_APPLICATION_PRIORITY, "mqtt_power_report",
                                   (mico_thread_function_t) reportMqttPowerInfoThread,
-                                  0x2000, 0);
+                                  0x800, 0);
     require_noerr_string(err, exit, "ERROR: Unable to start the mqtt_power_report thread.");
 
 
@@ -211,7 +208,6 @@ int application_start(void) {
         if (user_config->task_top && now >= user_config->task_top->prs_time) {
             ProcessTask();
         }
-
         mico_thread_msleep(1000);
     }
 

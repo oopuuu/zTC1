@@ -46,6 +46,8 @@ char* get_func_name(char func_code) {
             return "Toggle LED";
         case REBOOT_SYSTEM:
             return "Reboot";
+        case REBOOT_HTTP:
+            return "REBOOT_HTTP";
         case CONFIG_WIFI:
             return "WiFi Config";
         case RESET_SYSTEM:
@@ -226,10 +228,18 @@ static void KeyEventHandler(int num, boolean longPress) {
                         break;
             MicoSystemReboot();
             break;
+        case REBOOT_HTTP:
+        if (childLockEnabled)
+                        break;
+            AppHttpdStop();
+            mico_rtos_thread_sleep(1);
+            AppHttpdStart();
+            break;
         case CONFIG_WIFI:
         if (childLockEnabled)
                         break;
             StartLedBlink(3);
+            UserMqttDeInit();
             micoWlanSuspendStation();
             ApInit(true);
             break;

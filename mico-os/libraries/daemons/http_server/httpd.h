@@ -1125,6 +1125,8 @@ int httpd_parse_hdr_tags(httpd_request_t *req, int sock,
  */
 int httpd_get_data(httpd_request_t *req, char *content, int length);
 
+int httpd_get_data2(httpd_request_t *req, char *content, int length);
+
 /** @brief Get the incoming JSON data in case of HTTP POST request
  *
  *  @note  This function is an extension to \ref httpd_get_data. Additionally this

@@ -39,17 +39,11 @@ OSStatus system_discovery_init( system_context_t * const inContext )
   init.service_name = "_easylink._tcp.local.";
 
   /*   name#xxxxxx.local.  */
-  snprintf( temp_txt, 100, "%s#%c%c%c%c%c%c.local.", inContext->flashContentInRam.micoSystemConfig.name, 
-                                                     inContext->micoStatus.mac[9],  inContext->micoStatus.mac[10], \
-                                                     inContext->micoStatus.mac[12], inContext->micoStatus.mac[13], \
-                                                     inContext->micoStatus.mac[15], inContext->micoStatus.mac[16] );
+  snprintf( temp_txt, 100, "%s.local.", inContext->flashContentInRam.micoSystemConfig.name);
   init.host_name = (char*)__strdup(temp_txt);
 
   /*   name#xxxxxx.   */
-  snprintf( temp_txt, 100, "%s#%c%c%c%c%c%c",        inContext->flashContentInRam.micoSystemConfig.name, 
-                                                     inContext->micoStatus.mac[9],  inContext->micoStatus.mac[10], \
-                                                     inContext->micoStatus.mac[12], inContext->micoStatus.mac[13], \
-                                                     inContext->micoStatus.mac[15], inContext->micoStatus.mac[16] );
+  snprintf( temp_txt, 100, "%s",        inContext->flashContentInRam.micoSystemConfig.name);
   init.instance_name = (char*)__strdup(temp_txt);
 
 #ifndef MICO_LOCAL_SERVER_PORT

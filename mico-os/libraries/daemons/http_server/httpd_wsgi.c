@@ -543,6 +543,52 @@ out:
 	return req->remaining_bytes;
 }
 
+int httpd_get_data2(httpd_request_t *req, char *content, int length)
+{
+	int ret;
+	char *buf;
+
+	// /* Is this condition required? */
+	// if (req->body_nbytes >= HTTPD_MAX_MESSAGE - 2)
+	// 	return -kInProgressErr;
+
+	if (!req->hdr_parsed) {
+		buf = malloc(HTTPD_MAX_MESSAGE);
+		if (!buf) {
+			system_log("Failed to allocate memory for buffer");
+			return -kInProgressErr;
+		}
+
+		ret = httpd_parse_hdr_tags(req, req->sock, buf,
+			HTTPD_MAX_MESSAGE);
+
+		if (ret != kNoErr) {
+			system_log("Unable to parse header tags");
+			goto out;
+		} else {
+			system_log("Headers parsed successfully\r\n");
+			req->hdr_parsed = 1;
+		}
+
+		free(buf);
+	}
+
+	/* handle here */
+	ret = httpd_recv(req->sock, content,
+			length, 0);
+	if (ret == -1) {
+		system_log("Failed to read POST data");
+		goto out;
+	}
+	/* scratch will now have the JSON data */
+	// content[ret] = '\0';
+	req->remaining_bytes -= ret;
+	system_log("Read %d bytes and remaining %d bytes",
+		ret, req->remaining_bytes);
+out:
+	return ret;
+}
+
 static int get_matching_chars(const char *s1, const char *s2)
 {
 	int match = 0;

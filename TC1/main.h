@@ -16,7 +16,7 @@
 #define wifi_log(M, ...) custom_log("WIFI", M, ##__VA_ARGS__); web_log("WIFI", M, ##__VA_ARGS__);
 #define power_log(M, ...) custom_log("POWER", M, ##__VA_ARGS__); web_log("POWER", M, ##__VA_ARGS__);
 
-#define VERSION "v2.1.6"
+#define VERSION "v2.2.0"
 
 #define TYPE 1
 #define TYPE_NAME "TC1"

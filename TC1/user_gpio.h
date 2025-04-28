@@ -17,6 +17,7 @@
 #define CONFIG_WIFI 9
 #define RESET_SYSTEM 10
 #define SWITCH_CHILD_LOCK_ENABLE 11
+#define REBOOT_HTTP 12
 
 extern char socket_status[32];
 
