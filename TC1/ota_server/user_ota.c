@@ -1,7 +1,7 @@
 #include "http_server/web_log.h"
 
 #include "mico.h"
-#include "ota_server/ota_server.h"
+#include "ota_server.h"  // 使用相对路径，因为ota_server.c和ota_server.h在同一目录下
 #include "main.h"
 #include "mqtt_server/user_mqtt_client.h"
 
@@ -38,4 +38,3 @@ void UserOtaStart(char *url, char *md5)
     ota_log("ready to ota:%s",url);
     ota_server_start(url, md5, OtaServerStatusHandler);
 }
-

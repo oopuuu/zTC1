@@ -59,7 +59,7 @@ static mico_worker_thread_t mqtt_client_worker_thread; /* Worker thread to manag
 //static mico_timed_event_t mqtt_client_send_event;
 
 char topic_state[MAX_MQTT_TOPIC_SIZE];
-char topic_set[MAX_MQTT_TOPIC_SIZE];
+char topic_set[MAX_MQTT_TOPIC_SIZE];  // 修改为使用设备特定的主题
 
 mico_timer_t timer_handle;
 static char timer_status = 0;
@@ -125,7 +125,7 @@ OSStatus UserMqttInit(void) {
     OSStatus err = kNoErr;
 if(mqtt_msg_send_queue != NULL)
     return err;
-    sprintf(topic_set, MQTT_CLIENT_SUB_TOPIC1);
+    sprintf(topic_set, MQTT_CLIENT_SUB_TOPIC1, str_mac);  // 使用MAC地址作为设备标识符
     sprintf(topic_state, MQTT_CLIENT_PUB_TOPIC, str_mac);
     //TODO size:0x800
     int mqtt_thread_stack_size = 0x2000;
@@ -301,7 +301,7 @@ void MqttClientThread(mico_thread_arg_t arg) {
 
     UserLedSet(RelayOut() && user_config->power_led_enabled);
 
-    /* 4. mqtt client subscribe */
+    /* 4. mqtt client subscribe - 现在每个设备会订阅自己的主题 */
     rc = MQTTSubscribe(&c, topic_set, QOS0, MessageArrived);
     require_noerr_string(rc, MQTT_reconnect, "ERROR: MQTT client subscribe err.");mqtt_log(
             "MQTT client subscribe success! recv_topic=[%s].", topic_set);
@@ -595,7 +595,7 @@ void UserMqttHassAuto(char socket_id) {
                 "\"uniq_id\":\"tc1_%s_s%d\","
                 "\"object_id\":\"tc1_%s_s%d\","
                 "\"stat_t\":\"homeassistant/switch/%s/socket_%d/state\","
-                "\"cmd_t\":\"device/ztc1/set\","
+                "\"cmd_t\":\"device/ztc1/%s/set\","  // 修改命令主题以匹配设备唯一标识
                 "\"pl_on\":\"set socket %s %d 1\","
                 "\"pl_off\":\"set socket %s %d 0\","
                 "\"device_class\":\"outlet\","
@@ -605,6 +605,7 @@ void UserMqttHassAuto(char socket_id) {
                 "\"model\":\"TC1\","
                 "\"manufacturer\":\"PHICOMM\"}}",
                 user_config->socket_names[(int)socket_id], str_mac, socket_id,str_mac, socket_id, str_mac, socket_id,
+                str_mac,  // 添加设备MAC地址到命令主题中
                 str_mac,
                 socket_id, str_mac, socket_id, str_mac,sys_config->micoSystemConfig.name);
         UserMqttSendTopic(topic_buf, send_buf, 1);
@@ -627,14 +628,14 @@ void UserMqttHassAutoRebootButton(void) {
                 "{\"name\":\"重启设备\","
                 "\"uniq_id\":\"tc1_%s_reboot\","
                 "\"object_id\":\"tc1_%s_reboot\","
-                "\"cmd_t\":\"device/ztc1/set\","
+                "\"cmd_t\":\"device/ztc1/%s/set\","  // 修改命令主题以匹配设备唯一标识
                 "\"pl_prs\":\"reboot %s\","
                 "\"device\":{"
                 "\"identifiers\":[\"tc1_%s\"],"
                 "\"name\":\"%s\","
                 "\"model\":\"TC1\","
                 "\"manufacturer\":\"PHICOMM\"}}",
-                str_mac,str_mac,str_mac,str_mac, sys_config->micoSystemConfig.name);
+                str_mac,str_mac,str_mac,str_mac,str_mac, sys_config->micoSystemConfig.name);
         UserMqttSendTopic(topic_buf, send_buf, 1);
     }
     if (send_buf) free(send_buf);
@@ -653,7 +654,7 @@ void UserMqttHassAutoLed(void) {
                 "\"uniq_id\":\"tc1_%s_led\","
                 "\"object_id\":\"tc1_%s_led\","
                 "\"stat_t\":\"homeassistant/switch/%s/led/state\","
-                "\"cmd_t\":\"device/ztc1/set\","
+                "\"cmd_t\":\"device/ztc1/%s/set\","  // 修改命令主题以匹配设备唯一标识
                 "\"pl_on\":\"set led %s 1\","
                 "\"pl_off\":\"set led %s 0\","
                 "\"device_class\":\"outlet\","
@@ -662,7 +663,7 @@ void UserMqttHassAutoLed(void) {
                 "\"name\":\"%s\","
                 "\"model\":\"TC1\","
                 "\"manufacturer\":\"PHICOMM\"}}",
-                str_mac,str_mac,str_mac, str_mac, str_mac, str_mac,sys_config->micoSystemConfig.name);
+                str_mac,str_mac,str_mac, str_mac, str_mac, str_mac,str_mac,sys_config->micoSystemConfig.name);
         UserMqttSendTopic(topic_buf, send_buf, 1);
     }
     if (send_buf)
@@ -683,7 +684,7 @@ void UserMqttHassAutoChildLock(void) {
                 "\"uniq_id\":\"tc1_%s_child_lock\","
                 "\"object_id\":\"tc1_%s_child_lock\","
                 "\"stat_t\":\"homeassistant/switch/%s/childLock/state\","
-                "\"cmd_t\":\"device/ztc1/set\","
+                "\"cmd_t\":\"device/ztc1/%s/set\","  // 修改命令主题以匹配设备唯一标识
                 "\"pl_on\":\"set childLock %s 1\","
                 "\"pl_off\":\"set childLock %s 0\","
                 "\"device_class\":\"outlet\","
@@ -692,7 +693,7 @@ void UserMqttHassAutoChildLock(void) {
                 "\"name\":\"%s\","
                 "\"model\":\"TC1\","
                 "\"manufacturer\":\"PHICOMM\"}}",
-                str_mac,str_mac,str_mac, str_mac, str_mac, str_mac,sys_config->micoSystemConfig.name);
+                str_mac,str_mac,str_mac, str_mac, str_mac, str_mac,str_mac,sys_config->micoSystemConfig.name);
         UserMqttSendTopic(topic_buf, send_buf, 1);
     }
     if (send_buf)
@@ -713,7 +714,7 @@ void UserMqttHassAutoTotalSocket(void) {
                 "\"uniq_id\":\"tc1_%s_total_socket\","
                 "\"object_id\":\"tc1_%s_total_socket\","
                 "\"stat_t\":\"homeassistant/switch/%s/total_socket/state\","
-                "\"cmd_t\":\"device/ztc1/set\","
+                "\"cmd_t\":\"device/ztc1/%s/set\","  // 修改命令主题以匹配设备唯一标识
                 "\"pl_on\":\"set total_socket %s 1\","
                 "\"pl_off\":\"set total_socket %s 0\","
                 "\"device_class\":\"outlet\","
@@ -722,7 +723,7 @@ void UserMqttHassAutoTotalSocket(void) {
                 "\"name\":\"%s\","
                 "\"model\":\"TC1\","
                 "\"manufacturer\":\"PHICOMM\"}}",
-                str_mac, str_mac, str_mac, str_mac, str_mac, str_mac,sys_config->micoSystemConfig.name);
+                str_mac, str_mac, str_mac, str_mac, str_mac, str_mac, str_mac,sys_config->micoSystemConfig.name); 
         UserMqttSendTopic(topic_buf, send_buf, 1);
     }
     if (send_buf)

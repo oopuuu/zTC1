@@ -422,7 +422,7 @@ exit:
     return err;
 }
 
-OSStatus OtaServerStart(char *url, char *md5, ota_server_cb_fn call_back)
+OSStatus ota_server_start(char *url, char *md5, ota_server_cb_fn call_back)
 {
     OSStatus err = kNoErr;
 
