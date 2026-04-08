@@ -10,6 +10,7 @@
 #include "user_wifi.h"
 #include "time_server/user_rtc.h"
 #include "user_power.h"
+#include "mqtt_server/user_mqtt_client.h"
 #include "http_server/app_httpd.h"
 #include "udp_server/udp_server.h"
 #include "timed_task/timed_task.h"
@@ -113,7 +114,9 @@ void schedule_p_count_task(mico_thread_arg_t arg) {
 
 void reportMqttPowerInfoThread() {
     while (1) {
-        UserMqttHassPower();
+        if (UserMqttIsConnect()) {
+            UserMqttHassPower();
+        }
         int freq = user_config->mqtt_report_freq;
 
         if (freq == 0) {

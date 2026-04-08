@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="mkfatimg">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/mico-os/libraries/filesystem/FatFs/ver0_11/doc/img/mkfatimg.zip!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

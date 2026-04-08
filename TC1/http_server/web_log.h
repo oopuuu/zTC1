@@ -20,13 +20,16 @@ void WebLog(const char *M, ...);
 extern LogRecord log_record;
 extern char* LOG_TMP;
 extern time_t LOG_NOW;
-#define web_log(N, M, ...)                           \
-    LOG_TMP = (char*)malloc(sizeof(char)*LOG_LEN);     \
-    LOG_NOW = time(NULL) + 28800; \
-    strftime(LOG_TMP, TIME_LEN, "[%Y-%m-%d %H:%M:%S]", localtime(&LOG_NOW)); \
-    LOG_TMP[TIME_LEN - 1] = ' '; \
-    snprintf(LOG_TMP + TIME_LEN, LOG_LEN - TIME_LEN, "["N" %s:%d] "M, SHORT_FILE, __LINE__, ##__VA_ARGS__); \
-    SetLogRecord(&log_record, LOG_TMP);                \
+#define web_log(N, M, ...) do {                      \
+    char* _wl_tmp = (char*)malloc(sizeof(char)*LOG_LEN); \
+    if (_wl_tmp) {                                    \
+        time_t _wl_now = time(NULL) + 28800;          \
+        strftime(_wl_tmp, TIME_LEN, "[%Y-%m-%d %H:%M:%S]", localtime(&_wl_now)); \
+        _wl_tmp[TIME_LEN - 1] = ' ';                 \
+        snprintf(_wl_tmp + TIME_LEN, LOG_LEN - TIME_LEN, "[" N " %s:%d] " M, SHORT_FILE, __LINE__, ##__VA_ARGS__); \
+        SetLogRecord(&log_record, _wl_tmp);           \
+    }                                                 \
+} while(0)
 
 #define web_log0(N, M, ...) WebLog("["N" %s:%d] "M, SHORT_FILE, __LINE__, ##__VA_ARGS__)
 

@@ -62,6 +62,7 @@ mico_queue_t mqtt_msg_send_queue = NULL;
 mico_queue_t mqtt_msg_send_queue2 = NULL;
 
 volatile bool mqtt_thread_should_exit = false;
+static bool mqtt_initialized = false;
 
 static mico_worker_thread_t mqtt_client_worker_thread; /* Worker thread to manage send/recv events */
 
@@ -150,6 +151,7 @@ OSStatus UserMqttDeInit(void) {
 
     // 1. 请求线程退出
     mqtt_thread_should_exit = true;
+    mqtt_initialized = false;
 
     return err;
 }
@@ -157,6 +159,11 @@ OSStatus UserMqttDeInit(void) {
 /* Application entrance */
 OSStatus UserMqttInit(void) {
     OSStatus err = kNoErr;
+
+    if (mqtt_initialized) {
+        mqtt_log("MQTT already initialized, skip re-init.");
+        return kNoErr;
+    }
 
     sprintf(topic_set, MQTT_CLIENT_SUB_TOPIC1);
     sprintf(topic_state, MQTT_CLIENT_PUB_TOPIC, str_mac);
@@ -172,6 +179,12 @@ OSStatus UserMqttInit(void) {
                                sizeof(p_mqtt_send_msg_t),
                                MAX_MQTT_SEND_QUEUE_SIZE);
     require_noerr_action(err, exit, mqtt_log("ERROR: create mqtt msg send queue err=%d.", err));
+
+    /* create mqtt msg send queue 2 */
+    err = mico_rtos_init_queue(&mqtt_msg_send_queue2, "mqtt_msg_send_queue2",
+                               sizeof(p_mqtt_send_msg_t),
+                               MAX_MQTT_SEND_QUEUE_SIZE);
+    require_noerr_action(err, exit, mqtt_log("ERROR: create mqtt msg send queue2 err=%d.", err));
 
     /* start mqtt client */
     mqtt_context_t *ctx1 = malloc(sizeof(mqtt_context_t));
@@ -197,6 +210,8 @@ OSStatus UserMqttInit(void) {
     err = mico_rtos_create_worker_thread(&mqtt_client_worker_thread, MICO_APPLICATION_PRIORITY,
                                          0x1000, 5);
     require_noerr_string(err, exit, "ERROR: Unable to start the mqtt client worker thread.");
+
+    mqtt_initialized = true;
 
     exit:
     if (kNoErr != err)mqtt_log("ERROR2, app thread exit err: %d kNoErr[%d]", err, kNoErr);
@@ -344,6 +359,8 @@ void MqttClientThread(mico_thread_arg_t arg) {
     UserMqttSendTotalSocketState();
     UserMqttSendChildLockState();
 
+    mico_stop_timer(&timer_handle);
+    mico_deinit_timer(&timer_handle);
     mico_init_timer(&timer_handle, 150, UserMqttTimerFunc, &arg);
     registerMqttEvents();
     /* 5. client loop for recv msg && keepalive */
@@ -503,6 +520,8 @@ void MqttClientThread2(mico_thread_arg_t arg) {
     UserMqttSendTotalSocketState();
     UserMqttSendChildLockState();
 
+    mico_stop_timer(&timer_handle2);
+    mico_deinit_timer(&timer_handle2);
     mico_init_timer(&timer_handle2, 150, UserMqttTimerFunc2, &arg);
     registerMqttEvents2();
     /* 5. client loop for recv msg && keepalive */
@@ -665,47 +684,57 @@ void ProcessHaCmd(char *cmd) {
 }
 
 OSStatus UserMqttSendTopic(char *topic, char *arg, char retained) {
-    OSStatus err = kUnknownErr;
+    OSStatus err = kNoErr;
     p_mqtt_send_msg_t p_send_msg = NULL;
+    p_mqtt_send_msg_t p_old_msg = NULL;
 
 //  mqtt_log("======App prepare to send ![%d]======", MicoGetMemoryInfo()->free_memory);
 
+    /* Push to queue 1 */
     if(mqtt_msg_send_queue != NULL && isconnect) {
         /* Send queue is full, pop the oldest */
         if (mico_rtos_is_queue_full(&mqtt_msg_send_queue) == true) {
-            mico_rtos_pop_from_queue(&mqtt_msg_send_queue, &p_send_msg, 0);
-            free(p_send_msg);
-            p_send_msg = NULL;
+            mico_rtos_pop_from_queue(&mqtt_msg_send_queue, &p_old_msg, 0);
+            free(p_old_msg);
+            p_old_msg = NULL;
+        }
+        p_send_msg = (p_mqtt_send_msg_t) calloc(1, sizeof(mqtt_send_msg_t));
+        if (p_send_msg) {
+            p_send_msg->qos = 0;
+            p_send_msg->retained = retained;
+            p_send_msg->datalen = strlen(arg);
+            memcpy(p_send_msg->data, arg, p_send_msg->datalen);
+            strncpy(p_send_msg->topic, topic, MAX_MQTT_TOPIC_SIZE);
+            err = mico_rtos_push_to_queue(&mqtt_msg_send_queue, &p_send_msg, 0);
+            if (err != kNoErr) {
+                free(p_send_msg);
+                p_send_msg = NULL;
+            }
         }
     }
+
+    /* Push to queue 2 (separate allocation to avoid double-free) */
     if(mqtt_msg_send_queue2 != NULL && isconnect2) {
         if (mico_rtos_is_queue_full(&mqtt_msg_send_queue2) == true) {
-            mico_rtos_pop_from_queue(&mqtt_msg_send_queue2, &p_send_msg, 0);
-            free(p_send_msg);
-            p_send_msg = NULL;
+            mico_rtos_pop_from_queue(&mqtt_msg_send_queue2, &p_old_msg, 0);
+            free(p_old_msg);
+            p_old_msg = NULL;
+        }
+        p_send_msg = (p_mqtt_send_msg_t) calloc(1, sizeof(mqtt_send_msg_t));
+        if (p_send_msg) {
+            p_send_msg->qos = 0;
+            p_send_msg->retained = retained;
+            p_send_msg->datalen = strlen(arg);
+            memcpy(p_send_msg->data, arg, p_send_msg->datalen);
+            strncpy(p_send_msg->topic, topic, MAX_MQTT_TOPIC_SIZE);
+            err = mico_rtos_push_to_queue(&mqtt_msg_send_queue2, &p_send_msg, 0);
+            if (err != kNoErr) {
+                free(p_send_msg);
+                p_send_msg = NULL;
+            }
         }
     }
 
-    /* Push the latest data into send queue*/
-    p_send_msg = (p_mqtt_send_msg_t) calloc(1, sizeof(mqtt_send_msg_t));
-    require_action(p_send_msg, exit, err = kNoMemoryErr);
-
-    p_send_msg->qos = 0;
-    p_send_msg->retained = retained;
-    p_send_msg->datalen = strlen(arg);
-    memcpy(p_send_msg->data, arg, p_send_msg->datalen);
-    strncpy(p_send_msg->topic, topic, MAX_MQTT_TOPIC_SIZE);
-    if(mqtt_msg_send_queue != NULL && isconnect) {
-        err = mico_rtos_push_to_queue(&mqtt_msg_send_queue, &p_send_msg, 0);
-    }
-    if(mqtt_msg_send_queue2 != NULL && isconnect2) {
-        err = mico_rtos_push_to_queue(&mqtt_msg_send_queue2, &p_send_msg, 0);
-    }
-    require_noerr(err, exit);
-    //mqtt_log("Push user msg into send queue success!");
-
-    exit:
-    if (err != kNoErr && p_send_msg) free(p_send_msg);
     return err;
 }
 
@@ -1065,5 +1094,5 @@ extern void UserMqttHassPower(void) {
 }
 
 bool UserMqttIsConnect() {
-    return isconnect;
+    return isconnect || isconnect2;
 }

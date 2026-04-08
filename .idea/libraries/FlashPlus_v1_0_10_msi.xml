@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="FlashPlus_v1.0.10.msi">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/doc/FlashPlus_v1.0.10.msi.zip!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
